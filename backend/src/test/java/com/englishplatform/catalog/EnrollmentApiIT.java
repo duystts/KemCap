@@ -95,6 +95,19 @@ class EnrollmentApiIT extends ApiTestSupport {
         .isEqualTo(ErrorCode.NO_SESSIONS_LEFT);
   }
 
+  /** Hồi quy (phát hiện ở U3): nhiều thao tác bộ đếm trong cùng một transaction không bị mất. */
+  @Test
+  void severalCounterOperationsInOneTransactionAreAllKept() {
+    UUID id = activeEnrollment(3);
+    inTx(
+        () -> {
+          enrollmentApi.reserve(id);
+          enrollmentApi.reserve(id);
+          enrollmentApi.consume(id);
+        });
+    assertCounters(id, 1, 1, 1);
+  }
+
   @Test
   void eachCounterOperationKeepsTotals() {
     UUID id = activeEnrollment(3);

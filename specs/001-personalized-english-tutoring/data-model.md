@@ -252,7 +252,20 @@ Tạo exception trùng buổi `BOOKED` của giáo viên → 409 `EXCEPTION_OVER
 | reminder_24h_at / reminder_1h_at | timestamptz | đã phát `SessionReminderDue` cho mốc tương ứng (chống phát lại) |
 | outcome_overdue_notified_at | timestamptz | đã phát `SessionOutcomeOverdue` (buổi vẫn `BOOKED` khi `now >= ends_at + 24h`) — FR-014 |
 | outcome_by | UUID | giáo viên của buổi, hoặc admin khi chốt thay |
+| outcome_at | timestamptz | thời điểm chốt/sửa kết quả (thêm ở U3, phục vụ kiểm tra cửa sổ sửa 7 ngày và đối soát) |
 | version | bigint | |
+
+### session_outcome_change (nhật ký chốt/sửa kết quả — thêm ở U3, NFR-PRIV-04)
+
+| Field | Type | Rule |
+|---|---|---|
+| id | UUID | PK |
+| session_id | UUID | FK session |
+| from_status / to_status | enum trạng thái buổi | |
+| changed_by | UUID | giáo viên chốt hoặc admin chốt thay/sửa |
+| note | text | ghi chú (lý do sửa) |
+
+Chỉ thêm, không sửa/xóa. Admin xem qua `GET /sessions/{id}/outcome-history`.
 
 **Ràng buộc chống trùng** (R3):
 

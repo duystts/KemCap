@@ -7,6 +7,7 @@ app:
   jobs:
     # test tự gọi job; không để job nền chạy chen (ShedLock sẽ bỏ qua lần gọi của test)
     initial-delay: PT1H
+    outcome-overdue-cron: "-"
   privacy:
     policy-version: "2026-11"
 

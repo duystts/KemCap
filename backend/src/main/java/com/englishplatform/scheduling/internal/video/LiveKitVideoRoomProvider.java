@@ -47,7 +47,11 @@ class LiveKitVideoRoomProvider implements VideoRoomProvider {
     token.setIdentity(userId.toString());
     token.setName(displayName);
     token.setMetadata(role.name());
-    long ttlMillis = Math.max(Duration.between(clock.instant(), validUntil).toMillis(), 60_000L);
+    long ttlMillis = Duration.between(clock.instant(), validUntil).toMillis();
+    if (ttlMillis <= 0) {
+      // không cấp token đã hết hạn / kéo dài quá cửa sổ phòng (NFR-SEC-08)
+      throw new IllegalArgumentException("validUntil phải ở tương lai");
+    }
     token.setTtl(ttlMillis);
     token.addGrants(
         new RoomJoin(true),

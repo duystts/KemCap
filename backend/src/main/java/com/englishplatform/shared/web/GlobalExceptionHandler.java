@@ -23,7 +23,9 @@ class GlobalExceptionHandler {
 
   @ExceptionHandler(BusinessException.class)
   ProblemDetail handleBusiness(BusinessException ex) {
-    return problem(ex.code(), ex.getMessage(), ex.errors());
+    ProblemDetail pd = problem(ex.code(), ex.getMessage(), ex.errors());
+    ex.details().forEach(pd::setProperty);
+    return pd;
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -45,7 +45,7 @@ Registry phát lại event chưa hoàn tất khi khởi động lại (`republis
 | Interface (package gốc) | Module | Dùng bởi | Phương thức chính |
 |---|---|---|---|
 | `UserDirectory` | identity | mọi module | `find(userId)`, `requireActive(userId, role)` |
-| `EnrollmentApi` | catalog | scheduling, learning, billing | `get(id)`, `reserve(id)`, `release(id)`, `consume(id)`, `consumeReleased(id)` (INTERRUPTED → COMPLETED), `activateOnFirstPayment(id)` (billing gọi trong transaction ghi thanh toán đầu), `isAssigned(teacherId, studentId)` |
+| `EnrollmentApi` | catalog | scheduling, learning, billing | `get(id)`, `reserve(id)`, `release(id)`, `consume(id)`, `consumeReleased(id)` (INTERRUPTED → COMPLETED), `activateOnFirstPayment(id)` (billing gọi trong transaction ghi thanh toán đầu), `unconsume(id)` (admin sửa kết quả "tính" → "không tính", thêm ở U3), `findByStudent(studentId)` (thêm ở U3), `isAssigned(teacherId, studentId)` |
 | `SessionQueryApi` | scheduling | learning | `find(sessionId)` → SessionView(id, teacherId, studentId, startsAt, endsAt, status), `attendance(studentId)` → {completed, noShow, cancelledLate} |
 
 | `UserDeactivationGuard` (SPI) | identity định nghĩa, catalog cài | identity | `void check(userId, role)` — ném `TEACHER_HAS_STUDENTS` nếu giáo viên còn ghi danh ACTIVE/PENDING_PAYMENT |

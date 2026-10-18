@@ -223,6 +223,11 @@ phân quyền (GV xem HV không phân công → 404; HV chỉ đọc thanh toán
 người hủy (R7), IT hết hạn gói qua job (F3), test lọc `q`/`status` của `/students`, `/users` (F5).
 U3 — dùng `EnrollmentApi` trong cùng transaction với session (đã khóa + refresh, R2 đóng).
 
+**Việc chuyển từ verify U3** (build-test-U3.md): U8 (hardening) — khóa khi thêm ngày nghỉ song song
+với đặt buổi (R6), giới hạn/phân trang `GET /sessions` (R8), IT tranh chấp "cùng HV khác GV" song song
+(F1), test DST chiều lùi giờ + IT slot DST (F3), `/reports/teacher-sessions` (F6, T121). #2 — go/no-go
+LiveKit CN 1/11 gồm vào phòng bằng token thật (F4).
+
 ### U3 — Lịch rảnh, đặt lịch, trạng thái buổi & phòng học (B3 · 27/10–01/11 · BE #1 5,5 · FE #2 6)
 
 **BE (#1)**

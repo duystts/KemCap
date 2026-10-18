@@ -129,6 +129,24 @@ class EnrollmentTest {
     assertThat(e.getTeacherId()).isEqualTo(other);
   }
 
+  /** R7 verify U3: trả lại buổi trên gói đã quá hạn không đưa gói về ACTIVE. */
+  @Test
+  void unconsumeOnExpiredPackageStaysExpired() {
+    Enrollment e = active(1);
+    e.reserve(NOW);
+    e.consume();
+    assertThat(e.getStatus()).isEqualTo(EnrollmentStatus.EXHAUSTED);
+    e.unconsume(NOW.plus(Duration.ofDays(91)));
+    assertThat(e.getStatus()).isEqualTo(EnrollmentStatus.EXPIRED);
+
+    Enrollment fresh = active(1);
+    fresh.reserve(NOW);
+    fresh.consume();
+    fresh.unconsume(NOW.plus(Duration.ofDays(1)));
+    assertThat(fresh.getStatus()).isEqualTo(EnrollmentStatus.ACTIVE);
+    assertThat(fresh.sessionsRemaining()).isEqualTo(1);
+  }
+
   private static Enrollment enrollment(int sessions) {
     return new Enrollment(
         UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), sessions, 45, 90, 1_200_000L);

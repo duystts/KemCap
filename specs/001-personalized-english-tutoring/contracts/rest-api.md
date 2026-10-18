@@ -79,6 +79,7 @@ Mật khẩu: tối thiểu 8 ký tự, có chữ và số.
 | POST | `/sessions/{id}/cancel` | A; T; S | `{reason}` → `CANCELLED_ON_TIME`/`CANCELLED_LATE` (S, A) hoặc `TEACHER_ABSENT` (T) | FR-011 |
 | POST | `/sessions/{id}/reschedule` | A; S | `{newStartsAt}` (chỉ khi còn trong hạn hủy; sau hạn → 409 `CANCEL_WINDOW_PASSED`) | FR-011 |
 | POST | `/sessions/{id}/outcome` | T (của buổi); A | `{outcome: COMPLETED\|STUDENT_NO_SHOW\|INTERRUPTED\|TEACHER_ABSENT, note?}` (sau giờ bắt đầu; A chốt thay) | FR-014 |
+| GET | `/sessions/{id}/outcome-history` | A | nhật ký chốt/sửa kết quả (thêm ở U3) | FR-014 |
 | POST | `/sessions/{id}/interruption-decision` | A | `{decision: COUNT\|MAKE_UP}` — COUNT: `INTERRUPTED` → `COMPLETED`; MAKE_UP: giữ `INTERRUPTED` | FR-014 |
 | GET | `/sessions?outcomePending=true` | A; T | buổi `BOOKED` đã qua `ends_at` chưa chốt kết quả | FR-014 |
 | POST | `/sessions/{id}/join` | T; S (của buổi đó) | → `{serverUrl, token, roomName}`; 403 `ROOM_NOT_OPEN` nếu ngoài cửa sổ [−10 phút, +15 phút sau kết thúc] | FR-012 |

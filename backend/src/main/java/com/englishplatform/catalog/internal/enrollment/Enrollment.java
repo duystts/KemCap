@@ -142,6 +142,21 @@ public class Enrollment extends BaseEntity {
     exhaustIfUsedUp();
   }
 
+  /** Sửa kết quả "đã tính" thành "không tính": trả lại một buổi đã dùng. */
+  public void unconsume(Instant now) {
+    if (sessionsConsumed <= 0) {
+      throw new BusinessException(ErrorCode.INVALID_STATE_TRANSITION);
+    }
+    sessionsConsumed--;
+    if (status == EnrollmentStatus.EXHAUSTED) {
+      // gói đã quá hạn thì không quay lại ACTIVE
+      status =
+          expiresAt != null && !now.isBefore(expiresAt)
+              ? EnrollmentStatus.EXPIRED
+              : EnrollmentStatus.ACTIVE;
+    }
+  }
+
   /** Thanh toán đầu tiên: {@code expires_at = now + validity_days}. */
   public void activate(Instant now) {
     if (status != EnrollmentStatus.PENDING_PAYMENT) {

@@ -9,6 +9,7 @@ import com.englishplatform.shared.web.ErrorCode;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import java.time.Clock;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 import org.springframework.context.ApplicationEventPublisher;
@@ -49,6 +50,12 @@ class EnrollmentApiImpl implements EnrollmentApi {
   }
 
   @Override
+  @Transactional(readOnly = true)
+  public List<EnrollmentView> findByStudent(UUID studentId) {
+    return enrollments.search(studentId, null, null).stream().map(Enrollment::toView).toList();
+  }
+
+  @Override
   @Transactional(propagation = Propagation.MANDATORY)
   public void reserve(UUID enrollmentId) {
     update(enrollmentId, e -> e.reserve(clock.instant()));
@@ -70,6 +77,12 @@ class EnrollmentApiImpl implements EnrollmentApi {
   @Transactional(propagation = Propagation.MANDATORY)
   public void consumeReleased(UUID enrollmentId) {
     update(enrollmentId, Enrollment::consumeReleased);
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.MANDATORY)
+  public void unconsume(UUID enrollmentId) {
+    update(enrollmentId, e -> e.unconsume(clock.instant()));
   }
 
   @Override
@@ -103,6 +116,9 @@ class EnrollmentApiImpl implements EnrollmentApi {
     if (enrollment == null) {
       throw new BusinessException(ErrorCode.NOT_FOUND);
     }
+    // ghi thay đổi chưa flush trước (vd. reserve rồi consume trong cùng transaction) — refresh sẽ
+    // ghi đè trạng thái trong bộ nhớ bằng dữ liệu DB
+    entityManager.flush();
     entityManager.refresh(enrollment, LockModeType.PESSIMISTIC_WRITE);
     change.accept(enrollment);
   }

@@ -1,5 +1,6 @@
 package com.englishplatform.catalog;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -12,6 +13,9 @@ public interface EnrollmentApi {
   /** Ném {@code NOT_FOUND} nếu không có ghi danh. */
   EnrollmentView get(UUID enrollmentId);
 
+  /** Mọi ghi danh của học viên, mới nhất trước. */
+  List<EnrollmentView> findByStudent(UUID studentId);
+
   /** Đặt lịch: reserved +1. Ném {@code NO_SESSIONS_LEFT} / {@code ENROLLMENT_NOT_ACTIVE}. */
   void reserve(UUID enrollmentId);
 
@@ -23,6 +27,12 @@ public interface EnrollmentApi {
 
   /** Gián đoạn được giáo vụ tính là đã học: consumed +1 (chỗ đã được trả trước đó). */
   void consumeReleased(UUID enrollmentId);
+
+  /**
+   * Giáo vụ sửa kết quả buổi đã tính thành không tính (trong 7 ngày): consumed −1; ghi danh {@code
+   * EXHAUSTED} quay lại {@code ACTIVE}.
+   */
+  void unconsume(UUID enrollmentId);
 
   /**
    * Billing gọi trong transaction ghi nhận thanh toán đầu tiên (FR-025): {@code PENDING_PAYMENT} →
