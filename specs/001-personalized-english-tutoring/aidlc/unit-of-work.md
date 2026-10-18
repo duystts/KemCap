@@ -149,8 +149,8 @@ Danh sách gốc (để tham chiếu):
   trong `AuthFlowIT`; `AuthorizationMatrixIT` đầy đủ ở T140 (B7). ArchUnit **bỏ khỏi U1** (sửa sau verify
   U1, 2026-10-18): không có task trong tasks.md, ranh giới module đã do `ModularityTests` kiểm.
 - `backend/Dockerfile` multi-arch, `deploy/docker-compose.prod.yml` (backend `mem_limit: 1g`, postgres,
-  caddy), `Caddyfile` (TLS, 301, HSTS), `.env.example`; **deploy skeleton lên Oracle VM** để phát hiện
-  sớm rủi ro hosting (plan.md:165-166).
+  caddy), `Caddyfile` (TLS, 301, HSTS), `.env.example` — chỉ chuẩn bị file. **Deploy thật lên server
+  chuyển sang U5** (tách khỏi U1 ngày 2026-10-18: Oracle từ chối đăng ký, đang chờ support).
 - Profile `demo-seed` bản đầu.
 
 **FE (đề xuất #2)**: Vite + React 19 + TS + Tailwind + shadcn/ui; router, layout theo vai trò, auth
@@ -170,8 +170,8 @@ tạo bằng CLI trong B1 (thay spike BE của plan.md:159).
 NFR-SEC-04); forgot-password luôn 202 (NFR-SEC-10); hash BCrypt cost 10 (NFR-SEC-03); ma trận vai trò
 cho endpoint identity (bản tối thiểu); app không khởi động khi secret < 32 byte; token mời/reset
 không còn bản thô trong `event_publication`/`notification_dispatch` sau khi xử lý (NFR-SEC-03); retry
-email + chống trùng có test (NFR-REL-06); skeleton chạy trên môi trường demo (HTTPS) và T032 (2 trình
-duyệt vào cùng room) do #1 làm tay. **Quickstart bước 1** (quickstart.md:52) cần `POST /users` (T049,
+email + chống trùng có test (NFR-REL-06); T032 (2 trình duyệt vào cùng room, LiveKit local) do #1
+làm tay. Deploy HTTPS **không còn trong DoD U1** — chuyển sang U5 (tách khỏi U1 ngày 2026-10-18: Oracle từ chối đăng ký, đang chờ support). **Quickstart bước 1** (quickstart.md:52) cần `POST /users` (T049,
 U2) → **chuyển sang cổng U2** (sửa sau verify U1, 2026-10-18).
 
 **Việc chuyển từ verify U1** (build-test-U1.md, R7–R18 chưa sửa ở U1):
@@ -448,10 +448,10 @@ của bolt. Lịch theo **S2** và ngày lịch (giả định ở đầu file).
 
 | Bolt | Ngày | Units | BE (ai làm gì) | Điều kiện vào | Điều kiện xong (cổng ra) |
 |------|------|-------|----------------|---------------|--------------------------|
-| B1 | CN 18/10 – T6 23/10 (6 ngày) | U1 | #1: U1 | Plan, contracts, units được duyệt; D1–D4, K1–K3 được chốt trước T3 20/10 | DoD U1; CI bắt buộc trên `main`; skeleton chạy trên môi trường demo (HTTPS); FE shell + auth nối API thật |
+| B1 | CN 18/10 – T6 23/10 (6 ngày) | U1 | #1: U1 | Plan, contracts, units được duyệt; D1–D4, K1–K3 được chốt trước T3 20/10 | DoD U1; CI bắt buộc trên `main`; FE shell + auth nối API thật (deploy HTTPS chuyển sang B4/U5) |
 | B2 | T7 24/10 – T2 26/10 (3 ngày) | U2 | #1: catalog + `EnrollmentApi` · #4: billing core | B1 xong | DoD U2; quickstart bước 1–3 trên demo |
 | B3 | T3 27/10 – CN 01/11 (6 ngày) | U3, U4 | #1: U3 · #3: U4 (27–28/10) | B2 xong | DoD U3, U4; go/no-go LiveKit; IT đối chiếu bộ đếm xanh; quickstart bước 4–5, 7, 9, 11 (phần lộ trình), 14, 17–22 trên demo — **demo nội bộ P1** |
-| B4 | T2 02/11 – T4 04/11 (3 ngày) | U5 | #1: U5 | B3 xong | DoD U5; quickstart bước 5–6 (email), bản sao lưu đầu tiên trên R2 |
+| B4 | T2 02/11 – T4 04/11 (3 ngày) | U5 | #1: U5 | B3 xong | DoD U5; **deploy HTTPS lên server demo** (Oracle nếu được duyệt, không thì VPS Việt Nam hoặc Cloudflare Tunnel — quyết định trước 02/11); quickstart bước 5–6 (email), bản sao lưu đầu tiên trên R2 |
 | B5 | T5 05/11 – T7 07/11 (3 ngày) | U7, U8 | #1: U7 · #4: U8 (05–06/11) | B4 xong | DoD U7, U8; quickstart bước 13, 15, 16, 23 trên demo; dashboard không đổi sau ẩn danh hóa |
 | B6 | CN 08/11 – T3 10/11 (3 ngày) | U6 | #1: U6 | B5 xong (U3, U4, U5, U7) | DoD U6; **quickstart bước 1–24 đạt trên demo** (trừ phần bị cắt bởi K1/K2: bước 10 chỉ văn bản, bước 12 không có điểm hài lòng/tỷ lệ phiếu) |
 | B7 (ổn định, không thêm unit) | T4 11/11 (1 ngày) + demo T5 12/11 | — | #1: sửa lỗi, **diễn tập khôi phục sao lưu** (NFR-REL-10, hạn trước 11/11 — nên làm tối 10/11), chạy k6 · FE: Playwright, usability, Lighthouse (P2) | B6 xong | AI-DLC 3.6 `verify --all`; k6 NFR-PERF-01/02, NFR-SCAL-01, SCAL-03; NFR-PERF-03/04; runbook tối thiểu; tổng duyệt và demo |

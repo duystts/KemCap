@@ -102,7 +102,7 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 - [X] T029 [P] (#1·U1) Public API catalog `B/catalog/EnrollmentApi.java` (`get(id)` → `EnrollmentView`, `reserve(id)`, `release(id)`, `consume(id)`, `consumeReleased(id)`, `isAssigned(teacherId, studentId)`), `B/catalog/EnrollmentView.java`, event `EnrollmentCreated`, `EnrollmentActivated`, `TeacherReassigned`, `EnrollmentRenewalDue` trong `B/catalog/` đúng payload `contracts/events-and-ports.md`; stub `B/catalog/internal/StubEnrollmentApi.java` (`@Profile("stub")`)
 - [X] T030 [P] (#1·U1) Public API scheduling: event `SessionBooked`, `SessionCancelled`, `SessionRescheduled`, `SessionReminderDue`, `SessionFinished`, `SessionOutcomeOverdue` trong `B/scheduling/`; port `B/scheduling/VideoRoomProvider.java` + `JoinInfo(serverUrl, token, roomName)`; `B/scheduling/SessionQueryApi.java` (`find(sessionId)` → `SessionView(id, teacherId, studentId, startsAt, endsAt, status)`)
 - [X] T031 [P] (#1·U1) Event learning `SessionReportOverdue`, `SessionReportSubmitted`, `AssignmentSubmitted`, `AssignmentGraded` trong `B/learning/`; event billing `B/billing/PaymentRecorded.java(enrollmentId, paymentId, amountVnd, isFirstPayment)`
-- [ ] T032 (#1·U1) Spike LiveKit token: `B/scheduling/internal/video/LiveKitVideoRoomProvider.java` tối thiểu cấp token cho room `session-{id}` với `livekit-server --dev`; cùng #2 xác nhận hai trình duyệt vào chung phòng (go/no-go sớm, quyết định cuối 1/11)
+- [X] T032 (#1·U1) Spike LiveKit token: `B/scheduling/internal/video/LiveKitVideoRoomProvider.java` tối thiểu cấp token cho room `session-{id}` với `livekit-server --dev`; cùng #2 xác nhận hai trình duyệt vào chung phòng (go/no-go sớm, quyết định cuối 1/11)
 
 ### Frontend nền tảng
 

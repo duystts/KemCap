@@ -23,7 +23,7 @@ Ký hiệu: `[ ]` chưa làm · `[~]` đang chờ duyệt · `[x]` đã duyệt 
 
 | Unit | Plan approved | Implemented | Verified | Verdict |
 |------|---------------|-------------|----------|---------|
-| U1 Nền tảng & walking skeleton (B1, 18–23/10; BE #1, FE #2) | [x] 2026-10-18 | [x] 2026-10-18 (36/37 task; T032 chờ thử 2 trình duyệt, T137 tối thiểu xong) | [x] 2026-10-18 Verified (code) — PASS_WITH_NOTES sau sửa R1–R10; điều kiện đóng hẳn trước hết B1: CI/gitleaks chạy, deploy HTTPS Oracle VM, T032 (#1 làm tay) | build-test-U1.md |
+| U1 Nền tảng & walking skeleton (B1, 18–23/10; BE #1, FE #2) | [x] 2026-10-18 | [x] 2026-10-18 (37/37 task; T032 đạt 2026-10-18, T137 tối thiểu xong) | [x] 2026-10-18 **Verified (đóng)** — PASS_WITH_NOTES sau sửa R1–R10; điều kiện đóng hẳn trước hết B1: ~~CI/gitleaks~~ (xanh 2026-10-18, run 39099953407), ~~T032~~ (đạt 2026-10-18, GV + HV cùng room, cam/mic ổn); deploy HTTPS chuyển sang U5 | build-test-U1.md |
 | U2 Hồ sơ, gói, ghi danh, thanh toán (B2, 24–26/10; BE #1 + #4 billing, FE #4) | [ ] | [ ] | [ ] | |
 | U3 Lịch, đặt lịch, trạng thái buổi, phòng học (B3, 27/10–1/11; BE #1, FE #2) | [ ] | [ ] | [ ] | |
 | U4 Năng lực, mục tiêu, lộ trình (B3, 27–28/10; BE #3, FE #3) | [ ] | [ ] | [ ] | |

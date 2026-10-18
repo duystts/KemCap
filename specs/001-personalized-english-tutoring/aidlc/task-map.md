@@ -48,5 +48,5 @@ Task Phase 10 không có tag unit. Đề xuất gán:
 
 ## Điều chỉnh tại cổng U1 (2026-10-18, người dùng duyệt)
 
-- **T137 tách đôi**: bản tối thiểu (backend `Dockerfile` multi-arch, `deploy/docker-compose.prod.yml` backend + postgres + caddy, `deploy/Caddyfile`, deploy skeleton lên Oracle VM, HTTPS) làm trong **U1** để phát hiện sớm rủi ro hosting; log rotation, healthcheck ping và hoàn thiện `deploy/README.md` vẫn ở **U5**. T137 chỉ đánh `[x]` khi phần U5 xong.
+- **T137 tách đôi**: bản tối thiểu (backend `Dockerfile` multi-arch, `deploy/docker-compose.prod.yml` backend + postgres + caddy, `deploy/Caddyfile`) làm trong **U1**; **deploy thật lên server + HTTPS chuyển sang U5** (tách khỏi U1 ngày 2026-10-18: Oracle từ chối đăng ký, đang chờ support); log rotation, healthcheck ping và hoàn thiện `deploy/README.md` vẫn ở **U5**. T137 chỉ đánh `[x]` khi phần U5 xong.
 - **T032** (spike LiveKit hai trình duyệt) và **thao tác deploy thật lên VM** do người dùng thực hiện tay (cần tài khoản/trình duyệt); Claude chuẩn bị code + hướng dẫn.

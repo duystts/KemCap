@@ -30,3 +30,6 @@ Thumbs.db
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# Ghi chú cá nhân (chi phí, deploy) — không push
+notes/

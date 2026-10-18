@@ -1,0 +1,5 @@
+# Giữ LF cho script chạy trên Linux/Git Bash dù Windows bật core.autocrlf
+* text=auto
+backend/mvnw text eol=lf
+*.sh text eol=lf
+*.cmd text eol=crlf
