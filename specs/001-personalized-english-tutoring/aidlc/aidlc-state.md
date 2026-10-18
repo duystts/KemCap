@@ -4,7 +4,7 @@
 - **Profile**: classic
 - **Workspace**: greenfield
 - **Created**: 2026-10-17
-- **Current stage**: Construction — U4 unit gate (`/speckit-aidlc-unit-gate`)
+- **Current stage**: Construction — U5 unit gate (`/speckit-aidlc-unit-gate`)
 
 ## Stage progress
 
@@ -26,7 +26,7 @@ Ký hiệu: `[ ]` chưa làm · `[~]` đang chờ duyệt · `[x]` đã duyệt 
 | U1 Nền tảng & walking skeleton (B1, 18–23/10; BE #1, FE #2) | [x] 2026-10-18 | [x] 2026-10-18 (37/37 task; T032 đạt 2026-10-18, T137 tối thiểu xong) | [x] 2026-10-18 **Verified (đóng)** — PASS_WITH_NOTES sau sửa R1–R10; điều kiện đóng hẳn trước hết B1: ~~CI/gitleaks~~ (xanh 2026-10-18, run 39099953407), ~~T032~~ (đạt 2026-10-18, GV + HV cùng room, cam/mic ổn); deploy HTTPS chuyển sang U5 | build-test-U1.md |
 | U2 Hồ sơ, gói, ghi danh, thanh toán (B2, 24–26/10; BE #1 + #4 billing, FE #4) | [x] 2026-10-18 — phạm vi (c): toàn bộ BE do #1/Claude (gồm billing T104–T110 vốn của #4); FE T052–T055, T114 để #4 | [x] 2026-10-18 (21/21 task BE; verify xanh 29 unit + 45 IT; T111 đổi sang gọi đồng bộ activateOnFirstPayment) | [x] 2026-10-18 **Verified** — PASS_WITH_NOTES sau sửa R1–R4, F1, F2, F6 (30 unit + 47 IT); R5–R7, F3, F5 → U8; FE U2 (T052–T055, T114) còn mở cho #4 | build-test-U2.md | |
 | U3 Lịch, đặt lịch, trạng thái buổi, phòng học (B3, 27/10–1/11; BE #1, FE #2) | [x] 2026-10-18 — BE T056–T074 do Claude; FE T075–T079 để #2 | [x] 2026-10-18 (19/19 task BE; verify xanh 54 unit + 67 IT; sửa bug refresh làm mất thay đổi bộ đếm cùng transaction) | [x] 2026-10-18 **Verified** — PASS_WITH_NOTES sau sửa R1–R5, R7, R9, F5, F7 (57 unit + 68 IT); R6, R8, F1, F3, F6 → U8; F4 go/no-go LiveKit → #2 (1/11); FE U3 (T075–T079) còn mở cho #2 | build-test-U3.md | |
-| U4 Năng lực, mục tiêu, lộ trình (B3, 27–28/10; BE #3, FE #3) | [ ] | [ ] | [ ] | |
+| U4 Năng lực, mục tiêu, lộ trình (B3, 27–28/10; BE #3, FE #3) | [x] 2026-10-18 — BE T080–T087, T090 do Claude (thay D1); FE T088–T089 để #3; OQ-4 giải bằng SPI GoalStatusProvider | [x] 2026-10-18 (9/9 task BE; verify xanh 61 unit + 73 IT; smoke seed + cờ Cần tư vấn) | [x] 2026-10-18 **Verified** — PASS_WITH_NOTES sau sửa R1–R5, F1, F3–F5, R7 (64 unit + 73 IT); R6, F2, F6, F7 → U8; FE U4 (T088–T089) còn mở cho #3 | build-test-U4.md | |
 | U5 Thông báo, nhắc, vận hành/sao lưu (B4, 2–4/11; BE #1, FE #3) | [ ] | [ ] | [ ] | |
 | U7 Quyền riêng tư FR-030/031 (B5, 5–7/11; BE #1, FE #2 + #4) | [ ] | [ ] | [ ] | |
 | U8 Gia hạn, công nợ, báo cáo (B5, 5–6/11; BE #4, FE #4) | [ ] | [ ] | [ ] | |
@@ -38,4 +38,4 @@ Ký hiệu: `[ ]` chưa làm · `[~]` đang chờ duyệt · `[x]` đã duyệt 
 
 ## Next step
 
-`/speckit-aidlc-unit-gate` cho U4 (B3, hồ sơ năng lực, mục tiêu, lộ trình; D1: BE do #3 — hỏi lại phạm vi) → `/speckit-implement` → `/speckit-aidlc-verify`. Song song: #2 làm FE U3, #4 làm FE U2.
+`/speckit-aidlc-unit-gate` cho U5 (B4: thông báo, nhắc lịch, vận hành/deploy — gồm deploy HTTPS chuyển từ U1, R11–R13/R18 từ verify U1) → `/speckit-implement` → `/speckit-aidlc-verify`. Song song: #2 FE U3, #3 FE U4, #4 FE U2.

@@ -62,7 +62,8 @@ class ProfileController {
       String email,
       UserStatus status,
       StudentProfile.CefrLevel selfReportedLevel,
-      Set<UUID> teacherIds) {
+      Set<UUID> teacherIds,
+      boolean needsConsulting) {
     static StudentListItem of(ProfileService.StudentSummary s) {
       return new StudentListItem(
           s.user().id(),
@@ -70,7 +71,8 @@ class ProfileController {
           s.user().email(),
           s.user().status(),
           s.selfReportedLevel(),
-          s.teacherIds());
+          s.teacherIds(),
+          s.needsConsulting());
     }
   }
 
@@ -105,7 +107,7 @@ class ProfileController {
         service.updateStudentProfile(id, r.selfReportedLevel(), r.occupation(), r.notes()), true);
   }
 
-  /** {@code needsConsulting} được nhận nhưng chưa lọc cho tới khi có API của learning (U4). */
+  /** {@code needsConsulting=true}: học viên đang học mà chưa có mục tiêu {@code ACTIVE}. */
   @GetMapping("/students")
   @PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
   List<StudentListItem> students(
@@ -113,7 +115,9 @@ class ProfileController {
       @RequestParam(required = false) UUID teacherId,
       @RequestParam(required = false) UserStatus status,
       @RequestParam(required = false) Boolean needsConsulting) {
-    return service.listStudents(CurrentUser.require(), q, teacherId, status).stream()
+    return service
+        .listStudents(CurrentUser.require(), q, teacherId, status, needsConsulting)
+        .stream()
         .map(StudentListItem::of)
         .toList();
   }

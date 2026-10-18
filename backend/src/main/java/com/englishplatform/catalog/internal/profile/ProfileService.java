@@ -1,5 +1,7 @@
 package com.englishplatform.catalog.internal.profile;
 
+import com.englishplatform.catalog.EnrollmentStatus;
+import com.englishplatform.catalog.GoalStatusProvider;
 import com.englishplatform.catalog.internal.CatalogAccess;
 import com.englishplatform.catalog.internal.enrollment.Enrollment;
 import com.englishplatform.catalog.internal.enrollment.EnrollmentRepository;
@@ -10,6 +12,7 @@ import com.englishplatform.identity.UserView;
 import com.englishplatform.shared.security.CurrentUser;
 import com.englishplatform.shared.web.BusinessException;
 import com.englishplatform.shared.web.ErrorCode;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +20,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,23 +36,36 @@ public class ProfileService {
   private final EnrollmentRepository enrollments;
   private final UserDirectory userDirectory;
   private final CatalogAccess access;
+  private final ObjectProvider<GoalStatusProvider> goalStatus;
 
   ProfileService(
       TeacherProfileRepository teacherProfiles,
       StudentProfileRepository studentProfiles,
       EnrollmentRepository enrollments,
       UserDirectory userDirectory,
-      CatalogAccess access) {
+      CatalogAccess access,
+      ObjectProvider<GoalStatusProvider> goalStatus) {
     this.teacherProfiles = teacherProfiles;
     this.studentProfiles = studentProfiles;
     this.enrollments = enrollments;
     this.userDirectory = userDirectory;
     this.access = access;
+    this.goalStatus = goalStatus;
   }
 
-  /** Một dòng trong danh sách học viên. */
+  /** Ghi danh làm học viên "đang học" khi tính cờ "Cần tư vấn". */
+  static final Set<EnrollmentStatus> STUDYING =
+      EnumSet.of(EnrollmentStatus.ACTIVE, EnrollmentStatus.PENDING_PAYMENT);
+
+  /**
+   * Một dòng trong danh sách học viên. {@code needsConsulting}: đang có ghi danh {@code
+   * ACTIVE}/{@code PENDING_PAYMENT} mà chưa có mục tiêu học tập {@code ACTIVE}.
+   */
   public record StudentSummary(
-      UserView user, StudentProfile.CefrLevel selfReportedLevel, Set<UUID> teacherIds) {}
+      UserView user,
+      StudentProfile.CefrLevel selfReportedLevel,
+      Set<UUID> teacherIds,
+      boolean needsConsulting) {}
 
   @Transactional(readOnly = true)
   public TeacherProfile teacherProfile(CurrentUser actor, UUID teacherId) {
@@ -92,11 +109,11 @@ public class ProfileService {
 
   /**
    * Admin: mọi học viên (lọc {@code teacherId} nếu có). Giáo viên: chỉ học viên được phân công.
-   * {@code needsConsulting} cần API đọc của learning (T085, U4) — tới lúc đó bỏ qua.
+   * {@code needsConsulting} (tùy chọn) lọc theo cờ "Cần tư vấn".
    */
   @Transactional(readOnly = true)
   public List<StudentSummary> listStudents(
-      CurrentUser actor, String q, UUID teacherId, UserStatus status) {
+      CurrentUser actor, String q, UUID teacherId, UserStatus status, Boolean needsConsulting) {
     UUID scopeTeacher = CatalogAccess.isTeacher(actor) ? actor.id() : teacherId;
     if (!CatalogAccess.isAdmin(actor) && !CatalogAccess.isTeacher(actor)) {
       throw new BusinessException(ErrorCode.FORBIDDEN);
@@ -113,13 +130,21 @@ public class ProfileService {
     Map<UUID, StudentProfile> profiles =
         studentProfiles.findAllById(ids).stream()
             .collect(Collectors.toMap(StudentProfile::getUserId, Function.identity()));
+    List<Enrollment> studentEnrollments = enrollments.findByStudentIdIn(ids);
     Map<UUID, Set<UUID>> teachers =
-        enrollments.findByStudentIdIn(ids).stream()
+        studentEnrollments.stream()
             .filter(e -> Enrollment.ASSIGNED.contains(e.getStatus()))
             .collect(
                 Collectors.groupingBy(
                     Enrollment::getStudentId,
                     Collectors.mapping(Enrollment::getTeacherId, Collectors.toSet())));
+    Set<UUID> studying =
+        studentEnrollments.stream()
+            .filter(e -> STUDYING.contains(e.getStatus()))
+            .map(Enrollment::getStudentId)
+            .collect(Collectors.toSet());
+    GoalStatusProvider provider = goalStatus.getIfAvailable();
+    Set<UUID> withGoal = provider == null ? Set.of() : provider.studentsWithActiveGoal(studying);
     return students.stream()
         .map(
             u ->
@@ -128,7 +153,9 @@ public class ProfileService {
                     profiles.containsKey(u.id())
                         ? profiles.get(u.id()).getSelfReportedLevel()
                         : null,
-                    teachers.getOrDefault(u.id(), Set.of())))
+                    teachers.getOrDefault(u.id(), Set.of()),
+                    provider != null && studying.contains(u.id()) && !withGoal.contains(u.id())))
+        .filter(s -> needsConsulting == null || s.needsConsulting() == needsConsulting)
         .toList();
   }
 

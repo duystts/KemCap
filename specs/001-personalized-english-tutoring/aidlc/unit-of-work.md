@@ -228,6 +228,11 @@ với đặt buổi (R6), giới hạn/phân trang `GET /sessions` (R8), IT tran
 (F1), test DST chiều lùi giờ + IT slot DST (F3), `/reports/teacher-sessions` (F6, T121). #2 — go/no-go
 LiveKit CN 1/11 gồm vào phòng bằng token thật (F4).
 
+**Việc chuyển từ verify U4** (build-test-U4.md): U8 (hardening) — N+1 khi đọc lộ trình + giới hạn kích
+thước cây (R6), bổ sung IT ma trận quyền cho lộ trình/goal (F2), gom quy tắc "đang học" về một chỗ (F6),
+WARN Flyway out-of-order (F7, chấp nhận cho demo). U6 — dùng id chủ đề ổn định (đã đảm bảo khi chuyển
+chặng, R4).
+
 ### U3 — Lịch rảnh, đặt lịch, trạng thái buổi & phòng học (B3 · 27/10–01/11 · BE #1 5,5 · FE #2 6)
 
 **BE (#1)**
@@ -270,7 +275,7 @@ nếu chưa ổn → component dựng sẵn tối thiểu (plan.md:159).
 
 ### U4 — Hồ sơ năng lực, mục tiêu & lộ trình (B3 · S2: 27–28/10 song song U3 · BE #3 (S2) hoặc #1 1,5 · FE #3 3)
 
-**BE**: `proficiency_assessment` (INITIAL/PERIODIC, CEFR, chỉ INSERT), `learning_goal` (lịch sử),
+**BE**: `proficiency_assessment` (PLACEMENT/PERIODIC, CEFR, chỉ INSERT), `learning_goal` (lịch sử),
 `learning_path → milestone → topic`, `path_revision` (`reason` bắt buộc); API rest-api.md:87-93; phạm vi
 qua `EnrollmentApi.isAssigned` / `CurrentUser`; listener `StudentAnonymized` xóa dữ liệu learning I
 (data-model.md:368-369).
@@ -601,7 +606,7 @@ U1,U3 · UX-03 mọi unit FE + B7 · OBS-01 U1,U5 · **OBS-02 hoãn một phần
 | OQ-1 | **Owner FE chưa giao**: app shell + auth (U1 FE, 4 ngày), consent gate + checkbox accept-invite (U7, 1), màn privacy admin (U7, 2), chuông thông báo (U5, 1) | U1, U5, U7 | **#2**: app shell, auth, consent gate (cùng luồng đăng nhập; #2 rảnh đầu kỳ vì BE U3 tới 27/10 mới có) · **#4**: màn privacy admin (cùng `features/admin`) · **#3**: chuông thông báo. Tải FE sau đó: #2 ≈ 11, #3 ≈ 7,5, #4 ≈ 8,5 ngày |
 | OQ-2 | Team có làm T7, CN không? Kế hoạch giả định **ngày lịch** (25 ngày); nếu chỉ T2–T6 (18 ngày) thì kể cả S2 cũng thiếu ≈ 8,5 ngày BE | Toàn bộ lịch | Xác nhận trước 20/10 |
 | OQ-3 | Duyệt K1, K2, K3, P1, P2, D1, D4 (mục "Quyết định cần leader chốt") | Năng lực #1, phạm vi demo | Duyệt tất cả (S2) |
-| OQ-4 | Cờ "Cần tư vấn" (QĐ-5) chưa có trong contracts: cần endpoint (ví dụ trong `learning`, trả danh sách `studentId` chưa có mục tiêu, FE ghép với danh sách HV của catalog) và quy tắc "HV đang học" (có ghi danh ACTIVE/PENDING_PAYMENT?) | U4, FE #3/#4 | Bổ sung vào rest-api.md cùng lần cập nhật spec của orchestrator |
+| OQ-4 | Cờ "Cần tư vấn" (QĐ-5) chưa có trong contracts: cần endpoint (ví dụ trong `learning`, trả danh sách `studentId` chưa có mục tiêu, FE ghép với danh sách HV của catalog) và quy tắc "HV đang học" (có ghi danh ACTIVE/PENDING_PAYMENT?) | U4, FE #3/#4 | Bổ sung vào rest-api.md cùng lần cập nhật spec của orchestrator | **Đã giải ở U4 (2026-10-18)**: SPI `catalog.GoalStatusProvider` (learning cài); "đang học" = ghi danh ACTIVE/PENDING_PAYMENT; `GET /students?needsConsulting=` + `needsConsulting` trong `/proficiency`.
 | OQ-5 | **Mâu thuẫn**: S-US1.14 AC1 (stories.md:265) chặn ẩn danh hóa khi còn buổi Đã đặt; spec FR-031 (spec.md:247), Edge Case (spec.md:180) và events-and-ports.md:16 tự chuyển sang `CANCELLED_SYSTEM` | U7, U3 | Theo spec; sửa S-US1.14 AC1 |
 | OQ-6 | Nếu không duyệt K2: R2/MinIO có ép `Content-Length` trong pre-signed PUT không (nfr.md Q9) | U6 | Spike trong B1 chỉ khi K2 bị từ chối |
 | OQ-7 | Mốc 16 tuổi và nội dung chính sách chờ pháp lý (spec.md:296; research.md:208) | U7 (nội dung; code dùng cấu hình) | Cần văn bản chính thức trước khi dùng dữ liệu thật |

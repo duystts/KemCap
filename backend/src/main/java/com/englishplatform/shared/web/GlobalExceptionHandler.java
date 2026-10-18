@@ -14,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import tools.jackson.core.JacksonException;
 
 /** RFC 9457 Problem Details + property {@code code} và {@code errors[{field, message}]}. */
 @RestControllerAdvice
@@ -40,6 +41,24 @@ class GlobalExceptionHandler {
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
   ProblemDetail handleUnreadable(HttpMessageNotReadableException ex) {
+    // vd. CEFR "D1" không thuộc enum → chỉ rõ field (errors[].field)
+    for (Throwable t = ex.getCause(); t != null; t = t.getCause()) {
+      if (t instanceof JacksonException je && !je.getPath().isEmpty()) {
+        String field =
+            je.getPath().stream()
+                .map(
+                    r ->
+                        r.getPropertyName() != null
+                            ? r.getPropertyName()
+                            : "[" + r.getIndex() + "]")
+                .reduce((a, b) -> b.startsWith("[") ? a + b : a + "." + b)
+                .orElse("");
+        return problem(
+            ErrorCode.VALIDATION_FAILED,
+            ErrorCode.VALIDATION_FAILED.defaultMessage(),
+            List.of(new BusinessException.FieldError(field, "Giá trị không hợp lệ")));
+      }
+    }
     return problem(ErrorCode.VALIDATION_FAILED, "Nội dung yêu cầu không đọc được", List.of());
   }
 

@@ -48,6 +48,7 @@ Registry phát lại event chưa hoàn tất khi khởi động lại (`republis
 | `EnrollmentApi` | catalog | scheduling, learning, billing | `get(id)`, `reserve(id)`, `release(id)`, `consume(id)`, `consumeReleased(id)` (INTERRUPTED → COMPLETED), `activateOnFirstPayment(id)` (billing gọi trong transaction ghi thanh toán đầu), `unconsume(id)` (admin sửa kết quả "tính" → "không tính", thêm ở U3), `findByStudent(studentId)` (thêm ở U3), `isAssigned(teacherId, studentId)` |
 | `SessionQueryApi` | scheduling | learning | `find(sessionId)` → SessionView(id, teacherId, studentId, startsAt, endsAt, status), `attendance(studentId)` → {completed, noShow, cancelledLate} |
 
+| `GoalStatusProvider` (SPI) | catalog định nghĩa, learning cài | catalog | `Set<UUID> studentsWithActiveGoal(studentIds)` — cờ "Cần tư vấn" = có ghi danh `ACTIVE`/`PENDING_PAYMENT` và không có goal `ACTIVE` (OQ-4, giải ở U4; thay `LearningProfileApi` của T085 để tránh vòng catalog ↔ learning) |
 | `UserDeactivationGuard` (SPI) | identity định nghĩa, catalog cài | identity | `void check(userId, role)` — ném `TEACHER_HAS_STUDENTS` nếu giáo viên còn ghi danh ACTIVE/PENDING_PAYMENT |
 
 **Sửa ở U2 (2026-10-18)**: billing nghe `EnrollmentCreated` của catalog, nên nếu catalog lại nghe

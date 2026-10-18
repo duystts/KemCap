@@ -90,8 +90,9 @@ Mật khẩu: tối thiểu 8 ký tự, có chữ và số.
 | Method | Path | Quyền | Mô tả | FR |
 |---|---|---|---|---|
 | GET/POST | `/students/{id}/assessments` | A; T; S (GET) | đánh giá năng lực (đầu vào/định kỳ) | FR-015, FR-016 |
-| GET | `/students/{id}/proficiency` | A; T; S | hồ sơ năng lực hiện tại + lịch sử | FR-015 |
-| GET/POST/PUT | `/students/{id}/goals` | A; T; S (GET) | mục tiêu học tập | FR-015 |
+| GET | `/students/{id}/proficiency` | A; T; S | `{current, history[], needsConsulting}` | FR-015 |
+| GET/POST | `/students/{id}/goals` | A; T; S (GET) | mục tiêu học tập `{type, target, deadline?}` | FR-015 |
+| PUT | `/students/{id}/goals/{goalId}` | A; T | `{status?, deadline?}` — nội dung mục tiêu không sửa (đổi mục tiêu = đóng cái cũ + tạo mới, giữ lịch sử) | FR-015 |
 | GET | `/students/{id}/learning-path` | A; T; S | lộ trình ACTIVE (chặng, chủ đề, % hoàn thành) | FR-017 |
 | POST | `/students/{id}/learning-path` | A; T | tạo lộ trình | FR-017 |
 | PUT | `/learning-paths/{id}` | A; T | sửa toàn bộ cây chặng/chủ đề, `{…, reason}` bắt buộc | FR-018 |
