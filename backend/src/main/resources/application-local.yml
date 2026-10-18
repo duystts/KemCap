@@ -1,0 +1,11 @@
+# Profile local: chạy với docker-compose.yml ở thư mục gốc
+app:
+  security:
+    jwt-secret: ${JWT_SECRET:local-dev-secret-change-me-0123456789abcdef}
+  providers:
+    video: ${VIDEO_PROVIDER:livekit}
+    email: ${EMAIL_PROVIDER:smtp}
+
+logging:
+  level:
+    com.englishplatform: DEBUG

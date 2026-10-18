@@ -1,0 +1,88 @@
+spring:
+  application:
+    name: english-platform
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/english}
+    username: ${DB_USER:app}
+    password: ${DB_PASSWORD:app}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  flyway:
+    enabled: true
+  mail:
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PORT:1025}
+    username: ${SMTP_USER:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      # Brevo/Gmail cổng 587: SMTP_AUTH=true, SMTP_STARTTLS=true; Mailpit local để false
+      "[mail.smtp.auth]": ${SMTP_AUTH:false}
+      "[mail.smtp.starttls.enable]": ${SMTP_STARTTLS:false}
+      "[mail.smtp.starttls.required]": ${SMTP_STARTTLS:false}
+      # timeout (ms) để SMTP treo không giữ job thử lại/ShedLock
+      "[mail.smtp.connectiontimeout]": 10000
+      "[mail.smtp.timeout]": 10000
+      "[mail.smtp.writetimeout]": 10000
+  task:
+    scheduling:
+      pool:
+        size: 2
+  modulith:
+    events:
+      # xóa publication đã xử lý xong: event mời/reset mang token thô (NFR-SEC-03)
+      completion-mode: delete
+      republish-outstanding-events-on-restart: true
+      jdbc:
+        schema-initialization:
+          enabled: false
+
+server:
+  port: ${PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+app:
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  security:
+    # >= 32 byte (256 bit) — app từ chối khởi động nếu ngắn hơn (NFR-SEC-05)
+    jwt-secret: ${JWT_SECRET}
+    access-token-minutes: 15
+    refresh-token-days: 7
+  mail:
+    from: ${MAIL_FROM:no-reply@english.local}
+  providers:
+    video: ${VIDEO_PROVIDER:livekit}   # fake | livekit
+    email: ${EMAIL_PROVIDER:smtp}      # fake | smtp
+  livekit:
+    url: ${LIVEKIT_URL:ws://localhost:7880}
+    api-key: ${LIVEKIT_API_KEY:devkey}
+    api-secret: ${LIVEKIT_API_SECRET:secret}
+  privacy:
+    policy-version: ${POLICY_VERSION:2026-11}  # đổi giá trị → mọi người dùng phải đồng ý lại (FR-030)
+    guardian-consent-under-age: 16              # chờ pháp lý trung tâm xác nhận
+  jobs:
+    initial-delay: PT30S
+  scheduling:
+    cancel-cutoff-hours: 12
+    min-booking-lead-hours: 2
+    booking-horizon-days: 30
+    room-open-before-minutes: 10
+    room-close-after-minutes: 15
+  reminders:
+    session-windows: [24h, 1h]
+    report-overdue-hours: 24
+    outcome-overdue-hours: 24
+    renewal-low-sessions: 2
+    renewal-expiring-days: 7

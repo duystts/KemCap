@@ -1,0 +1,11 @@
+# HTTPS tự động (Let's Encrypt), HTTP → HTTPS 301 mặc định của Caddy
+{$DOMAIN} {
+	encode gzip
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+	reverse_proxy backend:8080
+}

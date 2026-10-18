@@ -1,0 +1,120 @@
+schema_version: "1.0"
+workflow:
+  id: "aidlc-sdd"
+  name: "AI-DLC + Spec Kit (Inception + Construction)"
+  version: "0.1.0"
+  author: "phamanhduy"
+  description: "Spec Kit SDD with AI-DLC stages: profile, stories, NFR, units of work, unit-by-unit construction with human gates"
+
+requires:
+  speckit_version: ">=1.0.0"
+  integrations:
+    any:
+      - "claude"
+
+inputs:
+  spec:
+    type: string
+    required: true
+    prompt: "Describe what you want to build"
+  profile:
+    type: string
+    default: "classic"
+    enum: ["express", "classic", "bugfix", "refactor"]
+    prompt: "AI-DLC profile (express | classic | bugfix | refactor)"
+  integration:
+    type: string
+    default: "auto"
+    prompt: "Integration to use ('auto' uses the project's initialized integration)"
+
+# The aidlc extension hooks run inside the core commands:
+#   specify   -> after: aidlc.init, aidlc.stories
+#   plan      -> after: aidlc.nfr, aidlc.units
+#   tasks     -> after: aidlc.map-tasks
+#   implement -> before: aidlc.unit-gate, after: aidlc.verify
+# In a workflow run the commands do not wait for approval; the gate steps below are the human approvals,
+# and each "approve-*" prompt records that approval in aidlc-state.md / audit.md.
+
+steps:
+  # ---------- Inception ----------
+  - id: specify
+    command: speckit.specify
+    integration: "{{ inputs.integration }}"
+    input:
+      args: "{{ inputs.spec }} (AI-DLC profile={{ inputs.profile }})"
+
+  - id: review-inception-1
+    type: gate
+    message: "Review spec.md, aidlc/aidlc-state.md (profile) and aidlc/stories.md before planning."
+    options: [approve, reject]
+    on_reject: abort
+
+  - id: approve-inception-1
+    type: prompt
+    integration: "{{ inputs.integration }}"
+    prompt: "AI-DLC: the human approved the gate 'review-inception-1'. In the current feature's aidlc/aidlc-state.md turn every stage marked [~] into [x], and append an 'approved' row (approver: human via workflow gate) to aidlc/audit.md. Change nothing else."
+
+  - id: plan
+    command: speckit.plan
+    integration: "{{ inputs.integration }}"
+    input:
+      args: "{{ inputs.spec }}"
+
+  - id: review-design
+    type: gate
+    message: "Review plan.md, aidlc/nfr.md and aidlc/unit-of-work.md (units, DAG, bolts)."
+    options: [approve, reject]
+    on_reject: abort
+
+  - id: approve-design
+    type: prompt
+    integration: "{{ inputs.integration }}"
+    prompt: "AI-DLC: the human approved the gate 'review-design'. In the current feature's aidlc/aidlc-state.md turn every stage marked [~] into [x], and append an 'approved' row (approver: human via workflow gate) to aidlc/audit.md. Change nothing else."
+
+  - id: tasks
+    command: speckit.tasks
+    integration: "{{ inputs.integration }}"
+    input:
+      args: "{{ inputs.spec }}"
+
+  - id: review-tasks
+    type: gate
+    message: "Review tasks.md and aidlc/task-map.md before construction starts."
+    options: [approve, reject]
+    on_reject: abort
+
+  # ---------- Construction: one unit per iteration ----------
+  - id: construction
+    type: do-while
+    max_iterations: 12
+    condition: "{{ steps.review_unit.output.choice == 'next-unit' }}"
+    steps:
+      - id: implement-unit
+        command: speckit.implement
+        integration: "{{ inputs.integration }}"
+        input:
+          args: "Implement the next AI-DLC unit only (the unit-gate hook chooses it)."
+
+      - id: review_unit
+        type: gate
+        message: "Review aidlc/build-test-<unit>.md. next-unit = approve and continue, done = approve and stop, reject = abort."
+        options: [next-unit, done, reject]
+        on_reject: abort
+
+      - id: approve-unit
+        type: prompt
+        integration: "{{ inputs.integration }}"
+        prompt: "AI-DLC: the human approved the unit just verified (gate 'review_unit'). In aidlc/aidlc-state.md mark that unit Plan approved + Verified with the verdict from its build-test report, turn any [~] into [x], set Next step, and append an 'approved' row to aidlc/audit.md. Change nothing else."
+
+  # ---------- Close ----------
+  - id: verify-all
+    command: speckit.aidlc.verify
+    integration: "{{ inputs.integration }}"
+    input:
+      args: "--all"
+
+  - id: converge
+    command: speckit.converge
+    integration: "{{ inputs.integration }}"
+    input:
+      args: "{{ inputs.spec }}"

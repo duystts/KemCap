@@ -1,0 +1,16 @@
+app:
+  security:
+    jwt-secret: test-secret-0123456789abcdef0123456789abcdef
+  providers:
+    video: fake
+    email: fake
+  jobs:
+    # test tự gọi job; không để job nền chạy chen (ShedLock sẽ bỏ qua lần gọi của test)
+    initial-delay: PT1H
+  privacy:
+    policy-version: "2026-11"
+
+spring:
+  docker:
+    compose:
+      enabled: false

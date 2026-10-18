@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "extensions": {
+    "aidlc": {
+      "version": "0.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:f8597f33b8d94d2b2ced78098549903585f7379a123e5f2b8bc05e23b25300ca",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.aidlc.init",
+          "speckit.aidlc.reverse",
+          "speckit.aidlc.stories",
+          "speckit.aidlc.nfr",
+          "speckit.aidlc.units",
+          "speckit.aidlc.map-tasks",
+          "speckit.aidlc.unit-gate",
+          "speckit.aidlc.verify",
+          "speckit.aidlc.status"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-10-17T16:09:15.589194+00:00"
+    }
+  }
+}

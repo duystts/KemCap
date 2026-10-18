@@ -1,0 +1,33 @@
+# Hạ tầng local cho dev (quickstart.md §2). MinIO/S3 chỉ từ GĐ2 (K2).
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: english
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d english"]
+      interval: 5s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # UI
+
+  livekit:
+    image: livekit/livekit-server
+    command: --dev --bind 0.0.0.0
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "7882:7882/udp"
+
+volumes:
+  pgdata:

@@ -1,0 +1,66 @@
+installed:
+- aidlc
+settings:
+  auto_execute_hooks: true
+hooks:
+  after_specify:
+  - extension: aidlc
+    command: speckit.aidlc.init
+    enabled: true
+    optional: false
+    priority: 1
+    prompt: Execute speckit.aidlc.init?
+    description: Initialize AI-DLC state and pick a workflow profile
+    condition: null
+  - extension: aidlc
+    command: speckit.aidlc.stories
+    enabled: true
+    optional: true
+    priority: 5
+    prompt: Generate AI-DLC user stories and personas?
+    description: AI-DLC user stories (skipped for express/bugfix/refactor)
+    condition: null
+  after_plan:
+  - extension: aidlc
+    command: speckit.aidlc.nfr
+    enabled: true
+    optional: true
+    priority: 5
+    prompt: Generate AI-DLC NFR requirements and design?
+    description: AI-DLC NFR requirements + design
+    condition: null
+  - extension: aidlc
+    command: speckit.aidlc.units
+    enabled: true
+    optional: false
+    priority: 10
+    prompt: Execute speckit.aidlc.units?
+    description: Decompose the plan into units of work (skipped for express)
+    condition: null
+  after_tasks:
+  - extension: aidlc
+    command: speckit.aidlc.map-tasks
+    enabled: true
+    optional: false
+    priority: 10
+    prompt: Execute speckit.aidlc.map-tasks?
+    description: Map tasks to units of work (skipped when there is no unit-of-work.md)
+    condition: null
+  before_implement:
+  - extension: aidlc
+    command: speckit.aidlc.unit-gate
+    enabled: true
+    optional: false
+    priority: 10
+    prompt: Execute speckit.aidlc.unit-gate?
+    description: Per-unit plan approval before code generation
+    condition: null
+  after_implement:
+  - extension: aidlc
+    command: speckit.aidlc.verify
+    enabled: true
+    optional: false
+    priority: 10
+    prompt: Execute speckit.aidlc.verify?
+    description: Build & test and independent review of the implemented unit
+    condition: null

@@ -1,0 +1,81 @@
+schema_version: "1.0"
+
+extension:
+  id: aidlc
+  name: "AI-DLC Stages for Spec Kit"
+  version: "0.1.0"
+  description: "Adds AWS AI-DLC Inception + Construction stages (profiles, user stories, NFR, units of work, per-unit approval gates, build & test review, audit trail) on top of the Spec Kit SDD flow"
+  author: phamanhduy
+  license: MIT
+
+requires:
+  speckit_version: ">=1.0.0"
+
+provides:
+  commands:
+    - name: speckit.aidlc.init
+      file: commands/speckit.aidlc.init.md
+      description: "AI-DLC workspace detection: choose a profile, create aidlc-state.md and audit.md for the current feature"
+    - name: speckit.aidlc.reverse
+      file: commands/speckit.aidlc.reverse.md
+      description: "AI-DLC reverse engineering of an existing (brownfield) codebase"
+    - name: speckit.aidlc.stories
+      file: commands/speckit.aidlc.stories.md
+      description: "AI-DLC user stories + personas derived from spec.md"
+    - name: speckit.aidlc.nfr
+      file: commands/speckit.aidlc.nfr.md
+      description: "AI-DLC NFR requirements and NFR design derived from spec, plan and constitution"
+    - name: speckit.aidlc.units
+      file: commands/speckit.aidlc.units.md
+      description: "AI-DLC units of work: decompose the plan into units with a dependency DAG and delivery order"
+    - name: speckit.aidlc.map-tasks
+      file: commands/speckit.aidlc.map-tasks.md
+      description: "Map every task in tasks.md to a unit of work"
+    - name: speckit.aidlc.unit-gate
+      file: commands/speckit.aidlc.unit-gate.md
+      description: "Pick the next unit by the DAG, show its plan and wait for approval before implementing"
+    - name: speckit.aidlc.verify
+      file: commands/speckit.aidlc.verify.md
+      description: "AI-DLC build & test plus independent constitution review for the unit just implemented"
+    - name: speckit.aidlc.status
+      file: commands/speckit.aidlc.status.md
+      description: "Show the AI-DLC stage, profile, unit progress and next step for the current feature"
+
+hooks:
+  after_specify:
+    - command: speckit.aidlc.init
+      optional: false
+      priority: 1
+      description: "Initialize AI-DLC state and pick a workflow profile"
+    - command: speckit.aidlc.stories
+      optional: true
+      priority: 5
+      prompt: "Generate AI-DLC user stories and personas?"
+      description: "AI-DLC user stories (skipped for express/bugfix/refactor)"
+  after_plan:
+    - command: speckit.aidlc.nfr
+      optional: true
+      priority: 5
+      prompt: "Generate AI-DLC NFR requirements and design?"
+      description: "AI-DLC NFR requirements + design"
+    - command: speckit.aidlc.units
+      optional: false
+      priority: 10
+      description: "Decompose the plan into units of work (skipped for express)"
+  after_tasks:
+    command: speckit.aidlc.map-tasks
+    optional: false
+    description: "Map tasks to units of work (skipped when there is no unit-of-work.md)"
+  before_implement:
+    command: speckit.aidlc.unit-gate
+    optional: false
+    description: "Per-unit plan approval before code generation"
+  after_implement:
+    command: speckit.aidlc.verify
+    optional: false
+    description: "Build & test and independent review of the implemented unit"
+
+tags:
+  - "aidlc"
+  - "workflow"
+  - "quality-gates"

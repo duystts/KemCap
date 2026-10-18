@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "workflows": {
+    "speckit": {
+      "name": "Full SDD Cycle",
+      "version": "1.0.1",
+      "description": "Runs specify \u2192 plan \u2192 tasks \u2192 implement with review gates",
+      "source": "bundled",
+      "installed_at": "2026-10-12T15:59:19.217099+00:00",
+      "updated_at": "2026-10-12T15:59:19.217111+00:00"
+    },
+    "aidlc-sdd": {
+      "name": "AI-DLC + Spec Kit (Inception + Construction)",
+      "version": "0.1.0",
+      "description": "Spec Kit SDD with AI-DLC stages: profile, stories, NFR, units of work, unit-by-unit construction with human gates",
+      "source": "extensions\\aidlc\\workflows\\aidlc-sdd.yml",
+      "installed_at": "2026-10-17T16:09:34.942032+00:00",
+      "updated_at": "2026-10-17T16:09:34.942071+00:00"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+# Gitleaks (job "secrets" trong CI): luật mặc định + bỏ qua secret giả có chủ đích
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Secret giả cho test và profile local (không dùng ở môi trường thật)"
+paths = [
+  '''backend/src/test/''',
+  '''backend/src/main/resources/application-local\.yml''',
+]
