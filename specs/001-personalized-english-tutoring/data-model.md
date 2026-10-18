@@ -183,7 +183,7 @@ Ngày sinh nằm ở `user_account` (identity) để identity tự kiểm tra m�
 **State**:
 
 ```text
-PENDING_PAYMENT --PaymentRecorded--> ACTIVE
+PENDING_PAYMENT --thanh toán đầu tiên (billing gọi EnrollmentApi.activateOnFirstPayment, cùng transaction)--> ACTIVE
 ACTIVE --consumed = total--> EXHAUSTED
 ACTIVE --now > expires_at--> EXPIRED      (job hằng ngày; buổi BOOKED sau hạn vẫn giữ)
 EXPIRED --giáo vụ gia hạn (expires_at mới)--> ACTIVE
@@ -379,7 +379,7 @@ tệp qua `FileStorage.delete` — chỉ từ GĐ2, MVP không có tệp); trong
 
 | Field | Type | Rule |
 |---|---|---|
-| enrollment_id | UUID | PK; tạo khi nhận event `EnrollmentCreated` |
+| enrollment_id | UUID | PK; tạo khi nhận event `EnrollmentCreated`, **trong cùng transaction** với ghi danh (`BEFORE_COMMIT`) |
 | student_id | UUID | |
 | amount_due_vnd | bigint | = enrollment.price_vnd |
 | amount_paid_vnd | bigint | tổng các payment |

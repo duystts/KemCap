@@ -5,6 +5,7 @@ import com.englishplatform.identity.UserDirectory;
 import com.englishplatform.identity.UserStatus;
 import com.englishplatform.identity.UserView;
 import com.englishplatform.shared.web.BusinessException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,6 +43,23 @@ class UserDirectoryImpl implements UserDirectory {
   @Override
   public List<UserView> findAdmins() {
     return users.findByRoleAndStatus(Role.ADMIN, UserStatus.ACTIVE).stream()
+        .map(UserAccount::toView)
+        .toList();
+  }
+
+  @Override
+  public Optional<UserView> findByEmail(String email) {
+    return users.findByEmailIgnoreCase(email == null ? "" : email.trim()).map(UserAccount::toView);
+  }
+
+  @Override
+  public List<UserView> findAll(Collection<UUID> userIds) {
+    return users.findAllById(userIds).stream().map(UserAccount::toView).toList();
+  }
+
+  @Override
+  public List<UserView> search(Role role, UserStatus status, String q) {
+    return users.search(role, status, UserAccountRepository.likePattern(q)).stream()
         .map(UserAccount::toView)
         .toList();
   }

@@ -218,6 +218,11 @@ thanh toán đầu kích hoạt, thanh toán sau không đổi hạn); sửa gi�
 phân quyền (GV xem HV không phân công → 404; HV chỉ đọc thanh toán của mình); `TEACHER_HAS_STUDENTS`;
 `@Version` → 409; listener ẩn danh hóa chạy 2 lần không lỗi.
 
+**Việc chuyển từ verify U2** (build-test-U2.md): U8 — điều chỉnh thanh toán trên ghi danh đã hủy
+(R5), IT 2 thanh toán đồng thời + công nợ có điều chỉnh trên DB thật (R6), `cancel` lưu `reason` +
+người hủy (R7), IT hết hạn gói qua job (F3), test lọc `q`/`status` của `/students`, `/users` (F5).
+U3 — dùng `EnrollmentApi` trong cùng transaction với session (đã khóa + refresh, R2 đóng).
+
 ### U3 — Lịch rảnh, đặt lịch, trạng thái buổi & phòng học (B3 · 27/10–01/11 · BE #1 5,5 · FE #2 6)
 
 **BE (#1)**

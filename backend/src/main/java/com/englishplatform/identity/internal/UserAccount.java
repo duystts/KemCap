@@ -75,6 +75,10 @@ public class UserAccount extends BaseEntity {
     return Period.between(dateOfBirth, today).getYears();
   }
 
+  public boolean isAnonymized() {
+    return anonymizedAt != null;
+  }
+
   public boolean isActive() {
     return status == UserStatus.ACTIVE;
   }

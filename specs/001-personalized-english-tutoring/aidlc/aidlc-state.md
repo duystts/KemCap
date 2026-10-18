@@ -4,7 +4,7 @@
 - **Profile**: classic
 - **Workspace**: greenfield
 - **Created**: 2026-10-17
-- **Current stage**: Construction — U2 unit gate (`/speckit-aidlc-unit-gate`)
+- **Current stage**: Construction — U3 unit gate (`/speckit-aidlc-unit-gate`)
 
 ## Stage progress
 
@@ -24,7 +24,7 @@ Ký hiệu: `[ ]` chưa làm · `[~]` đang chờ duyệt · `[x]` đã duyệt 
 | Unit | Plan approved | Implemented | Verified | Verdict |
 |------|---------------|-------------|----------|---------|
 | U1 Nền tảng & walking skeleton (B1, 18–23/10; BE #1, FE #2) | [x] 2026-10-18 | [x] 2026-10-18 (37/37 task; T032 đạt 2026-10-18, T137 tối thiểu xong) | [x] 2026-10-18 **Verified (đóng)** — PASS_WITH_NOTES sau sửa R1–R10; điều kiện đóng hẳn trước hết B1: ~~CI/gitleaks~~ (xanh 2026-10-18, run 39099953407), ~~T032~~ (đạt 2026-10-18, GV + HV cùng room, cam/mic ổn); deploy HTTPS chuyển sang U5 | build-test-U1.md |
-| U2 Hồ sơ, gói, ghi danh, thanh toán (B2, 24–26/10; BE #1 + #4 billing, FE #4) | [ ] | [ ] | [ ] | |
+| U2 Hồ sơ, gói, ghi danh, thanh toán (B2, 24–26/10; BE #1 + #4 billing, FE #4) | [x] 2026-10-18 — phạm vi (c): toàn bộ BE do #1/Claude (gồm billing T104–T110 vốn của #4); FE T052–T055, T114 để #4 | [x] 2026-10-18 (21/21 task BE; verify xanh 29 unit + 45 IT; T111 đổi sang gọi đồng bộ activateOnFirstPayment) | [x] 2026-10-18 **Verified** — PASS_WITH_NOTES sau sửa R1–R4, F1, F2, F6 (30 unit + 47 IT); R5–R7, F3, F5 → U8; FE U2 (T052–T055, T114) còn mở cho #4 | build-test-U2.md | |
 | U3 Lịch, đặt lịch, trạng thái buổi, phòng học (B3, 27/10–1/11; BE #1, FE #2) | [ ] | [ ] | [ ] | |
 | U4 Năng lực, mục tiêu, lộ trình (B3, 27–28/10; BE #3, FE #3) | [ ] | [ ] | [ ] | |
 | U5 Thông báo, nhắc, vận hành/sao lưu (B4, 2–4/11; BE #1, FE #3) | [ ] | [ ] | [ ] | |
@@ -38,4 +38,4 @@ Ký hiệu: `[ ]` chưa làm · `[~]` đang chờ duyệt · `[x]` đã duyệt 
 
 ## Next step
 
-`/speckit-aidlc-unit-gate` cho U2 (B2, 24–26/10) → `/speckit-implement` → `/speckit-aidlc-verify`. Cổng U2 kiểm thêm quickstart bước 1 (chuyển từ U1).
+`/speckit-aidlc-unit-gate` cho U3 (B3, 27/10–01/11: lịch rảnh, đặt lịch, trạng thái buổi, phòng học) → `/speckit-implement` → `/speckit-aidlc-verify`. Song song: #4 làm FE U2 trên API thật.

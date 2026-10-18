@@ -13,6 +13,9 @@ spring:
       hibernate.jdbc.time_zone: UTC
   flyway:
     enabled: true
+    # số migration được gán trước theo module (V4 catalog, V8 billing, …) → module sau có thể thêm số
+    # nhỏ hơn số đã chạy
+    out-of-order: true
   mail:
     host: ${SMTP_HOST:localhost}
     port: ${SMTP_PORT:1025}

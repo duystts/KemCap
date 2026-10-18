@@ -21,7 +21,7 @@ token (sửa sau verify U1, 2026-10-18).
 | `EnrollmentActivated` | catalog | enrollmentId, studentId, expiresAt | notification → email chào mừng |
 | `TeacherReassigned` | catalog | enrollmentId, studentId, fromTeacherId, toTeacherId | scheduling → buổi `BOOKED` tương lai với giáo viên cũ → `CANCELLED_SYSTEM`; notification → báo học viên + hai giáo viên |
 | `EnrollmentRenewalDue` | catalog (job hằng ngày) | enrollmentId, studentId, sessionsRemaining, expiresAt, reason `LOW_SESSIONS`\|`EXPIRING` | notification → nhắc HV + admin |
-| `PaymentRecorded` | billing | enrollmentId, paymentId, amountVnd, isFirstPayment | catalog → kích hoạt enrollment (nếu `PENDING_PAYMENT`) |
+| `PaymentRecorded` | billing | enrollmentId, paymentId, amountVnd, isFirstPayment | (chưa module nào nghe trong MVP — U8 báo cáo có thể dùng). Kích hoạt ghi danh **không** qua event này mà qua `EnrollmentApi.activateOnFirstPayment` (xem §2) |
 | `SessionBooked` | scheduling | sessionId, enrollmentId, teacherId, studentId, startsAt, endsAt | notification → xác nhận cho cả hai |
 | `SessionCancelled` | scheduling | sessionId, enrollmentId, status, cancelledBy, startsAt | notification → báo bên còn lại; nếu `TEACHER_ABSENT` báo admin |
 | `SessionRescheduled` | scheduling | oldSessionId, newSessionId, newStartsAt | notification |
@@ -45,10 +45,15 @@ Registry phát lại event chưa hoàn tất khi khởi động lại (`republis
 | Interface (package gốc) | Module | Dùng bởi | Phương thức chính |
 |---|---|---|---|
 | `UserDirectory` | identity | mọi module | `find(userId)`, `requireActive(userId, role)` |
-| `EnrollmentApi` | catalog | scheduling, learning, billing | `get(id)`, `reserve(id)`, `release(id)`, `consume(id)`, `consumeReleased(id)` (INTERRUPTED → COMPLETED), `isAssigned(teacherId, studentId)` |
+| `EnrollmentApi` | catalog | scheduling, learning, billing | `get(id)`, `reserve(id)`, `release(id)`, `consume(id)`, `consumeReleased(id)` (INTERRUPTED → COMPLETED), `activateOnFirstPayment(id)` (billing gọi trong transaction ghi thanh toán đầu), `isAssigned(teacherId, studentId)` |
 | `SessionQueryApi` | scheduling | learning | `find(sessionId)` → SessionView(id, teacherId, studentId, startsAt, endsAt, status), `attendance(studentId)` → {completed, noShow, cancelledLate} |
 
 | `UserDeactivationGuard` (SPI) | identity định nghĩa, catalog cài | identity | `void check(userId, role)` — ném `TEACHER_HAS_STUDENTS` nếu giáo viên còn ghi danh ACTIVE/PENDING_PAYMENT |
+
+**Sửa ở U2 (2026-10-18)**: billing nghe `EnrollmentCreated` của catalog, nên nếu catalog lại nghe
+`PaymentRecorded` của billing thì hai module phụ thuộc vòng (Modulith báo lỗi). Vì vậy billing gọi đồng
+bộ `activateOnFirstPayment` trong cùng transaction ghi thanh toán (thay listener T111) — thanh toán và
+kích hoạt luôn cùng thành công hoặc cùng thất bại. Hướng phụ thuộc: billing → catalog → identity.
 
 `isAssigned` được dùng cho kiểm tra quyền "giáo viên chỉ thấy học viên được phân công" (FR-003).
 `UserDeactivationGuard` đảo chiều phụ thuộc: identity không gọi catalog, catalog đăng ký bean cài interface của identity.

@@ -27,6 +27,7 @@ Bảng dưới là thỏa thuận ban đầu để 4 người làm song song.
 | POST | `/me/consents` | Any | `{policyVersion}` đồng ý phiên bản chính sách hiện hành | FR-030 |
 | PATCH | `/me` | Any | sửa `fullName`, `phone`, `timezone` | |
 | GET | `/users?role=&status=&q=` | A | danh sách người dùng | FR-007 |
+| GET | `/users/{id}` | A | chi tiết một người dùng (thêm ở U2) | FR-004 |
 | POST | `/users` | A | `{email, fullName, role, phone?, dateOfBirth?}` (`dateOfBirth` bắt buộc khi STUDENT) → tạo + gửi email mời; học viên < 16 tuổi → `AWAITING_GUARDIAN_CONSENT`, chưa gửi mời | FR-002, FR-004, FR-030 |
 | PATCH | `/users/{id}/status` | A | `{status: ACTIVE\|INACTIVE}`; 409 `TEACHER_HAS_STUDENTS` khi ngừng giáo viên còn học viên; 409 `ANONYMIZED` với hồ sơ đã ẩn danh | FR-004 |
 | POST | `/users/{id}/resend-invite` | A | gửi lại lời mời | |
@@ -55,11 +56,13 @@ Mật khẩu: tối thiểu 8 ký tự, có chữ và số.
 | POST | `/enrollments` | A | `{studentId, packageId, teacherId, priceVnd?}` → `PENDING_PAYMENT` | FR-006 |
 | GET | `/enrollments?studentId=&teacherId=&status=` | A; T; S | danh sách ghi danh + số buổi còn lại | FR-024 |
 | GET | `/enrollments/{id}` | A; T; S | chi tiết | |
+| GET | `/enrollments/{id}/teacher-history` | A | lịch sử phân công giáo viên (thêm ở U2) | FR-006 |
 | PUT | `/enrollments/{id}/teacher` | A | `{teacherId, reason}` đổi giáo viên; buổi `BOOKED` tương lai với giáo viên cũ → `CANCELLED_SYSTEM` (bất đồng bộ) | FR-006 |
 | POST | `/enrollments/{id}/extend` | A | `{newExpiresAt}` gia hạn thủ công (EXPIRED/ACTIVE → ACTIVE, ghi người + thời điểm) | FR-024 |
 | POST | `/enrollments/{id}/cancel` | A | `{reason}` | |
 
-`EnrollmentDto` gồm: `sessionsTotal, sessionsReserved, sessionsConsumed, sessionsRemaining, expiresAt, status`.
+`EnrollmentDto` gồm: `sessionsTotal, sessionsReserved, sessionsConsumed, sessionsRemaining, expiresAt, status` (+ `priceVnd` — null khi người xem là giáo viên, `version`).
+**MVP (U2)**: các API danh sách (`/users`, `/students`, `/enrollments`, `/courses`, `/packages`) trả mảng, chưa phân trang — quy mô demo nhỏ; thêm `page/size` khi cần. `GET /students/{id}/profile`: `notes` chỉ trả cho admin.
 
 ## scheduling
 
