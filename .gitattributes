@@ -1,5 +1,10 @@
-# Giữ LF cho script chạy trên Linux/Git Bash dù Windows bật core.autocrlf
+# Giữ LF cho script và frontend source dù Windows bật core.autocrlf
 * text=auto
 backend/mvnw text eol=lf
 *.sh text eol=lf
 *.cmd text eol=crlf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+*.html text eol=lf
