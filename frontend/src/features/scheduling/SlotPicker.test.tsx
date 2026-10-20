@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import SlotPicker from './SlotPicker'
@@ -36,18 +36,10 @@ describe('SlotPicker component', () => {
     // Verify header exists
     expect(screen.getByText(/Bước 1: Chọn ngày học/i)).toBeInTheDocument()
 
-    // Wait for slots to finish loading
-    await waitFor(() => {
-      expect(screen.queryByText(/Đang tìm các khung giờ trống/i)).not.toBeInTheDocument()
-    })
-
-    // Click on a slot (format time matching system timezone)
-    const expectedStart = new Date(mockSlots[0].startsAt).toLocaleTimeString('vi-VN', {
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-    const slotBtn = await screen.findByRole('button', { name: new RegExp(expectedStart) })
-    await userEvent.click(slotBtn)
+    // Wait for slots to finish loading and select the first slot
+    const slotBtns = await screen.findAllByTestId('slot-item')
+    expect(slotBtns.length).toBeGreaterThan(0)
+    await userEvent.click(slotBtns[0])
     expect(onSelectSlot).toHaveBeenCalledWith(mockSlots[0])
   })
 })

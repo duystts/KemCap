@@ -113,6 +113,7 @@ export default function SlotPicker({ enrollmentId, selectedSlot, onSelectSlot }:
                 <button
                   key={slot.startsAt}
                   type="button"
+                  data-testid="slot-item"
                   onClick={() => onSelectSlot(slot)}
                   className={`p-3 rounded-xl border text-left transition-all relative ${
                     isSelected
