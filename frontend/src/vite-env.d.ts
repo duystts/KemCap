@@ -35,5 +35,12 @@ declare module 'lucide-react' {
   export const X: LucideIcon
   export const Check: LucideIcon
   export const AlertCircle: LucideIcon
+  export const AlertTriangle: LucideIcon
   export const Info: LucideIcon
+  export const ArrowLeft: LucideIcon
+  export const Filter: LucideIcon
+  export const ExternalLink: LucideIcon
+  export const CheckCircle: LucideIcon
+  export const CheckCircle2: LucideIcon
+  export const XCircle: LucideIcon
 }
