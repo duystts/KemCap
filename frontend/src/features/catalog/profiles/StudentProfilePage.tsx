@@ -269,7 +269,8 @@ export default function StudentProfilePage() {
           </CardHeader>
           <CardContent>
             <div className="p-8 text-center text-sm text-slate-500 bg-slate-50 rounded-xl border border-dashed">
-              Chỗ trống cho Hồ sơ năng lực 5 kỹ năng CEFR và Mục tiêu học tập (Được triển khai trong Unit 4).
+              Chỗ trống cho Hồ sơ năng lực 5 kỹ năng CEFR và Mục tiêu học tập (Được triển khai trong
+              Unit 4).
             </div>
           </CardContent>
         </Card>
@@ -285,7 +286,8 @@ export default function StudentProfilePage() {
           </CardHeader>
           <CardContent>
             <div className="p-8 text-center text-sm text-slate-500 bg-slate-50 rounded-xl border border-dashed">
-              Chỗ trống cho Lộ trình học cá nhân hóa theo từng chặng và chủ đề (Được triển khai trong Unit 4).
+              Chỗ trống cho Lộ trình học cá nhân hóa theo từng chặng và chủ đề (Được triển khai
+              trong Unit 4).
             </div>
           </CardContent>
         </Card>
