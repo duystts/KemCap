@@ -48,13 +48,28 @@ class SchedulingNotificationListenerTest {
 
     UserView student =
         new UserView(
-            studentId, "student@test.local", "Học Viên A", Role.STUDENT, UserStatus.ACTIVE, "Asia/Ho_Chi_Minh");
+            studentId,
+            "student@test.local",
+            "Học Viên A",
+            Role.STUDENT,
+            UserStatus.ACTIVE,
+            "Asia/Ho_Chi_Minh");
     UserView teacher =
         new UserView(
-            teacherId, "teacher@test.local", "Giáo Viên B", Role.TEACHER, UserStatus.ACTIVE, "Asia/Ho_Chi_Minh");
+            teacherId,
+            "teacher@test.local",
+            "Giáo Viên B",
+            Role.TEACHER,
+            UserStatus.ACTIVE,
+            "Asia/Ho_Chi_Minh");
     UserView admin =
         new UserView(
-            adminId, "admin@test.local", "Giáo Vụ C", Role.ADMIN, UserStatus.ACTIVE, "Asia/Ho_Chi_Minh");
+            adminId,
+            "admin@test.local",
+            "Giáo Vụ C",
+            Role.ADMIN,
+            UserStatus.ACTIVE,
+            "Asia/Ho_Chi_Minh");
 
     when(userDirectory.find(studentId)).thenReturn(Optional.of(student));
     when(userDirectory.find(teacherId)).thenReturn(Optional.of(teacher));
@@ -101,13 +116,7 @@ class SchedulingNotificationListenerTest {
     ArgumentCaptor<String> dedupeCaptor = ArgumentCaptor.forClass(String.class);
     verify(dispatchService, times(2))
         .notify(
-            dedupeCaptor.capture(),
-            any(),
-            any(),
-            any(),
-            eq("session-reminder"),
-            anyMap(),
-            any());
+            dedupeCaptor.capture(), any(), any(), any(), eq("session-reminder"), anyMap(), any());
 
     assertThat(dedupeCaptor.getAllValues())
         .contains(
@@ -136,13 +145,6 @@ class SchedulingNotificationListenerTest {
 
     // Báo student + báo teacher + báo admin = 3 thông báo
     verify(dispatchService, times(3))
-        .notify(
-            any(),
-            any(),
-            any(),
-            any(),
-            eq("session-cancelled"),
-            anyMap(),
-            any());
+        .notify(any(), any(), any(), any(), eq("session-cancelled"), anyMap(), any());
   }
 }

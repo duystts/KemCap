@@ -16,8 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 class CatalogNotificationListener {
 
-  private static final DateTimeFormatter DATE_FORMATTER =
-      DateTimeFormatter.ofPattern("dd/MM/yyyy");
+  private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
   private final DispatchService dispatchService;
   private final UserDirectory userDirectory;
@@ -155,7 +154,9 @@ class CatalogNotificationListener {
               String expiresAtFormatted = formatDate(event.expiresAt(), student.timezone());
               String reasonText =
                   (event.reason() == CatalogEvents.RenewalReason.LOW_SESSIONS)
-                      ? "Gói học của bạn sắp hết buổi (chỉ còn " + event.sessionsRemaining() + " buổi)."
+                      ? "Gói học của bạn sắp hết buổi (chỉ còn "
+                          + event.sessionsRemaining()
+                          + " buổi)."
                       : "Gói học của bạn sắp hết hạn sử dụng vào ngày " + expiresAtFormatted + ".";
 
               String studentLink = frontendUrl + "/student/packages";
@@ -180,10 +181,7 @@ class CatalogNotificationListener {
                   "renewal-reminder",
                   model,
                   new DispatchService.InApp(
-                      "RENEWAL_DUE",
-                      "Nhắc gia hạn gói học",
-                      reasonText,
-                      studentLink));
+                      "RENEWAL_DUE", "Nhắc gia hạn gói học", reasonText, studentLink));
 
               // Báo admin
               for (UserView admin : userDirectory.findAdmins()) {
@@ -191,7 +189,11 @@ class CatalogNotificationListener {
                 adminModel.put("fullName", admin.fullName());
                 adminModel.put(
                     "reasonText",
-                    "Học viên " + student.fullName() + " có gói học cần gia hạn (" + reasonText + ").");
+                    "Học viên "
+                        + student.fullName()
+                        + " có gói học cần gia hạn ("
+                        + reasonText
+                        + ").");
                 adminModel.put("sessionsRemaining", event.sessionsRemaining());
                 adminModel.put("formattedExpiresAt", expiresAtFormatted);
                 adminModel.put("link", frontendUrl + "/admin/billing");

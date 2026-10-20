@@ -13,7 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.englishplatform.notification.internal.Notification;
 import com.englishplatform.notification.internal.NotificationService;
 import com.englishplatform.shared.security.CurrentUser;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -77,16 +76,14 @@ class NotificationControllerTest {
   void markRead_callsService() throws Exception {
     UUID notifId = UUID.randomUUID();
 
-    mvc.perform(post("/api/v1/notifications/" + notifId + "/read"))
-        .andExpect(status().isOk());
+    mvc.perform(post("/api/v1/notifications/" + notifId + "/read")).andExpect(status().isOk());
 
     verify(service).markRead(userId, notifId);
   }
 
   @Test
   void markAllRead_callsService() throws Exception {
-    mvc.perform(post("/api/v1/notifications/read-all"))
-        .andExpect(status().isOk());
+    mvc.perform(post("/api/v1/notifications/read-all")).andExpect(status().isOk());
 
     verify(service).markAllRead(userId);
   }

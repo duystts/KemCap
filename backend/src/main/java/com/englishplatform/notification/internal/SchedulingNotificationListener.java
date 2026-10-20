@@ -10,7 +10,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Component;
@@ -91,7 +90,10 @@ class SchedulingNotificationListener {
                             new DispatchService.InApp(
                                 "SESSION_BOOKED",
                                 "Có lịch dạy mới",
-                                "Học viên " + student.fullName() + " đã đặt buổi học lúc " + teacherTime,
+                                "Học viên "
+                                    + student.fullName()
+                                    + " đã đặt buổi học lúc "
+                                    + teacherTime,
                                 teacherLink));
                       });
             });
@@ -173,10 +175,14 @@ class SchedulingNotificationListener {
                 for (UserView admin : userDirectory.findAdmins()) {
                   Map<String, Object> adminModel = new HashMap<>();
                   adminModel.put("fullName", admin.fullName());
-                  adminModel.put("formattedTime", formatInstant(event.startsAt(), admin.timezone()));
+                  adminModel.put(
+                      "formattedTime", formatInstant(event.startsAt(), admin.timezone()));
                   adminModel.put(
                       "reason",
-                      "Giáo viên " + teacher.fullName() + " vắng/hủy buổi học với học viên " + student.fullName());
+                      "Giáo viên "
+                          + teacher.fullName()
+                          + " vắng/hủy buổi học với học viên "
+                          + student.fullName());
                   adminModel.put("consumeNote", "Cần xem xét xếp buổi bù hoặc hỗ trợ học viên.");
                   adminModel.put("link", frontendUrl + "/admin/schedule");
 
@@ -190,7 +196,10 @@ class SchedulingNotificationListener {
                       new DispatchService.InApp(
                           "TEACHER_ABSENT",
                           "Giáo viên vắng buổi học",
-                          "GV " + teacher.fullName() + " vắng buổi học với HV " + student.fullName(),
+                          "GV "
+                              + teacher.fullName()
+                              + " vắng buổi học với HV "
+                              + student.fullName(),
                           frontendUrl + "/admin/schedule"));
                 }
               }
@@ -255,7 +264,8 @@ class SchedulingNotificationListener {
     UserView teacher = userDirectory.find(event.teacherId()).orElse(null);
     if (student == null || teacher == null) return;
 
-    String windowText = (event.window() == SchedulingEvents.ReminderWindow.H24) ? "24 giờ" : "1 giờ";
+    String windowText =
+        (event.window() == SchedulingEvents.ReminderWindow.H24) ? "24 giờ" : "1 giờ";
     String windowCode = event.window().name();
 
     // Nhắc học viên
@@ -351,7 +361,10 @@ class SchedulingNotificationListener {
                     new DispatchService.InApp(
                         "OUTCOME_OVERDUE",
                         "Buổi học chưa chốt kết quả",
-                        "GV " + teacher.fullName() + " chưa chốt kết quả buổi học kết thúc lúc " + teacherTime,
+                        "GV "
+                            + teacher.fullName()
+                            + " chưa chốt kết quả buổi học kết thúc lúc "
+                            + teacherTime,
                         frontendUrl + "/admin/schedule"));
               }
             });

@@ -63,11 +63,7 @@ class NotificationListenerIT {
     admin =
         userAccountRepository.save(
             new UserAccount(
-                "admin.test@demo.local",
-                "Giáo Vụ Test",
-                Role.ADMIN,
-                null,
-                UserStatus.ACTIVE));
+                "admin.test@demo.local", "Giáo Vụ Test", Role.ADMIN, null, UserStatus.ACTIVE));
   }
 
   @AfterEach
@@ -129,7 +125,8 @@ class NotificationListenerIT {
 
     assertThat(emailSender.sent())
         .hasSize(1)
-        .anyMatch(msg -> msg.to().equals(student.getEmail()) && msg.subject().contains("kích hoạt"));
+        .anyMatch(
+            msg -> msg.to().equals(student.getEmail()) && msg.subject().contains("kích hoạt"));
 
     assertThat(notificationRepository.findByUserIdOrderByCreatedAtDesc(student.getId(), null))
         .anyMatch(n -> n.getType().equals("ENROLLMENT_ACTIVATED"));
@@ -140,11 +137,7 @@ class NotificationListenerIT {
     UserAccount newTeacher =
         userAccountRepository.save(
             new UserAccount(
-                "teacher.new@demo.local",
-                "Giáo Viên Mới",
-                Role.TEACHER,
-                null,
-                UserStatus.ACTIVE));
+                "teacher.new@demo.local", "Giáo Viên Mới", Role.TEACHER, null, UserStatus.ACTIVE));
 
     UUID enrollmentId = UUID.randomUUID();
 
@@ -169,11 +162,13 @@ class NotificationListenerIT {
         new LearningEvents.SessionReportOverdue(
             sessionId, teacher.getId(), Instant.parse("2026-11-01T12:00:00Z")));
     assertThat(emailSender.sent())
-        .anyMatch(msg -> msg.to().equals(teacher.getEmail()) && msg.subject().contains("phiếu đánh giá"));
+        .anyMatch(
+            msg -> msg.to().equals(teacher.getEmail()) && msg.subject().contains("phiếu đánh giá"));
 
     // 2. AssignmentGraded -> Báo student
     events.publishEvent(new LearningEvents.AssignmentGraded(assignmentId, student.getId(), 9));
     assertThat(emailSender.sent())
-        .anyMatch(msg -> msg.to().equals(student.getEmail()) && msg.subject().contains("chấm điểm"));
+        .anyMatch(
+            msg -> msg.to().equals(student.getEmail()) && msg.subject().contains("chấm điểm"));
   }
 }

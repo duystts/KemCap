@@ -22,19 +22,11 @@ class NotificationApiIT extends ApiTestSupport {
 
     notificationRepository.save(
         new Notification(
-            studentA.id(),
-            "SESSION_BOOKED",
-            "Thông báo cho A",
-            "Nội dung A",
-            "/student/schedule"));
+            studentA.id(), "SESSION_BOOKED", "Thông báo cho A", "Nội dung A", "/student/schedule"));
 
     notificationRepository.save(
         new Notification(
-            studentB.id(),
-            "SESSION_BOOKED",
-            "Thông báo cho B",
-            "Nội dung B",
-            "/student/schedule"));
+            studentB.id(), "SESSION_BOOKED", "Thông báo cho B", "Nội dung B", "/student/schedule"));
 
     // Student A lấy danh sách thông báo
     call(get("/api/v1/notifications"), studentA, null)
@@ -84,15 +76,12 @@ class NotificationApiIT extends ApiTestSupport {
     TestUser student = user(Role.STUDENT);
 
     notificationRepository.save(
-        new Notification(
-            student.id(), "TYPE_1", "Tiêu đề 1", "Nội dung 1", "/link1"));
+        new Notification(student.id(), "TYPE_1", "Tiêu đề 1", "Nội dung 1", "/link1"));
     notificationRepository.save(
-        new Notification(
-            student.id(), "TYPE_2", "Tiêu đề 2", "Nội dung 2", "/link2"));
+        new Notification(student.id(), "TYPE_2", "Tiêu đề 2", "Nội dung 2", "/link2"));
 
     // Đánh dấu đọc tất cả
-    call(post("/api/v1/notifications/read-all"), student, null)
-        .andExpect(status().isOk());
+    call(post("/api/v1/notifications/read-all"), student, null).andExpect(status().isOk());
 
     // Kiểm tra unreadCount = 0
     call(get("/api/v1/notifications?unread=true"), student, null)
