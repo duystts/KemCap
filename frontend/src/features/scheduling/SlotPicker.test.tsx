@@ -41,8 +41,12 @@ describe('SlotPicker component', () => {
       expect(screen.queryByText(/Đang tìm các khung giờ trống/i)).not.toBeInTheDocument()
     })
 
-    // Click on a slot (09:00 UTC formatted in local time)
-    const slotBtn = await screen.findByRole('button', { name: /16:00/i })
+    // Click on a slot (format time matching system timezone)
+    const expectedStart = new Date(mockSlots[0].startsAt).toLocaleTimeString('vi-VN', {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+    const slotBtn = await screen.findByRole('button', { name: new RegExp(expectedStart) })
     await userEvent.click(slotBtn)
     expect(onSelectSlot).toHaveBeenCalledWith(mockSlots[0])
   })
