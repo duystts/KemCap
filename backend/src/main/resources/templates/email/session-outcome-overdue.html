@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${subject}">Cảnh báo: Buổi học chưa chốt kết quả</title>
+</head>
+<body style="font-family: Arial, sans-serif; color: #1f2937; line-height: 1.5; padding: 16px;">
+  <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 24px;">
+    <h2 style="color: #d97706; margin-top: 0;">Cảnh báo: Buổi học quá 24h chưa chốt kết quả</h2>
+    <p>Xin chào <strong th:text="${fullName}">bạn</strong>,</p>
+    <p>Buổi học kết thúc lúc <strong th:text="${formattedTime}">19:00, 24/10/2026</strong> đã quá 24 giờ nhưng chưa được ghi nhận kết quả (Hoàn thành / Vắng / Gián đoạn).</p>
+    <p>Vui lòng kiểm tra và cập nhật trạng thái buổi học để hệ thống xử lý trừ buổi và giải phóng báo cáo.</p>
+
+    <p style="margin-top: 24px;">
+      <a th:href="${link}" href="#"
+         style="display: inline-block; padding: 10px 20px; background: #d97706; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold;">
+        Chốt kết quả buổi học
+      </a>
+    </p>
+    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
+    <p style="font-size: 13px; color: #6b7280; margin: 0;">Nền tảng đào tạo tiếng Anh 1 kèm 1 cá nhân hóa (English 1-1 Platform).</p>
+  </div>
+</body>
+</html>

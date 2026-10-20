@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${subject}">Gói học đã được kích hoạt</title>
+</head>
+<body style="font-family: Arial, sans-serif; color: #1f2937; line-height: 1.5; padding: 16px;">
+  <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 24px;">
+    <h2 style="color: #16a34a; margin-top: 0;">Chúc mừng! Gói học của bạn đã sẵn sàng</h2>
+    <p>Xin chào <strong th:text="${fullName}">bạn</strong>,</p>
+    <p>Khoản thanh toán học phí đã được ghi nhận và gói học tiếng Anh 1 kèm 1 của bạn đã chính thức được kích hoạt.</p>
+    
+    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 14px 18px; border-radius: 6px; margin: 16px 0;">
+      <p style="margin: 6px 0;"><strong>Hạn sử dụng gói:</strong> <span th:text="${formattedExpiresAt}">31/12/2026</span></p>
+      <p style="margin: 6px 0;">Bây giờ bạn đã có thể bắt đầu chọn lịch rảnh của giáo viên và đặt buổi học đầu tiên!</p>
+    </div>
+
+    <p style="margin-top: 24px;">
+      <a th:href="${link}" href="#"
+         style="display: inline-block; padding: 12px 24px; background: #16a34a; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">
+        Đặt lịch học ngay
+      </a>
+    </p>
+    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
+    <p style="font-size: 13px; color: #6b7280; margin: 0;">Nền tảng đào tạo tiếng Anh 1 kèm 1 cá nhân hóa (English 1-1 Platform).</p>
+  </div>
+</body>
+</html>
