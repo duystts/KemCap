@@ -43,4 +43,27 @@ declare module 'lucide-react' {
   export const CheckCircle: LucideIcon
   export const CheckCircle2: LucideIcon
   export const XCircle: LucideIcon
+  export const Mail: LucideIcon
+  export const Shield: LucideIcon
+  export const Award: LucideIcon
+  export const FileText: LucideIcon
+  export const DollarSign: LucideIcon
+  export const CreditCard: LucideIcon
+  export const Send: LucideIcon
+  export const History: LucideIcon
+  export const TrendingUp: LucideIcon
+  export const Target: LucideIcon
+  export const Book: LucideIcon
+  export const GraduationCap: LucideIcon
+  export const Sparkles: LucideIcon
+  export const RefreshCw: LucideIcon
+  export const UserPlus: LucideIcon
+  export const RotateCw: LucideIcon
+  export const Power: LucideIcon
+  export const Package: LucideIcon
+  export const UserCheck: LucideIcon
+  export const ArrowRight: LucideIcon
+  export const Briefcase: LucideIcon
+  export const Save: LucideIcon
+  export const Circle: LucideIcon
 }
