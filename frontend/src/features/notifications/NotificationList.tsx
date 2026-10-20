@@ -73,19 +73,22 @@ export function NotificationList({
               >
                 <div className="pt-1">
                   {isUnread ? (
-                    <span className="block h-2 w-2 rounded-full bg-blue-600" aria-label="Chưa đọc" />
+                    <span
+                      className="block h-2 w-2 rounded-full bg-blue-600"
+                      aria-label="Chưa đọc"
+                    />
                   ) : (
                     <span className="block h-2 w-2 rounded-full bg-transparent" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-xs ${isUnread ? 'font-semibold text-foreground' : 'text-foreground/90'}`}>
+                  <p
+                    className={`text-xs ${isUnread ? 'font-semibold text-foreground' : 'text-foreground/90'}`}
+                  >
                     {item.title}
                   </p>
                   {item.body && (
-                    <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
-                      {item.body}
-                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">{item.body}</p>
                   )}
                   <span className="mt-1 block text-[11px] text-muted-foreground/75">
                     {formatRelativeTime(item.createdAt)}
