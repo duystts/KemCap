@@ -330,17 +330,17 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 
 ### Thông báo cho mọi event (U5)
 
-- [ ] T132 (#1·U5) Listener `B/notification/internal/SchedulingNotificationListener.java`: `SessionBooked` (xác nhận cho cả hai), `SessionCancelled` (báo bên còn lại; `TEACHER_ABSENT` báo thêm mọi admin qua `UserDirectory.findAdmins()`; `CANCELLED_SYSTEM` báo học viên + giáo viên), `SessionRescheduled`, `SessionReminderDue` (dedupe `session:{id}:reminder:{window}:{userId}`), `SessionOutcomeOverdue` (giáo viên + admin); giờ theo `timezone` người nhận; template `TPL/session-booked.html`, `session-cancelled.html`, `session-rescheduled.html`, `session-reminder.html`, `session-outcome-overdue.html`
-- [ ] T133 (#1·U5) Listener `B/notification/internal/CatalogNotificationListener.java`: `TeacherReassigned` (học viên + giáo viên cũ + giáo viên mới), `EnrollmentActivated` (chào mừng), `EnrollmentRenewalDue` (học viên + mọi admin; email + trong hệ thống); template `teacher-reassigned.html`, `enrollment-activated.html`, `renewal-reminder.html`
-- [ ] T134 (#1·U5) Listener `B/notification/internal/LearningNotificationListener.java`: `SessionReportOverdue` (nhắc giáo viên), `SessionReportSubmitted` (mời học viên xem nhận xét + chấm sao), `AssignmentSubmitted`, `AssignmentGraded`; template tương ứng
-- [ ] T135 (#1·U5) `B/notification/internal/web/NotificationController.java`: `GET /notifications?unread=`, `POST /{id}/read`, `POST /read-all` (chỉ của chính user)
-- [ ] T136 [P] (#3·U5) Frontend `F/features/notifications/NotificationBell.tsx` + `NotificationList.tsx` (gọi lại mỗi 60 giây, đánh dấu đã đọc)
+- [X] T132 (#1·U5) Listener `B/notification/internal/SchedulingNotificationListener.java`: `SessionBooked` (xác nhận cho cả hai), `SessionCancelled` (báo bên còn lại; `TEACHER_ABSENT` báo thêm mọi admin qua `UserDirectory.findAdmins()`; `CANCELLED_SYSTEM` báo học viên + giáo viên), `SessionRescheduled`, `SessionReminderDue` (dedupe `session:{id}:reminder:{window}:{userId}`), `SessionOutcomeOverdue` (giáo viên + admin); giờ theo `timezone` người nhận; template `TPL/session-booked.html`, `session-cancelled.html`, `session-rescheduled.html`, `session-reminder.html`, `session-outcome-overdue.html`
+- [X] T133 (#1·U5) Listener `B/notification/internal/CatalogNotificationListener.java`: `TeacherReassigned` (học viên + giáo viên cũ + giáo viên mới), `EnrollmentActivated` (chào mừng), `EnrollmentRenewalDue` (học viên + mọi admin; email + trong hệ thống); template `teacher-reassigned.html`, `enrollment-activated.html`, `renewal-reminder.html`
+- [X] T134 (#1·U5) Listener `B/notification/internal/LearningNotificationListener.java`: `SessionReportOverdue` (nhắc giáo viên), `SessionReportSubmitted` (mời học viên xem nhận xét + chấm sao), `AssignmentSubmitted`, `AssignmentGraded`; template tương ứng
+- [X] T135 (#1·U5) `B/notification/internal/web/NotificationController.java`: `GET /notifications?unread=`, `POST /{id}/read`, `POST /read-all` (chỉ của chính user)
+- [X] T136 [P] (#3·U5) Frontend `F/features/notifications/NotificationBell.tsx` + `NotificationList.tsx` (gọi lại mỗi 60 giây, đánh dấu đã đọc)
 
 ### Vận hành demo (U5)
 
-- [ ] T137 (#1·U5) `backend/Dockerfile` (multi-stage, chạy được trên ARM64), `deploy/docker-compose.prod.yml` (backend, postgres 16 có volume, caddy; Docker log rotation `max-size: 10m`, `max-file: 3`; healthcheck `/actuator/health`), `deploy/Caddyfile` (HTTPS tự động); hướng dẫn `deploy/README.md` cho Oracle Cloud Always Free VM
-- [ ] T138 (#1·U5) Sao lưu (R17): service `backup` trong `deploy/docker-compose.prod.yml` chạy `pg_dump` hằng ngày → bucket R2 riêng, giữ 7 bản; script khôi phục `deploy/restore.sh`; RPO ≤ 24 h, RTO ≤ 4 h
-- [ ] T139 [P] (#1·U5) Dịch vụ demo: LiveKit Cloud free, Brevo hoặc Gmail SMTP, Cloudflare Pages cho `frontend/` (`VITE_API_URL`), dịch vụ ping healthcheck free; ghi trong `deploy/README.md` (không ghi secret)
+- [X] T137 (#1·U5) `backend/Dockerfile` (multi-stage, chạy được trên ARM64), `deploy/docker-compose.prod.yml` (backend, postgres 16 có volume, caddy; Docker log rotation `max-size: 10m`, `max-file: 3`; healthcheck `/actuator/health`), `deploy/Caddyfile` (HTTPS tự động); hướng dẫn `deploy/README.md` cho Oracle Cloud Always Free VM
+- [X] T138 (#1·U5) Sao lưu (R17): service `backup` trong `deploy/docker-compose.prod.yml` chạy `pg_dump` hằng ngày → bucket R2 riêng, giữ 7 bản; script khôi phục `deploy/restore.sh`; RPO ≤ 24 h, RTO ≤ 4 h
+- [X] T139 [P] (#1·U5) Dịch vụ demo: LiveKit Cloud free, Brevo hoặc Gmail SMTP, Cloudflare Pages cho `frontend/` (`VITE_API_URL`), dịch vụ ping healthcheck free; ghi trong `deploy/README.md` (không ghi secret)
 
 ### Ổn định (B6–B7)
 

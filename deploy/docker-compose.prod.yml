@@ -1,9 +1,17 @@
-# Bản tối thiểu (U1): backend + postgres + caddy trên Oracle Cloud Always Free VM.
-# U5 bổ sung: log rotation đầy đủ, healthcheck ping ngoài, service backup pg_dump → R2 (R17).
+# Bản hoàn thiện (U5): backend + postgres + caddy + backup trên Oracle Cloud Always Free VM.
+# Bổ sung: log rotation đầy đủ, healthcheck, service backup pg_dump hằng ngày → R2/local (R17).
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   postgres:
     image: postgres:16
     restart: unless-stopped
+    logging: *default-logging
     environment:
       POSTGRES_DB: english
       POSTGRES_USER: ${DB_USER:-app}
@@ -18,6 +26,7 @@ services:
   backend:
     build: ../backend
     restart: unless-stopped
+    logging: *default-logging
     env_file: .env
     environment:
       DB_URL: jdbc:postgresql://postgres:5432/english
@@ -26,12 +35,19 @@ services:
       postgres:
         condition: service_healthy
     mem_limit: 1g
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     expose:
       - "8080"
 
   caddy:
     image: caddy:2
     restart: unless-stopped
+    logging: *default-logging
     ports:
       - "80:80"
       - "443:443"
@@ -43,6 +59,33 @@ services:
       - caddy_config:/config
     depends_on:
       - backend
+
+  backup:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      PGHOST: postgres
+      POSTGRES_DB: english
+      DB_USER: ${DB_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      R2_ENDPOINT: ${R2_ENDPOINT:-}
+      R2_BUCKET: ${R2_BUCKET:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+    volumes:
+      - ./backups:/backups
+      - ./backup.sh:/backup.sh:ro
+      - ./restore.sh:/restore.sh:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint: |
+      sh -c '
+        echo "0 2 * * * /backup.sh >> /var/log/backup.log 2>&1" > /etc/crontabs/root
+        echo "Khởi động cron sao lưu CSDL (chạy lúc 02:00 UTC hằng ngày)..."
+        crond -f -l 2
+      '
 
 volumes:
   pgdata:
