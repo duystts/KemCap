@@ -18,7 +18,7 @@ const ScheduleCalendar = lazy(() => import('@/features/scheduling/ScheduleCalend
 const SessionDetailPage = lazy(() => import('@/features/scheduling/SessionDetailPage'))
 const ClassroomPage = lazy(() => import('@/features/classroom/ClassroomPage'))
 
-// Catalog, Users & Enrollments features (U2)
+// User Management, Catalog & Profiles (U2)
 const UsersPage = lazy(() => import('@/features/admin/users/UsersPage'))
 const CoursesPage = lazy(() => import('@/features/catalog/courses/CoursesPage'))
 const PackagesPage = lazy(() => import('@/features/catalog/packages/PackagesPage'))
@@ -29,6 +29,11 @@ const EnrollmentDetailPage = lazy(
   () => import('@/features/catalog/enrollments/EnrollmentDetailPage'),
 )
 const StudentPackagesPage = lazy(() => import('@/features/catalog/enrollments/StudentPackagesPage'))
+
+// Learning & Proficiency (U4)
+const StudentLearningPathPage = lazy(
+  () => import('@/features/learning/path/StudentLearningPathPage'),
+)
 
 function page(node: ReactNode) {
   return <Suspense fallback={<div className="p-8 text-sm">Đang tải…</div>}>{node}</Suspense>
@@ -74,12 +79,12 @@ export const router = createBrowserRouter([
         path: '/teacher',
         element: <AppLayout />,
         children: [
-          { index: true, element: page(<PlaceholderPage title="Tổng quan" />) },
-          { path: 'availability', element: page(<AvailabilityEditor />) },
+          { index: true, element: page(<PlaceholderPage title="Trang chủ giáo viên" />) },
           { path: 'schedule', element: page(<ScheduleCalendar />) },
+          { path: 'availability', element: page(<AvailabilityEditor />) },
           { path: 'students', element: page(<StudentsListPage />) },
           { path: 'students/:id', element: page(<StudentProfilePage />) },
-          placeholder('evaluations', 'Đánh giá buổi học'),
+          { path: 'profile', element: page(<TeacherProfilePage />) },
         ],
       },
     ],
@@ -91,29 +96,30 @@ export const router = createBrowserRouter([
         path: '/student',
         element: <AppLayout />,
         children: [
-          { index: true, element: page(<PlaceholderPage title="Tổng quan" />) },
-          { path: 'packages', element: page(<StudentPackagesPage />) },
+          { index: true, element: page(<PlaceholderPage title="Trang chủ học viên" />) },
           { path: 'book', element: page(<BookSessionPage />) },
           { path: 'schedule', element: page(<ScheduleCalendar />) },
-          placeholder('learning-path', 'Lộ trình học'),
-          placeholder('evaluations', 'Tiến bộ & Nhận xét'),
+          { path: 'learning-path', element: page(<StudentLearningPathPage />) },
+          placeholder('progress', 'Tiến bộ'),
+          { path: 'packages', element: page(<StudentPackagesPage />) },
         ],
       },
     ],
   },
-  // Các trang dùng chung (chi tiết buổi, phòng học)
+  // Chi tiết buổi học & Lớp học trực tuyến WebRTC
   {
     element: <RequireRole roles={['ADMIN', 'TEACHER', 'STUDENT']} />,
     children: [
       {
+        path: '/sessions/:id',
         element: <AppLayout />,
-        children: [{ path: '/sessions/:id', element: page(<SessionDetailPage />) }],
+        children: [{ index: true, element: page(<SessionDetailPage />) }],
       },
       {
-        path: '/classroom/:id',
+        path: '/sessions/:id/classroom',
         element: page(<ClassroomPage />),
       },
     ],
   },
-  { path: '*', element: page(<PlaceholderPage title="Không tìm thấy trang" />) },
+  { path: '*', element: <HomeRedirect /> },
 ])

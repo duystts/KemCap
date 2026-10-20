@@ -12,6 +12,9 @@ import {
 } from '@/lib/api/catalog'
 import { fetchUser } from '@/lib/api/users'
 import { StatusBadge } from '@/components/StatusBadge'
+import ProficiencyPanel from '@/features/learning/proficiency/ProficiencyPanel'
+import GoalsPanel from '@/features/learning/proficiency/GoalsPanel'
+import LearningPathView from '@/features/learning/path/LearningPathView'
 import CreateEnrollmentDialog from '@/features/catalog/enrollments/CreateEnrollmentDialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -261,35 +264,14 @@ export default function StudentProfilePage() {
 
       {/* Tab 2: CEFR Proficiency & Goals */}
       {activeTab === 'proficiency' && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-bold text-slate-800">
-              Hồ sơ năng lực CEFR & Mục tiêu học tập
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="p-8 text-center text-sm text-slate-500 bg-slate-50 rounded-xl border border-dashed">
-              Chỗ trống cho Hồ sơ năng lực 5 kỹ năng CEFR và Mục tiêu học tập (Được triển khai trong Unit 4).
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          <GoalsPanel studentId={id!} canEdit={canEdit} />
+          <ProficiencyPanel studentId={id!} canEdit={canEdit} />
+        </div>
       )}
 
       {/* Tab 3: Learning Path */}
-      {activeTab === 'path' && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-bold text-slate-800">
-              Lộ trình học tập & Tiến độ
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="p-8 text-center text-sm text-slate-500 bg-slate-50 rounded-xl border border-dashed">
-              Chỗ trống cho Lộ trình học cá nhân hóa theo từng chặng và chủ đề (Được triển khai trong Unit 4).
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {activeTab === 'path' && <LearningPathView studentId={id!} canEdit={canEdit} />}
 
       {/* Tab 4: Enrollments */}
       {activeTab === 'enrollments' && (

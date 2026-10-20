@@ -3,6 +3,7 @@ import { notificationHandlers } from './notifications'
 import { schedulingHandlers } from './scheduling'
 import { usersHandlers } from './users'
 import { catalogHandlers } from './catalog'
+import { learningHandlers } from './learning'
 
 export const handlers = [
   ...authHandlers,
@@ -10,4 +11,5 @@ export const handlers = [
   ...schedulingHandlers,
   ...usersHandlers,
   ...catalogHandlers,
+  ...learningHandlers,
 ]
