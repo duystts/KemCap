@@ -1,5 +1,15 @@
 import { authHandlers } from './auth'
+import { notificationHandlers } from './notifications'
+import { schedulingHandlers } from './scheduling'
+import { usersHandlers } from './users'
+import { catalogHandlers } from './catalog'
+import { learningHandlers } from './learning'
 
-// Mỗi FE dev thêm handler của feature mình (catalog, scheduling, learning, billing…) theo
-// contracts/rest-api.md, rồi chuyển sang API thật khi unit tương ứng merge (D4).
-export const handlers = [...authHandlers]
+export const handlers = [
+  ...authHandlers,
+  ...notificationHandlers,
+  ...schedulingHandlers,
+  ...usersHandlers,
+  ...catalogHandlers,
+  ...learningHandlers,
+]

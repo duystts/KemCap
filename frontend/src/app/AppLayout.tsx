@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router'
 import { LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { NotificationBell } from '@/features/notifications/NotificationBell'
 import type { Role } from '@/lib/api/types'
 import { cn } from '@/lib/utils'
 import { useAuth } from './AuthProvider'
@@ -73,8 +74,8 @@ export function AppLayout() {
       </aside>
       <div className="flex flex-1 flex-col">
         <header className="flex items-center justify-end gap-3 border-b border-border px-4 py-3">
-          {/* chuông thông báo (U5) gắn ở đây */}
-          <span className="text-sm">{me.fullName}</span>
+          <NotificationBell />
+          <span className="text-sm font-medium">{me.fullName}</span>
           <Button variant="ghost" size="sm" onClick={() => void logout()} aria-label="Đăng xuất">
             <LogOut className="h-4 w-4" />
             Đăng xuất
