@@ -13,7 +13,8 @@ class NotificationDispatchTest {
 
   @Test
   void backsOffThenFailsAfterThreeRetries() {
-    NotificationDispatch d = new NotificationDispatch("k", "a@test.local", "s", "<p>x</p>", T0);
+    NotificationDispatch d =
+        new NotificationDispatch("k", null, "a@test.local", "s", "<p>x</p>", T0);
 
     d.markFailed(T0, "lỗi 1");
     assertThat(d.getStatus()).isEqualTo(NotificationDispatch.Status.PENDING);
@@ -32,11 +33,13 @@ class NotificationDispatchTest {
     assertThat(d.getNextAttemptAt()).isNull();
     assertThat(d.getError()).isEqualTo("lỗi 4");
     assertThat(d.getBodyHtml()).isEqualTo(NotificationDispatch.SCRUBBED_BODY);
+    assertThat(d.getSubject()).isEqualTo(NotificationDispatch.SCRUBBED_BODY);
   }
 
   @Test
   void sentClearsBodyAndSchedule() {
-    NotificationDispatch d = new NotificationDispatch("k", "a@test.local", "s", "<p>token</p>", T0);
+    NotificationDispatch d =
+        new NotificationDispatch("k", null, "a@test.local", "s", "<p>token</p>", T0);
     d.markFailed(T0, "lỗi");
     d.markSent(T0.plus(Duration.ofMinutes(1)));
 
@@ -45,5 +48,6 @@ class NotificationDispatchTest {
     assertThat(d.getNextAttemptAt()).isNull();
     assertThat(d.getError()).isNull();
     assertThat(d.getBodyHtml()).isEqualTo(NotificationDispatch.SCRUBBED_BODY);
+    assertThat(d.getSubject()).isEqualTo(NotificationDispatch.SCRUBBED_BODY);
   }
 }

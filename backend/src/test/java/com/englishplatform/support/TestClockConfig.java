@@ -16,27 +16,44 @@ public class TestClockConfig {
   @Bean
   @Primary
   MutableClock testClock() {
-    return new MutableClock(Instant.now());
+    return MutableClock.ticking(Instant.now());
   }
 
+  /**
+   * Clock tua được. Tạo bằng constructor thì đứng yên (unit test so khớp chính xác); bean Spring
+   * dùng {@link #ticking} để vẫn chạy tiếp từ mốc đã đặt như clock thật — tránh hai bản ghi tạo
+   * liền nhau có cùng {@code created_at} khi entity lấy giờ từ Clock của app (R18).
+   */
   public static class MutableClock extends Clock {
 
-    private volatile Instant now;
+    private volatile Instant base;
+    private volatile long baseNanos;
+    private final boolean ticks;
 
     public MutableClock(Instant now) {
-      this.now = now;
+      this(now, false);
     }
 
-    public void set(Instant instant) {
-      this.now = instant;
+    private MutableClock(Instant now, boolean ticks) {
+      this.ticks = ticks;
+      set(now);
     }
 
-    public void advance(Duration duration) {
-      this.now = now.plus(duration);
+    public static MutableClock ticking(Instant now) {
+      return new MutableClock(now, true);
+    }
+
+    public synchronized void set(Instant instant) {
+      this.base = instant;
+      this.baseNanos = System.nanoTime();
+    }
+
+    public synchronized void advance(Duration duration) {
+      set(instant().plus(duration));
     }
 
     public void reset() {
-      this.now = Instant.now();
+      set(Instant.now());
     }
 
     @Override
@@ -51,7 +68,7 @@ public class TestClockConfig {
 
     @Override
     public Instant instant() {
-      return now;
+      return ticks ? base.plusNanos((System.nanoTime() - baseNanos) / 1_000 * 1_000) : base;
     }
   }
 }

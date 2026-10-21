@@ -1,13 +1,21 @@
-# Bản tối thiểu (U1): backend + postgres + caddy trên Oracle Cloud Always Free VM.
-# U5 bổ sung: log rotation đầy đủ, healthcheck ping ngoài, service backup pg_dump → R2 (R17).
+# Demo/production trên 1 VPS (T137): postgres + backend + web (Caddy: FE + HTTPS) + backup → R2.
+# Chạy bằng deploy/deploy.sh — script tự sinh mật khẩu DB, JWT secret và domain sslip.io nếu trống.
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   postgres:
     image: postgres:16
     restart: unless-stopped
+    logging: *logging
     environment:
       POSTGRES_DB: english
       POSTGRES_USER: ${DB_USER:-app}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?đặt POSTGRES_PASSWORD trong deploy/.env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?chạy deploy.sh để sinh POSTGRES_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -18,33 +26,70 @@ services:
   backend:
     build: ../backend
     restart: unless-stopped
+    logging: *logging
     env_file: .env
     environment:
       DB_URL: jdbc:postgresql://postgres:5432/english
+      DB_USER: ${DB_USER:-app}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
+      # FE và API cùng domain (R13) → CORS và link trong email dùng chính domain này
+      FRONTEND_URL: https://${DOMAIN}
     depends_on:
       postgres:
         condition: service_healthy
     mem_limit: 1g
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
     expose:
       - "8080"
 
-  caddy:
-    image: caddy:2
+  web:
+    build:
+      context: ../frontend
+      dockerfile: ../deploy/web.Dockerfile
     restart: unless-stopped
+    logging: *logging
     ports:
       - "80:80"
       - "443:443"
     environment:
-      DOMAIN: ${DOMAIN:?đặt DOMAIN trong deploy/.env}
+      DOMAIN: ${DOMAIN:?chạy deploy.sh để đặt DOMAIN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+
+  backup:
+    build:
+      context: .
+      dockerfile: backup.Dockerfile
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      PGHOST: postgres
+      PGDATABASE: english
+      PGUSER: ${DB_USER:-app}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      R2_ENDPOINT: ${R2_ENDPOINT:-}
+      R2_BUCKET: ${R2_BUCKET:-}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      BACKUP_KEEP: ${BACKUP_KEEP:-7}
+    volumes:
+      - backups:/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   pgdata:
   caddy_data:
   caddy_config:
+  backups:

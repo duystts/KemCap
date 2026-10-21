@@ -30,7 +30,7 @@ class AccessTokenIssuer {
     Instant now = clock.instant();
     JwtClaimsSet claims =
         JwtClaimsSet.builder()
-            .issuer("english-platform")
+            .issuer(CurrentUser.JWT_ISSUER)
             .subject(user.getId().toString())
             .issuedAt(now)
             .expiresAt(now.plus(Duration.ofMinutes(properties.accessTokenMinutes())))

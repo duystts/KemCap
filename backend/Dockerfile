@@ -1,4 +1,4 @@
-# Multi-stage, chạy được trên ARM64 (Oracle Cloud Always Free) và AMD64
+# Multi-stage, chạy được trên AMD64 và ARM64 (VPS bất kỳ)
 FROM eclipse-temurin:21-jdk AS build
 WORKDIR /src
 COPY .mvn .mvn
@@ -8,6 +8,8 @@ COPY src src
 RUN ./mvnw -B -q package -DskipTests && cp target/english-platform-*.jar /app.jar
 
 FROM eclipse-temurin:21-jre
+# curl cho healthcheck của docker compose
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 RUN useradd --system --uid 10001 app
 USER app
 COPY --from=build /app.jar /app/app.jar

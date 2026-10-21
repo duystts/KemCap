@@ -1,5 +1,13 @@
-# Profile local: chạy với docker-compose.yml ở thư mục gốc
+# Profile local: chạy với docker-compose.yml ở thư mục gốc — giá trị dev chỉ nằm ở đây (R12)
+spring:
+  datasource:
+    password: ${DB_PASSWORD:app}
+
 app:
+  livekit:
+    url: ${LIVEKIT_URL:ws://localhost:7880}
+    api-key: ${LIVEKIT_API_KEY:devkey}
+    api-secret: ${LIVEKIT_API_SECRET:secret}
   security:
     jwt-secret: ${JWT_SECRET:local-dev-secret-change-me-0123456789abcdef}
   providers:

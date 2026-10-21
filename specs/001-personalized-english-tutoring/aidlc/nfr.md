@@ -287,3 +287,20 @@ Chỉ là đề xuất — architect **không** sửa plan.md; owner plan (leade
 | Q11 | Số người dùng đồng thời mục tiêu cho API (ngoài video) ở quy mô 1.000 HV chưa được nêu; tài liệu này giả định 20 VU (thường) và 200 VU (đỉnh SC-010) | NFR-PERF-01, SCAL-01 | Giữ giả định, xác nhận với leader |
 | Q12 | Danh sách trình duyệt/phiên bản tối thiểu và có hỗ trợ phòng học trên iOS Safari trong demo không | NFR-UX-03 | 2 phiên bản mới nhất; iOS Safari ở mức Should |
 | Q13 | FR-028 yêu cầu "xuất được" nhưng phạm vi demo chỉ cần "lưu có cấu trúc" (spec.md:28) — xác nhận không cần API xuất trong MVP | NFR-PORT-03 | Không làm API xuất trong MVP |
+
+## Cập nhật 2026-10-21 (unit gate U5): hosting demo, chi phí và pháp lý
+
+- **Q3, dữ liệu cá nhân ở nước ngoài**: từ 01/01/2026 áp dụng Luật Bảo vệ dữ liệu cá nhân 91/2025/QH15
+  và Nghị định 356/2025/NĐ-CP (thay Nghị định 13/2023); chuyển dữ liệu ra nước ngoài vẫn phải có hồ sơ
+  đánh giá tác động (Điều 22). Quyết định ban đầu: VPS **tại Việt Nam**. **Đổi sau verify U5 (R1-b, 2026-10-21): giữ chi phí 0 đ theo constitution III → demo trên laptop, không thuê VPS**; bộ `deploy/` giữ sẵn, muốn dùng phải sửa constitution. Demo vẫn dùng R2 (backup), Brevo
+  (email) và LiveKit Cloud (video) ở nước ngoài vì demo chỉ có dữ liệu seed. Trước khi có học viên
+  thật: chuyển backup về storage S3-compatible trong nước (đổi `R2_ENDPOINT`), tự host LiveKit, và hỏi
+  luật sư về hồ sơ cho các dịch vụ còn ở nước ngoài.
+- **Q10, hạn mức free** (tra 2026-10-21, cần kiểm lại khi dùng): LiveKit Cloud Build 5.000 phút-người
+  mỗi tháng (khoảng 40 buổi 60 phút), Brevo 300 email/ngày, R2 miễn phí 10 GB.
+- **Lộ trình chi phí** (NFR-COST): demo **0 đ** trên laptop (R1-b); nếu sau này thuê VPS: khoảng 300.000 đ/tháng (2 vCPU/4 GB, cần sửa constitution). Với khoảng 100 học
+  viên: khoảng 4.800 email/tháng (vẫn trong free), video vượt free khoảng 19 lần → tự host LiveKit trên
+  VPS trong nước (khoảng 400.000–800.000 đ/tháng), tổng khoảng 1 triệu đ/tháng. Không phải sửa code nhờ
+  port/adapter (FR-029).
+- **R13, cookie khác site**: FE và API cùng domain do Caddy phục vụ (bỏ Cloudflare Pages). Đã kiểm
+  login + refresh qua HTTPS cùng domain trên Docker local.

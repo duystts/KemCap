@@ -33,6 +33,11 @@ class LiveKitVideoRoomProvider implements VideoRoomProvider {
       @Value("${app.livekit.api-key}") String apiKey,
       @Value("${app.livekit.api-secret}") String apiSecret,
       Clock clock) {
+    // R12: không chạy với credential rỗng/mặc định khi thiếu biến môi trường
+    if (serverUrl.isBlank() || apiKey.isBlank() || apiSecret.isBlank()) {
+      throw new IllegalStateException(
+          "Thiếu LIVEKIT_URL / LIVEKIT_API_KEY / LIVEKIT_API_SECRET (app.providers.video=livekit)");
+    }
     this.serverUrl = serverUrl;
     this.apiKey = apiKey;
     this.apiSecret = apiSecret;

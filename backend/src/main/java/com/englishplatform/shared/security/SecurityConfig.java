@@ -1,6 +1,7 @@
 package com.englishplatform.shared.security;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import java.time.Clock;
 import java.util.List;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -15,9 +16,17 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
+import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -34,6 +43,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableMethodSecurity
 @EnableConfigurationProperties(SecurityProperties.class)
 class SecurityConfig {
+
+  private static final String TOKEN_EXPIRED = "token_expired";
 
   @Bean
   SecurityFilterChain securityFilterChain(
@@ -72,8 +83,7 @@ class SecurityConfig {
   /** 401 dạng Problem Details; token hết hạn → {@code TOKEN_EXPIRED} để frontend gọi refresh. */
   private AuthenticationEntryPoint authenticationEntryPoint() {
     return (request, response, ex) -> {
-      String message = ex.getMessage() == null ? "" : ex.getMessage();
-      boolean expired = message.toLowerCase().contains("expired");
+      boolean expired = isExpired(ex);
       String code = expired ? "TOKEN_EXPIRED" : "UNAUTHENTICATED";
       String detail = expired ? "Phiên đăng nhập đã hết hạn" : "Chưa đăng nhập";
       response.setStatus(401);
@@ -90,6 +100,17 @@ class SecurityConfig {
     };
   }
 
+  /** Nhận diện hết hạn qua mã lỗi của validator (không so chuỗi message của Nimbus — R11). */
+  private static boolean isExpired(Throwable ex) {
+    for (Throwable t = ex; t != null; t = t.getCause()) {
+      if (t instanceof JwtValidationException v
+          && v.getErrors().stream().anyMatch(e -> TOKEN_EXPIRED.equals(e.getErrorCode()))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private JwtAuthenticationConverter jwtAuthenticationConverter() {
     JwtGrantedAuthoritiesConverter authorities = new JwtGrantedAuthoritiesConverter();
     authorities.setAuthoritiesClaimName(CurrentUser.CLAIM_ROLE);
@@ -104,9 +125,23 @@ class SecurityConfig {
     return new SecretKeySpec(properties.secretBytes(), "HmacSHA256");
   }
 
+  /** Kiểm hạn theo {@link Clock} của app (cùng nguồn với phần cấp token) và kiểm issuer (R11). */
   @Bean
-  JwtDecoder jwtDecoder(SecretKey jwtSecretKey) {
-    return NimbusJwtDecoder.withSecretKey(jwtSecretKey).macAlgorithm(MacAlgorithm.HS256).build();
+  JwtDecoder jwtDecoder(SecretKey jwtSecretKey, Clock clock) {
+    NimbusJwtDecoder decoder =
+        NimbusJwtDecoder.withSecretKey(jwtSecretKey).macAlgorithm(MacAlgorithm.HS256).build();
+    JwtTimestampValidator timestamps = new JwtTimestampValidator();
+    timestamps.setClock(clock);
+    OAuth2TokenValidator<Jwt> notExpired =
+        jwt ->
+            timestamps.validate(jwt).hasErrors()
+                ? OAuth2TokenValidatorResult.failure(
+                    new OAuth2Error(TOKEN_EXPIRED, "Access token đã hết hạn", null))
+                : OAuth2TokenValidatorResult.success();
+    decoder.setJwtValidator(
+        new DelegatingOAuth2TokenValidator<>(
+            notExpired, new JwtIssuerValidator(CurrentUser.JWT_ISSUER)));
+    return decoder;
   }
 
   @Bean

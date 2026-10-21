@@ -315,7 +315,7 @@ hóa idempotent.
 **DoD riêng**: cùng event 2 lần → 1 email (NFR-REL-05); `FakeEmailSender` lỗi N ≤ 3 → `SENT`, N > 3 →
 `FAILED` (NFR-REL-06); đặt lịch khi SMTP lỗi vẫn 201; listener lỗi → restart → được xử lý (NFR-REL-04);
 `Scenario` từng event → đúng người nhận, đúng múi giờ; E2E với U2/U3 thật: quickstart bước 5–6 (email
-xác nhận, nhắc 1h không trùng); bản sao lưu đầu tiên có trên R2.
+xác nhận, nhắc 1h không trùng); bản sao lưu đầu tiên có trên R2 — *từ 2026-10-21 (R1-b, demo 0 đ trên laptop): sao lưu/diễn tập đạt trên Docker local với S3 giả lập; R2 thật và NFR-REL-10 trên server chỉ áp dụng khi deploy*.
 
 ### U7 — Quyền riêng tư & bảo mật tài khoản (B5 · 05–07/11 · BE #1 3 · FE đề xuất #2 1 + #4 2)
 
@@ -466,7 +466,7 @@ của bolt. Lịch theo **S2** và ngày lịch (giả định ở đầu file).
 | B1 | CN 18/10 – T6 23/10 (6 ngày) | U1 | #1: U1 | Plan, contracts, units được duyệt; D1–D4, K1–K3 được chốt trước T3 20/10 | DoD U1; CI bắt buộc trên `main`; FE shell + auth nối API thật (deploy HTTPS chuyển sang B4/U5) |
 | B2 | T7 24/10 – T2 26/10 (3 ngày) | U2 | #1: catalog + `EnrollmentApi` · #4: billing core | B1 xong | DoD U2; quickstart bước 1–3 trên demo |
 | B3 | T3 27/10 – CN 01/11 (6 ngày) | U3, U4 | #1: U3 · #3: U4 (27–28/10) | B2 xong | DoD U3, U4; go/no-go LiveKit; IT đối chiếu bộ đếm xanh; quickstart bước 4–5, 7, 9, 11 (phần lộ trình), 14, 17–22 trên demo — **demo nội bộ P1** |
-| B4 | T2 02/11 – T4 04/11 (3 ngày) | U5 | #1: U5 | B3 xong | DoD U5; **deploy HTTPS lên server demo** (Oracle nếu được duyệt, không thì VPS Việt Nam hoặc Cloudflare Tunnel — quyết định trước 02/11); quickstart bước 5–6 (email), bản sao lưu đầu tiên trên R2 |
+| B4 | T2 02/11 – T4 04/11 (3 ngày) | U5 | #1: U5 | B3 xong | DoD U5; ~~deploy HTTPS lên server demo~~ **demo trên laptop, 0 đ (R1-b, 2026-10-21)**; quickstart bước 5–6 (email qua Brevo free) |
 | B5 | T5 05/11 – T7 07/11 (3 ngày) | U7, U8 | #1: U7 · #4: U8 (05–06/11) | B4 xong | DoD U7, U8; quickstart bước 13, 15, 16, 23 trên demo; dashboard không đổi sau ẩn danh hóa |
 | B6 | CN 08/11 – T3 10/11 (3 ngày) | U6 | #1: U6 | B5 xong (U3, U4, U5, U7) | DoD U6; **quickstart bước 1–24 đạt trên demo** (trừ phần bị cắt bởi K1/K2: bước 10 chỉ văn bản, bước 12 không có điểm hài lòng/tỷ lệ phiếu) |
 | B7 (ổn định, không thêm unit) | T4 11/11 (1 ngày) + demo T5 12/11 | — | #1: sửa lỗi, **diễn tập khôi phục sao lưu** (NFR-REL-10, hạn trước 11/11 — nên làm tối 10/11), chạy k6 · FE: Playwright, usability, Lighthouse (P2) | B6 xong | AI-DLC 3.6 `verify --all`; k6 NFR-PERF-01/02, NFR-SCAL-01, SCAL-03; NFR-PERF-03/04; runbook tối thiểu; tổng duyệt và demo |

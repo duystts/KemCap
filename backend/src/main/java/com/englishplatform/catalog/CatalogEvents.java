@@ -13,8 +13,13 @@ public final class CatalogEvents {
 
   public record EnrollmentActivated(UUID enrollmentId, UUID studentId, Instant expiresAt) {}
 
+  /** {@code reassignmentId}: id bản ghi lịch sử đổi GV — mỗi lần đổi một id (dedupe thông báo). */
   public record TeacherReassigned(
-      UUID enrollmentId, UUID studentId, UUID fromTeacherId, UUID toTeacherId) {}
+      UUID enrollmentId,
+      UUID studentId,
+      UUID fromTeacherId,
+      UUID toTeacherId,
+      UUID reassignmentId) {}
 
   public enum RenewalReason {
     LOW_SESSIONS,

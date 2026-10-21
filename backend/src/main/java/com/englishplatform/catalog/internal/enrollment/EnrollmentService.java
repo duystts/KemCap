@@ -115,8 +115,10 @@ public class EnrollmentService {
     Enrollment enrollment = find(id);
     UUID from = enrollment.getTeacherId();
     enrollment.changeTeacher(newTeacherId);
-    history.save(new TeacherAssignmentHistory(id, from, newTeacherId, by, reason.trim()));
-    events.publishEvent(new TeacherReassigned(id, enrollment.getStudentId(), from, newTeacherId));
+    TeacherAssignmentHistory entry =
+        history.save(new TeacherAssignmentHistory(id, from, newTeacherId, by, reason.trim()));
+    events.publishEvent(
+        new TeacherReassigned(id, enrollment.getStudentId(), from, newTeacherId, entry.getId()));
     return enrollment;
   }
 

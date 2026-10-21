@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${subject}">Nhắc nhở nộp phiếu đánh giá sau buổi học</title>
+</head>
+<body style="font-family: Arial, sans-serif; color: #1f2937; line-height: 1.5; padding: 16px;">
+  <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 24px;">
+    <h2 style="color: #d97706; margin-top: 0;">Nhắc nhở: Phiếu đánh giá buổi học quá hạn</h2>
+    <p>Xin chào <strong th:text="${fullName}">Thầy/Cô</strong>,</p>
+    <p>Buổi học đã hoàn thành cách đây hơn 24 giờ nhưng phiếu nhận xét và đánh giá kỹ năng vẫn chưa được nộp.</p>
+    <p>Đánh giá kịp thời giúp học viên nắm bắt được sự tiến bộ và duy trì động lực học tập. Thầy/Cô vui lòng dành 3 phút hoàn thiện phiếu nhé!</p>
+
+    <p style="margin-top: 24px;">
+      <a th:href="${link}" href="#"
+         style="display: inline-block; padding: 10px 20px; background: #d97706; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold;">
+        Điền phiếu đánh giá ngay
+      </a>
+    </p>
+    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
+    <p style="font-size: 13px; color: #6b7280; margin: 0;">Nền tảng đào tạo tiếng Anh 1 kèm 1 cá nhân hóa (English 1-1 Platform).</p>
+  </div>
+</body>
+</html>

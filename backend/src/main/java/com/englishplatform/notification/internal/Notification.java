@@ -28,14 +28,24 @@ public class Notification extends BaseEntity {
   @Column(name = "read_at")
   private Instant readAt;
 
+  /** Học viên được nhắc tới (thông báo gửi GV/admin) — để xóa khi ẩn danh hóa học viên. */
+  @Column(name = "about_student_id")
+  private UUID aboutStudentId;
+
   protected Notification() {}
 
   public Notification(UUID userId, String type, String title, String body, String link) {
+    this(userId, type, title, body, link, null);
+  }
+
+  public Notification(
+      UUID userId, String type, String title, String body, String link, UUID aboutStudentId) {
     this.userId = userId;
     this.type = type;
     this.title = title;
     this.body = body;
     this.link = link;
+    this.aboutStudentId = aboutStudentId;
   }
 
   public void markRead(Instant at) {

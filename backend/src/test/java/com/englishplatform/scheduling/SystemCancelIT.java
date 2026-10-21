@@ -50,7 +50,11 @@ class SystemCancelIT extends SchedulingTestSupport {
     // phát lại event: không lỗi, không trả chỗ lần hai
     TeacherReassigned replay =
         new TeacherReassigned(
-            s.enrollmentId(), s.student().id(), s.teacher().id(), newTeacher.id());
+            s.enrollmentId(),
+            s.student().id(),
+            s.teacher().id(),
+            newTeacher.id(),
+            UUID.randomUUID());
     scenario
         .publish(replay)
         .andWaitForStateChange(() -> enrollment(s.enrollmentId()))

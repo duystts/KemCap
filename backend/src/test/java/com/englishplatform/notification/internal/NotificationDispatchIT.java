@@ -5,6 +5,7 @@ import static org.awaitility.Awaitility.await;
 
 import com.englishplatform.identity.PasswordResetRequested;
 import com.englishplatform.identity.Role;
+import com.englishplatform.identity.StudentAnonymized;
 import com.englishplatform.identity.UserStatus;
 import com.englishplatform.identity.internal.PasswordResetService;
 import com.englishplatform.identity.internal.UserAccount;
@@ -20,12 +21,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Gửi email tin cậy (NFR-REL-06): thử lại theo backoff, chống gửi trùng; và không để token thô nằm
@@ -47,6 +51,8 @@ class NotificationDispatchIT {
   @Autowired JdbcTemplate jdbc;
   @Autowired MutableClock clock;
   @Autowired ApplicationEvents events;
+  @Autowired ApplicationEventPublisher publisher;
+  @Autowired PlatformTransactionManager txManager;
 
   @BeforeEach
   void clearOutbox() {
@@ -156,6 +162,43 @@ class NotificationDispatchIT {
                 like,
                 like))
         .isZero();
+  }
+
+  /** FR-031 (review U5 R2): email mời/đặt lại mật khẩu cũng bị che sau ẩn danh hóa. */
+  @Test
+  void anonymizationMasksIdentityEmailsOfStudent() {
+    UserAccount student =
+        new UserAccount(
+            "s" + UUID.randomUUID().toString().substring(0, 8) + "@test.local",
+            "Học viên thử",
+            Role.STUDENT,
+            java.time.LocalDate.of(2000, 1, 1),
+            UserStatus.INVITED);
+    student.activate(passwordEncoder.encode("Matkhau123"));
+    users.save(student);
+    emailSender.failNext(1); // để lại một lỗi SMTP có thể chứa email trong cột error
+    passwordResets.requestReset(student.getEmail());
+    await().atMost(Duration.ofSeconds(10)).until(() -> countByRecipient(student.getEmail()) == 1L);
+
+    new TransactionTemplate(txManager)
+        .executeWithoutResult(
+            s -> publisher.publishEvent(new StudentAnonymized(student.getId(), UUID.randomUUID())));
+
+    await()
+        .atMost(Duration.ofSeconds(10))
+        .untilAsserted(() -> assertThat(countByRecipient(student.getEmail())).isZero());
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from notification_dispatch where user_id = ?"
+                    + " and (recipient <> 'anonymized' or error is not null or status = 'PENDING')",
+                Long.class,
+                student.getId()))
+        .isZero();
+  }
+
+  private long countByRecipient(String email) {
+    return jdbc.queryForObject(
+        "select count(*) from notification_dispatch where recipient = ?", Long.class, email);
   }
 
   private void notify(String key) {

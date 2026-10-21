@@ -1,12 +1,11 @@
 package com.englishplatform.shared.persistence;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PostPersist;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Transient;
 import java.time.Instant;
 import java.util.UUID;
@@ -14,6 +13,7 @@ import org.springframework.data.domain.Persistable;
 
 /** Khóa chính UUID sinh ở ứng dụng + {@code created_at}/{@code updated_at} (UTC). */
 @MappedSuperclass
+@EntityListeners(EntityTimestampListener.class)
 public abstract class BaseEntity implements Persistable<UUID> {
 
   @Id private UUID id = UUID.randomUUID();
@@ -44,16 +44,13 @@ public abstract class BaseEntity implements Persistable<UUID> {
     return isNew;
   }
 
-  @PrePersist
-  void onPrePersist() {
-    Instant now = Instant.now();
+  void touchCreated(Instant now) {
     createdAt = now;
     updatedAt = now;
   }
 
-  @PreUpdate
-  void onPreUpdate() {
-    updatedAt = Instant.now();
+  void touchUpdated(Instant now) {
+    updatedAt = now;
   }
 
   @PostLoad

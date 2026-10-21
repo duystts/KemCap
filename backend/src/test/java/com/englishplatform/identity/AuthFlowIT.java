@@ -35,6 +35,11 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
@@ -57,6 +62,7 @@ class AuthFlowIT {
   static final String POLICY = "2026-11";
 
   @Autowired MockMvc mvc;
+  @Autowired JwtEncoder jwtEncoder;
   @Autowired UserAccountRepository users;
   @Autowired PolicyConsentRepository consents;
   @Autowired InvitationService invitations;
@@ -200,6 +206,42 @@ class AuthFlowIT {
     mvc.perform(get("/api/v1/me").header("Authorization", "Bearer " + token))
         .andExpect(status().isUnauthorized())
         .andExpect(jsonPath("$.code").value("TOKEN_EXPIRED"));
+  }
+
+  /** R11: hạn token tính theo Clock của app — tua clock là token hết hạn. */
+  @Test
+  void accessTokenExpiresByApplicationClock() throws Exception {
+    UserAccount user = activeUser(Role.ADMIN, true);
+    String token = accessToken(login(user.getEmail(), PASSWORD).andReturn());
+    mvc.perform(get("/api/v1/me").header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk());
+
+    clock.advance(Duration.ofMinutes(17));
+    mvc.perform(get("/api/v1/me").header("Authorization", "Bearer " + token))
+        .andExpect(status().isUnauthorized())
+        .andExpect(jsonPath("$.code").value("TOKEN_EXPIRED"));
+  }
+
+  /** R11: token ký đúng khóa nhưng sai issuer bị từ chối. */
+  @Test
+  void tokenWithForeignIssuerIsRejected() throws Exception {
+    UserAccount user = activeUser(Role.ADMIN, true);
+    Instant now = clock.instant();
+    JwtClaimsSet claims =
+        JwtClaimsSet.builder()
+            .issuer("someone-else")
+            .subject(user.getId().toString())
+            .issuedAt(now)
+            .expiresAt(now.plus(Duration.ofMinutes(5)))
+            .claim("role", "ADMIN")
+            .build();
+    String token =
+        jwtEncoder
+            .encode(JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims))
+            .getTokenValue();
+    mvc.perform(get("/api/v1/me").header("Authorization", "Bearer " + token))
+        .andExpect(status().isUnauthorized())
+        .andExpect(jsonPath("$.code").value("UNAUTHENTICATED"));
   }
 
   @Test

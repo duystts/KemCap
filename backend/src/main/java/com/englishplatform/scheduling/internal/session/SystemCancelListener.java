@@ -5,10 +5,13 @@ import com.englishplatform.catalog.EnrollmentApi;
 import com.englishplatform.identity.Role;
 import com.englishplatform.identity.StudentAnonymized;
 import com.englishplatform.identity.UserDeactivated;
+import com.englishplatform.scheduling.SchedulingEvents.CancelCause;
+import com.englishplatform.scheduling.SchedulingEvents.ReassignmentSessionsCancelled;
 import com.englishplatform.scheduling.SchedulingEvents.SessionCancelled;
 import com.englishplatform.scheduling.SessionStatus;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.modulith.events.ApplicationModuleListener;
@@ -41,49 +44,66 @@ class SystemCancelListener {
   @ApplicationModuleListener
   void on(TeacherReassigned event) {
     Instant now = clock.instant();
-    cancel(
-        sessions
-            .findByEnrollmentIdAndStatusAndStartsAtAfter(
-                event.enrollmentId(), SessionStatus.BOOKED, now)
-            .stream()
-            .filter(s -> s.getTeacherId().equals(event.fromTeacherId()))
-            .toList(),
-        now);
+    List<Instant> cancelled =
+        cancel(
+            sessions
+                .findByEnrollmentIdAndStatusAndStartsAtAfter(
+                    event.enrollmentId(), SessionStatus.BOOKED, now)
+                .stream()
+                .filter(s -> s.getTeacherId().equals(event.fromTeacherId()))
+                .toList(),
+            now,
+            CancelCause.TEACHER_REASSIGNED);
+    events.publishEvent(
+        new ReassignmentSessionsCancelled(
+            event.enrollmentId(),
+            event.studentId(),
+            event.fromTeacherId(),
+            event.toTeacherId(),
+            event.reassignmentId(),
+            cancelled));
   }
 
   @ApplicationModuleListener
   void on(UserDeactivated event) {
     if (event.role() == Role.STUDENT) {
-      cancelStudentSessions(event.userId());
+      cancelStudentSessions(event.userId(), CancelCause.USER_DEACTIVATED);
     }
   }
 
   @ApplicationModuleListener
   void on(StudentAnonymized event) {
-    cancelStudentSessions(event.studentId());
+    cancelStudentSessions(event.studentId(), CancelCause.ANONYMIZED);
   }
 
-  private void cancelStudentSessions(java.util.UUID studentId) {
+  private void cancelStudentSessions(java.util.UUID studentId, CancelCause cause) {
     Instant now = clock.instant();
     cancel(
         sessions.findByStudentIdAndStatusAndStartsAtAfter(studentId, SessionStatus.BOOKED, now),
-        now);
+        now,
+        cause);
   }
 
-  private void cancel(List<Session> candidates, Instant now) {
+  /** Trả về giờ bắt đầu của các buổi thật sự bị hủy lần này (theo thứ tự thời gian). */
+  private List<Instant> cancel(List<Session> candidates, Instant now, CancelCause cause) {
+    List<Instant> cancelled = new ArrayList<>();
     for (Session s : candidates) {
       s.cancelBySystem(now)
           .ifPresent(
               action -> {
                 action.apply(enrollmentApi, s.getEnrollmentId());
+                cancelled.add(s.getStartsAt());
                 events.publishEvent(
                     new SessionCancelled(
                         s.getId(),
                         s.getEnrollmentId(),
                         SessionStatus.CANCELLED_SYSTEM,
                         null,
-                        s.getStartsAt()));
+                        s.getStartsAt(),
+                        cause));
               });
     }
+    cancelled.sort(null);
+    return cancelled;
   }
 }

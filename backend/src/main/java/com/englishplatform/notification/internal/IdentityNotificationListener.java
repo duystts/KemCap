@@ -27,7 +27,7 @@ class IdentityNotificationListener {
     String link = frontendUrl + "/accept-invite?token=" + encode(event.inviteToken());
     dispatchService.notify(
         "user:" + event.userId() + ":invite:" + event.tokenId(),
-        null,
+        event.userId(),
         event.email(),
         "Mời kích hoạt tài khoản English 1-1",
         "invite",
@@ -40,7 +40,7 @@ class IdentityNotificationListener {
     String link = frontendUrl + "/reset-password?token=" + encode(event.resetToken());
     dispatchService.notify(
         "user:" + event.userId() + ":reset:" + event.tokenId(),
-        null,
+        event.userId(),
         event.email(),
         "Đặt lại mật khẩu English 1-1",
         "reset-password",

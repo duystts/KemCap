@@ -19,11 +19,12 @@ token (sửa sau verify U1, 2026-10-18).
 | `StudentAnonymized` | identity | studentId, requestId | scheduling → `BOOKED` tương lai → `CANCELLED_SYSTEM`; catalog → xóa `notes`, `self_reported_level`, `occupation`; learning → xóa dữ liệu học tập (data-model.md); notification → xóa thông báo, che `recipient` |
 | `EnrollmentCreated` | catalog | enrollmentId, studentId, teacherId, priceVnd | billing → tạo receivable |
 | `EnrollmentActivated` | catalog | enrollmentId, studentId, expiresAt | notification → email chào mừng |
-| `TeacherReassigned` | catalog | enrollmentId, studentId, fromTeacherId, toTeacherId | scheduling → buổi `BOOKED` tương lai với giáo viên cũ → `CANCELLED_SYSTEM`; notification → báo học viên + hai giáo viên |
+| `TeacherReassigned` | catalog | enrollmentId, studentId, fromTeacherId, toTeacherId, reassignmentId (id `teacher_assignment_history`) | scheduling → buổi `BOOKED` tương lai với giáo viên cũ → `CANCELLED_SYSTEM`, rồi phát `ReassignmentSessionsCancelled` (notification không nghe trực tiếp event này — 2026-10-21) |
 | `EnrollmentRenewalDue` | catalog (job hằng ngày) | enrollmentId, studentId, sessionsRemaining, expiresAt, reason `LOW_SESSIONS`\|`EXPIRING` | notification → nhắc HV + admin |
 | `PaymentRecorded` | billing | enrollmentId, paymentId, amountVnd, isFirstPayment | (chưa module nào nghe trong MVP — U8 báo cáo có thể dùng). Kích hoạt ghi danh **không** qua event này mà qua `EnrollmentApi.activateOnFirstPayment` (xem §2) |
 | `SessionBooked` | scheduling | sessionId, enrollmentId, teacherId, studentId, startsAt, endsAt | notification → xác nhận cho cả hai |
-| `SessionCancelled` | scheduling | sessionId, enrollmentId, status, cancelledBy, startsAt | notification → báo bên còn lại; nếu `TEACHER_ABSENT` báo admin |
+| `SessionCancelled` | scheduling | sessionId, enrollmentId, status, cancelledBy, startsAt, cause (`TEACHER_REASSIGNED`\|`USER_DEACTIVATED`\|`ANONYMIZED`\|null — chỉ có khi `CANCELLED_SYSTEM`) | notification → báo bên còn lại (người hủy là HV → báo GV; là GV → báo HV; admin/hệ thống → báo cả hai); nếu `TEACHER_ABSENT` báo thêm admin; `cause = TEACHER_REASSIGNED` → bỏ qua (đã gộp); `ANONYMIZED` → chỉ báo GV |
+| `ReassignmentSessionsCancelled` | scheduling (sau khi xử lý `TeacherReassigned`) | enrollmentId, studentId, fromTeacherId, toTeacherId, reassignmentId, cancelledStartsAt[] | notification → **một** thông báo gộp cho học viên + hai giáo viên, liệt kê buổi đã hủy; `dedupe_key = enrollment:{id}:reassigned:{reassignmentId}:{userId}` (2026-10-21) |
 | `SessionRescheduled` | scheduling | oldSessionId, newSessionId, newStartsAt | notification |
 | `SessionReminderDue` | scheduling (job mỗi phút) | sessionId, teacherId, studentId, startsAt, window `24H`\|`1H` | notification → email + thông báo |
 | `SessionFinished` | scheduling | sessionId, enrollmentId, teacherId, studentId, outcome, endsAt | learning → tạo `session_report` PENDING (nếu COMPLETED) |

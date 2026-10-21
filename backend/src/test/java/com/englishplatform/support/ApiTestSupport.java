@@ -11,9 +11,12 @@ import com.englishplatform.identity.internal.UserAccount;
 import com.englishplatform.identity.internal.UserAccountRepository;
 import com.englishplatform.support.TestClockConfig.MutableClock;
 import com.jayway.jsonpath.JsonPath;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,6 +45,13 @@ public abstract class ApiTestSupport {
   @Autowired protected PasswordEncoder passwordEncoder;
   @Autowired protected MutableClock clock;
 
+  /**
+   * Token cấp lại theo clock hiện tại khi test đã tua clock (hạn token theo Clock của app — R11).
+   */
+  private final Map<UUID, Instant> tokenIssuedAt = new ConcurrentHashMap<>();
+
+  private final Map<UUID, String> freshTokens = new ConcurrentHashMap<>();
+
   @AfterEach
   void resetClock() {
     clock.reset();
@@ -56,7 +66,10 @@ public abstract class ApiTestSupport {
 
   protected TestUser user(Role role) throws Exception {
     UserAccount account = activeAccount(role);
-    return new TestUser(account.getId(), account.getEmail(), role, login(account.getEmail()));
+    String token = login(account.getEmail());
+    tokenIssuedAt.put(account.getId(), clock.instant());
+    freshTokens.put(account.getId(), token);
+    return new TestUser(account.getId(), account.getEmail(), role, token);
   }
 
   protected UserAccount activeAccount(Role role) {
@@ -83,11 +96,23 @@ public abstract class ApiTestSupport {
 
   protected ResultActions call(MockHttpServletRequestBuilder request, TestUser as, String json)
       throws Exception {
-    request.header("Authorization", as.bearer());
+    request.header("Authorization", "Bearer " + tokenFor(as));
     if (json != null) {
       request.contentType(MediaType.APPLICATION_JSON).content(json);
     }
     return mvc.perform(request);
+  }
+
+  /** Như frontend tự refresh: clock đã qua hơn 10 phút kể từ lúc cấp → đăng nhập lại. */
+  private String tokenFor(TestUser as) throws Exception {
+    Instant issued = tokenIssuedAt.get(as.id());
+    if (issued == null || !clock.instant().isAfter(issued.plus(Duration.ofMinutes(10)))) {
+      return freshTokens.getOrDefault(as.id(), as.token());
+    }
+    String token = login(as.email());
+    tokenIssuedAt.put(as.id(), clock.instant());
+    freshTokens.put(as.id(), token);
+    return token;
   }
 
   protected ResultActions call(MockHttpServletRequestBuilder request, TestUser as)

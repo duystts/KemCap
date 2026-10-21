@@ -12,6 +12,9 @@ app:
     policy-version: "2026-11"
 
 spring:
+  datasource:
+    # Testcontainers ghi đè kết nối; giá trị này chỉ để base config không thiếu biến
+    password: test
   docker:
     compose:
       enabled: false

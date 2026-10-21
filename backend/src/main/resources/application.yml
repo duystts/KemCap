@@ -4,7 +4,8 @@ spring:
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/english}
     username: ${DB_USER:app}
-    password: ${DB_PASSWORD:app}
+    # không có mặc định: thiếu biến môi trường → app không khởi động (R12, NFR-SEC-05)
+    password: ${DB_PASSWORD}
   jpa:
     open-in-view: false
     hibernate:
@@ -47,6 +48,10 @@ server:
   port: ${PORT:8080}
 
 management:
+  health:
+    # SMTP lỗi chỉ làm email chờ thử lại (NFR-REL-06), không được coi là app chết
+    mail:
+      enabled: false
   endpoints:
     web:
       exposure:
@@ -69,9 +74,10 @@ app:
     video: ${VIDEO_PROVIDER:livekit}   # fake | livekit
     email: ${EMAIL_PROVIDER:smtp}      # fake | smtp
   livekit:
-    url: ${LIVEKIT_URL:ws://localhost:7880}
-    api-key: ${LIVEKIT_API_KEY:devkey}
-    api-secret: ${LIVEKIT_API_SECRET:secret}
+    # bắt buộc khi providers.video=livekit — adapter từ chối khởi động nếu trống (R12)
+    url: ${LIVEKIT_URL:}
+    api-key: ${LIVEKIT_API_KEY:}
+    api-secret: ${LIVEKIT_API_SECRET:}
   privacy:
     policy-version: ${POLICY_VERSION:2026-11}  # đổi giá trị → mọi người dùng phải đồng ý lại (FR-030)
     guardian-consent-under-age: 16              # chờ pháp lý trung tâm xác nhận

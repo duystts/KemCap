@@ -71,7 +71,8 @@ public class CancellationService {
             session.getEnrollmentId(),
             session.getStatus(),
             actor.id(),
-            session.getStartsAt()));
+            session.getStartsAt(),
+            null));
     return session;
   }
 

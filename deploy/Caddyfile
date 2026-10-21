@@ -1,4 +1,5 @@
-# HTTPS tự động (Let's Encrypt), HTTP → HTTPS 301 mặc định của Caddy
+# HTTPS tự động (Let's Encrypt), HTTP → HTTPS 301 mặc định của Caddy.
+# Một domain cho cả frontend và API (R13).
 {$DOMAIN} {
 	encode gzip
 	header {
@@ -7,5 +8,21 @@
 		Referrer-Policy "strict-origin-when-cross-origin"
 		-Server
 	}
-	reverse_proxy backend:8080
+
+	handle /api/* {
+		reverse_proxy backend:8080
+	}
+	handle /actuator/health* {
+		reverse_proxy backend:8080
+	}
+
+	# file build của Vite có hash trong tên → cache lâu
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
 }
