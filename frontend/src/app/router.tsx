@@ -11,6 +11,30 @@ const ForgotPasswordPage = lazy(() => import('@/features/auth/ForgotPasswordPage
 const ResetPasswordPage = lazy(() => import('@/features/auth/ResetPasswordPage'))
 const PlaceholderPage = lazy(() => import('./PlaceholderPage'))
 
+// Scheduling & Video features (U3)
+const AvailabilityEditor = lazy(() => import('@/features/scheduling/AvailabilityEditor'))
+const BookSessionPage = lazy(() => import('@/features/scheduling/BookSessionPage'))
+const ScheduleCalendar = lazy(() => import('@/features/scheduling/ScheduleCalendar'))
+const SessionDetailPage = lazy(() => import('@/features/scheduling/SessionDetailPage'))
+const ClassroomPage = lazy(() => import('@/features/classroom/ClassroomPage'))
+
+// User Management, Catalog & Profiles (U2)
+const UsersPage = lazy(() => import('@/features/admin/users/UsersPage'))
+const CoursesPage = lazy(() => import('@/features/catalog/courses/CoursesPage'))
+const PackagesPage = lazy(() => import('@/features/catalog/packages/PackagesPage'))
+const StudentsListPage = lazy(() => import('@/features/catalog/profiles/StudentsListPage'))
+const StudentProfilePage = lazy(() => import('@/features/catalog/profiles/StudentProfilePage'))
+const TeacherProfilePage = lazy(() => import('@/features/catalog/profiles/TeacherProfilePage'))
+const EnrollmentDetailPage = lazy(
+  () => import('@/features/catalog/enrollments/EnrollmentDetailPage'),
+)
+const StudentPackagesPage = lazy(() => import('@/features/catalog/enrollments/StudentPackagesPage'))
+
+// Learning & Proficiency (U4)
+const StudentLearningPathPage = lazy(
+  () => import('@/features/learning/path/StudentLearningPathPage'),
+)
+
 function page(node: ReactNode) {
   return <Suspense fallback={<div className="p-8 text-sm">Đang tải…</div>}>{node}</Suspense>
 }
@@ -34,10 +58,14 @@ export const router = createBrowserRouter([
         element: <AppLayout />,
         children: [
           { index: true, element: page(<PlaceholderPage title="Tổng quan" />) },
-          placeholder('users', 'Người dùng'),
-          placeholder('students', 'Học viên'),
-          placeholder('courses', 'Khóa học & gói học'),
-          placeholder('schedule', 'Lịch học'),
+          { path: 'users', element: page(<UsersPage />) },
+          { path: 'students', element: page(<StudentsListPage />) },
+          { path: 'students/:id', element: page(<StudentProfilePage />) },
+          { path: 'teachers/:id', element: page(<TeacherProfilePage />) },
+          { path: 'courses', element: page(<CoursesPage />) },
+          { path: 'packages', element: page(<PackagesPage />) },
+          { path: 'enrollments/:id', element: page(<EnrollmentDetailPage />) },
+          { path: 'schedule', element: page(<ScheduleCalendar />) },
           placeholder('billing', 'Học phí & công nợ'),
           placeholder('privacy', 'Dữ liệu cá nhân'),
         ],
@@ -52,9 +80,11 @@ export const router = createBrowserRouter([
         element: <AppLayout />,
         children: [
           { index: true, element: page(<PlaceholderPage title="Trang chủ giáo viên" />) },
-          placeholder('schedule', 'Lịch dạy'),
-          placeholder('availability', 'Lịch rảnh'),
-          placeholder('students', 'Học viên của tôi'),
+          { path: 'schedule', element: page(<ScheduleCalendar />) },
+          { path: 'availability', element: page(<AvailabilityEditor />) },
+          { path: 'students', element: page(<StudentsListPage />) },
+          { path: 'students/:id', element: page(<StudentProfilePage />) },
+          { path: 'profile', element: page(<TeacherProfilePage />) },
         ],
       },
     ],
@@ -67,12 +97,27 @@ export const router = createBrowserRouter([
         element: <AppLayout />,
         children: [
           { index: true, element: page(<PlaceholderPage title="Trang chủ học viên" />) },
-          placeholder('book', 'Đặt lịch'),
-          placeholder('schedule', 'Lịch học'),
-          placeholder('learning-path', 'Lộ trình'),
+          { path: 'book', element: page(<BookSessionPage />) },
+          { path: 'schedule', element: page(<ScheduleCalendar />) },
+          { path: 'learning-path', element: page(<StudentLearningPathPage />) },
           placeholder('progress', 'Tiến bộ'),
-          placeholder('packages', 'Gói học'),
+          { path: 'packages', element: page(<StudentPackagesPage />) },
         ],
+      },
+    ],
+  },
+  // Chi tiết buổi học & Lớp học trực tuyến WebRTC
+  {
+    element: <RequireRole roles={['ADMIN', 'TEACHER', 'STUDENT']} />,
+    children: [
+      {
+        path: '/sessions/:id',
+        element: <AppLayout />,
+        children: [{ index: true, element: page(<SessionDetailPage />) }],
+      },
+      {
+        path: '/sessions/:id/classroom',
+        element: page(<ClassroomPage />),
       },
     ],
   },
