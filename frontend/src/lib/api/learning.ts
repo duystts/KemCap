@@ -59,6 +59,7 @@ export interface LearningPathDto {
   status: 'ACTIVE' | 'ARCHIVED'
   milestones: MilestoneItem[]
   progressPercent: number
+  version?: number
 }
 
 export interface RevisionItem {
@@ -155,6 +156,7 @@ export function updateLearningPath(
       topics: { id?: string; title: string; objective?: string; status?: TopicStatus }[]
     }[]
     reason: string
+    version: number
   },
 ): Promise<LearningPathDto> {
   return api<LearningPathDto>(`/learning-paths/${pathId}`, {

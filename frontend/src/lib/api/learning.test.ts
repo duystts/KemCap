@@ -118,6 +118,7 @@ describe('learning API client', () => {
       title: 'New Title',
       milestones: [],
       reason: 'Điều chỉnh theo năng lực thực tế',
+      version: 1,
     })
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining('/learning-paths/lp-1'),

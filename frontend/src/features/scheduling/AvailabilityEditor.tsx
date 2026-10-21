@@ -105,8 +105,33 @@ export default function AvailabilityEditor({ teacherIdOverride }: { teacherIdOve
       toast.error('Giờ bắt đầu phải trước giờ kết thúc')
       return
     }
+    const isOverlapping = rules
+      .filter((r) => r.dayOfWeek === selectedDay)
+      .some((r) => newStart < r.endTime && newEnd > r.startTime)
+    if (isOverlapping) {
+      toast.error('Khung giờ này bị trùng hoặc chồng lấn với khung giờ đã có trong ngày!')
+      return
+    }
     const updated = [...rules, { dayOfWeek: selectedDay, startTime: newStart, endTime: newEnd }]
     setRules(updated)
+  }
+
+  const handleSaveRules = () => {
+    for (const d of DAYS) {
+      const dayRules = rules
+        .filter((r) => r.dayOfWeek === d.key)
+        .sort((a, b) => a.startTime.localeCompare(b.startTime))
+      for (let i = 1; i < dayRules.length; i++) {
+        if (dayRules[i - 1].endTime > dayRules[i].startTime) {
+          toast.error(
+            `Ngày ${d.label} có khung giờ bị trùng hoặc chồng lấn (${dayRules[i - 1].startTime}-${dayRules[i - 1].endTime} và ${dayRules[i].startTime}-${dayRules[i].endTime})! Vui lòng xóa bớt trước khi lưu.`,
+          )
+          setSelectedDay(d.key)
+          return
+        }
+      }
+    }
+    saveMutation.mutate(rules)
   }
 
   const handleRemoveRule = (index: number) => {
@@ -137,7 +162,7 @@ export default function AvailabilityEditor({ teacherIdOverride }: { teacherIdOve
             Khung giờ rảnh lặp lại hàng tuần
           </CardTitle>
           <Button
-            onClick={() => saveMutation.mutate(rules)}
+            onClick={handleSaveRules}
             disabled={saveMutation.isPending || loadingRules}
             className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium"
           >

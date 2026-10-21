@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { recordOutcome, type SessionStatus } from '@/lib/api/scheduling'
+import { recordOutcome, fetchSession, type SessionStatus } from '@/lib/api/scheduling'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
@@ -63,6 +63,14 @@ export default function SessionOutcomeDialog({
   const [selectedOutcome, setSelectedOutcome] = useState<SessionStatus>('COMPLETED')
   const [note, setNote] = useState('')
 
+  const { data: session } = useQuery({
+    queryKey: ['session', sessionId],
+    queryFn: () => fetchSession(sessionId),
+    enabled: !!sessionId && open,
+  })
+
+  const isFutureSession = session?.startsAt ? new Date(session.startsAt) > new Date() : false
+
   const outcomeMutation = useMutation({
     mutationFn: () => recordOutcome(sessionId, selectedOutcome, note),
     onSuccess: () => {
@@ -87,6 +95,27 @@ export default function SessionOutcomeDialog({
             buổi cho học viên.
           </p>
         </div>
+
+        {isFutureSession && (
+          <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs flex items-start gap-2.5">
+            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
+            <div className="space-y-0.5">
+              <span className="font-semibold text-amber-800">Buổi học chưa diễn ra</span>
+              <p className="text-amber-700">
+                Buổi học này được lên lịch vào{' '}
+                <strong>
+                  {new Date(session!.startsAt).toLocaleTimeString('vi-VN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}{' '}
+                  ngày {new Date(session!.startsAt).toLocaleDateString('vi-VN')}
+                </strong>
+                . Theo quy chế đào tạo, bạn chỉ có thể chốt kết quả sau khi buổi học đã đến giờ bắt
+                đầu.
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="space-y-2.5">
           {OUTCOMES.map((item) => {
@@ -138,8 +167,8 @@ export default function SessionOutcomeDialog({
           <Button
             type="button"
             onClick={() => outcomeMutation.mutate()}
-            disabled={outcomeMutation.isPending}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium"
+            disabled={outcomeMutation.isPending || isFutureSession}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {outcomeMutation.isPending ? 'Đang lưu…' : 'Xác nhận chốt kết quả'}
           </Button>

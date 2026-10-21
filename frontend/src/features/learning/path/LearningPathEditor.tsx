@@ -75,6 +75,7 @@ export default function LearningPathEditor({
             })),
           })),
           reason: revisionReason.trim(),
+          version: existingPath.version ?? 0,
         })
       } else {
         return createLearningPath(studentId, {
