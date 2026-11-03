@@ -177,6 +177,7 @@ Ngày sinh nằm ở `user_account` (identity) để identity tự kiểm tra m�
 | status | enum (xem dưới) | |
 | renewal_low_notified_at / renewal_expiring_notified_at | timestamptz | đã nhắc gia hạn (mỗi lý do một lần; email + thông báo trong hệ thống) |
 | extended_by / extended_at | UUID / timestamptz | lần gia hạn thủ công gần nhất (FR-024) |
+| cancel_reason / cancelled_by / cancelled_at | text / UUID / timestamptz | ai hủy ghi danh, lúc nào, vì sao; `cancel_reason` bị xóa khi ẩn danh hóa |
 | version | bigint | optimistic lock |
 
 **Ràng buộc**: `sessions_reserved + sessions_consumed ≤ sessions_total` (CHECK constraint).

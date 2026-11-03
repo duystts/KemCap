@@ -83,6 +83,15 @@ public class Enrollment extends BaseEntity {
   @Column(name = "extended_at")
   private Instant extendedAt;
 
+  @Column(name = "cancel_reason")
+  private String cancelReason;
+
+  @Column(name = "cancelled_by")
+  private UUID cancelledBy;
+
+  @Column(name = "cancelled_at")
+  private Instant cancelledAt;
+
   @Version private long version;
 
   protected Enrollment() {}
@@ -175,6 +184,33 @@ public class Enrollment extends BaseEntity {
     status = EnrollmentStatus.EXPIRED;
   }
 
+  public boolean isPastExpiry(Instant now) {
+    return status == EnrollmentStatus.ACTIVE && expiresAt != null && !now.isBefore(expiresAt);
+  }
+
+  /** Còn ≤ {@code threshold} buổi và chưa nhắc lý do này (FR-026); gói dùng hết vẫn được nhắc. */
+  public boolean needsLowSessionsReminder(int threshold) {
+    return (status == EnrollmentStatus.ACTIVE || status == EnrollmentStatus.EXHAUSTED)
+        && sessionsRemaining() <= threshold
+        && renewalLowNotifiedAt == null;
+  }
+
+  /** Còn ≤ {@code window} tới hạn và chưa nhắc lý do này (FR-026). */
+  public boolean needsExpiringReminder(Instant now, Duration window) {
+    return status == EnrollmentStatus.ACTIVE
+        && expiresAt != null
+        && !now.plus(window).isBefore(expiresAt)
+        && renewalExpiringNotifiedAt == null;
+  }
+
+  public void markLowSessionsReminded(Instant now) {
+    renewalLowNotifiedAt = now;
+  }
+
+  public void markExpiringReminded(Instant now) {
+    renewalExpiringNotifiedAt = now;
+  }
+
   /** Gia hạn thủ công (FR-024): {@code ACTIVE}/{@code EXPIRED} → {@code ACTIVE}. */
   public void extend(Instant newExpiresAt, UUID by, Instant now) {
     if (status != EnrollmentStatus.ACTIVE && status != EnrollmentStatus.EXPIRED) {
@@ -190,7 +226,7 @@ public class Enrollment extends BaseEntity {
   }
 
   /** Hủy ghi danh: chỉ {@code PENDING_PAYMENT}/{@code ACTIVE} và không còn buổi đã đặt. */
-  public void cancel() {
+  public void cancel(String reason, UUID by, Instant now) {
     if (status != EnrollmentStatus.PENDING_PAYMENT && status != EnrollmentStatus.ACTIVE) {
       throw new BusinessException(ErrorCode.INVALID_STATE_TRANSITION);
     }
@@ -199,6 +235,9 @@ public class Enrollment extends BaseEntity {
           ErrorCode.INVALID_STATE_TRANSITION, "Ghi danh còn buổi đã đặt, hãy hủy các buổi trước");
     }
     status = EnrollmentStatus.CANCELLED;
+    cancelReason = reason == null || reason.isBlank() ? null : reason.trim();
+    cancelledBy = by;
+    cancelledAt = now;
   }
 
   public void changeTeacher(UUID newTeacherId) {
@@ -234,6 +273,18 @@ public class Enrollment extends BaseEntity {
     if (sessionsConsumed >= sessionsTotal && status == EnrollmentStatus.ACTIVE) {
       status = EnrollmentStatus.EXHAUSTED;
     }
+  }
+
+  public String getCancelReason() {
+    return cancelReason;
+  }
+
+  public UUID getCancelledBy() {
+    return cancelledBy;
+  }
+
+  public Instant getCancelledAt() {
+    return cancelledAt;
   }
 
   public UUID getStudentId() {

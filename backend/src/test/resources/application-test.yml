@@ -8,6 +8,8 @@ app:
     # test tự gọi job; không để job nền chạy chen (ShedLock sẽ bỏ qua lần gọi của test)
     initial-delay: PT1H
     outcome-overdue-cron: "-"
+    enrollment-lifecycle-cron: "-"
+    enrollment-lifecycle-on-startup: false
   privacy:
     policy-version: "2026-11"
 

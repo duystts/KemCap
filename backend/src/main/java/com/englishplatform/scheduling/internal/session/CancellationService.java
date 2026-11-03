@@ -90,6 +90,8 @@ public class CancellationService {
     if (old.wouldConsumeIfCancelled(now, props.cancelCutoff())) {
       throw new BusinessException(ErrorCode.CANCEL_WINDOW_PASSED);
     }
+    // khóa trước khi đụng ghi danh, cùng thứ tự với đặt buổi mới, để không deadlock
+    sessions.lockTeacherSchedule(old.getTeacherId().toString());
     old.cancel(now, props.cancelCutoff(), actor.id(), "Đổi lịch")
         .apply(enrollmentApi, old.getEnrollmentId());
     sessions.flush();

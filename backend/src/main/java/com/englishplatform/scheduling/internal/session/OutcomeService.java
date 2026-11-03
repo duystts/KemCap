@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -100,9 +101,9 @@ public class OutcomeService {
 
   /** Buổi đã qua giờ kết thúc mà chưa chốt: admin mọi buổi, giáo viên buổi của mình. */
   @Transactional(readOnly = true)
-  public List<Session> pending(CurrentUser actor) {
+  public List<Session> pending(CurrentUser actor, Pageable page) {
     UUID teacher = SchedulingAccess.isAdmin(actor) ? null : actor.id();
-    return sessions.findOutcomePending(clock.instant(), teacher);
+    return sessions.findOutcomePending(clock.instant(), teacher, page);
   }
 
   /**

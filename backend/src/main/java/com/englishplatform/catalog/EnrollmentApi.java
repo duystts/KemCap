@@ -1,6 +1,7 @@
 package com.englishplatform.catalog;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -15,6 +16,9 @@ public interface EnrollmentApi {
 
   /** Mọi ghi danh của học viên, mới nhất trước. */
   List<EnrollmentView> findByStudent(UUID studentId);
+
+  /** Ghi danh đã hủy; billing loại khỏi tổng công nợ (FR-025, chốt khi duyệt U8). */
+  Set<UUID> findCancelledIds();
 
   /** Đặt lịch: reserved +1. Ném {@code NO_SESSIONS_LEFT} / {@code ENROLLMENT_NOT_ACTIVE}. */
   void reserve(UUID enrollmentId);

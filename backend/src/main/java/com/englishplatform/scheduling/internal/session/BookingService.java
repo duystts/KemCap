@@ -11,6 +11,7 @@ import com.englishplatform.shared.security.CurrentUser;
 import com.englishplatform.shared.web.BusinessException;
 import com.englishplatform.shared.web.ErrorCode;
 import java.sql.SQLException;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.context.ApplicationEventPublisher;
@@ -33,13 +34,16 @@ public class BookingService {
   private final SlotService slotService;
   private final UserDirectory userDirectory;
   private final ApplicationEventPublisher events;
+  private final Clock clock;
 
   BookingService(
       SessionRepository sessions,
       EnrollmentApi enrollmentApi,
       SlotService slotService,
       UserDirectory userDirectory,
-      ApplicationEventPublisher events) {
+      ApplicationEventPublisher events,
+      Clock clock) {
+    this.clock = clock;
     this.sessions = sessions;
     this.enrollmentApi = enrollmentApi;
     this.slotService = slotService;
@@ -72,9 +76,13 @@ public class BookingService {
       throw SchedulingAccess.notFound();
     }
     userDirectory.requireNotAnonymized(enrollment.studentId());
-    if (enrollment.status() != EnrollmentStatus.ACTIVE) {
+    // quá hạn mà job hằng ngày chưa kịp đổi trạng thái cũng báo cùng một mã lỗi
+    boolean pastExpiry =
+        enrollment.expiresAt() != null && !clock.instant().isBefore(enrollment.expiresAt());
+    if (enrollment.status() != EnrollmentStatus.ACTIVE || pastExpiry) {
       throw new BusinessException(ErrorCode.ENROLLMENT_NOT_ACTIVE);
     }
+    sessions.lockTeacherSchedule(enrollment.teacherId().toString());
     if (!slotService.isBookable(enrollment, startsAt)) {
       throw BusinessException.validation(
           "startsAt", "Giờ học không nằm trong khung giờ trống của giáo viên");

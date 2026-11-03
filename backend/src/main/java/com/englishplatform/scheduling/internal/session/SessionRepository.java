@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -48,14 +49,47 @@ public interface SessionRepository extends JpaRepository<Session, UUID> {
         and (:status is null or s.status = :status)
         and (cast(:from as timestamp) is null or s.endsAt > :from)
         and (cast(:to as timestamp) is null or s.startsAt < :to)
-      order by s.startsAt
+      order by s.startsAt, s.id
       """)
   List<Session> search(
       @Param("teacherId") UUID teacherId,
       @Param("studentId") UUID studentId,
       @Param("status") SessionStatus status,
       @Param("from") Instant from,
+      @Param("to") Instant to,
+      Pageable page);
+
+  /**
+   * Khóa lịch của giáo viên tới hết transaction: đặt buổi và thêm ngày nghỉ song song không thể
+   * cùng thành công (FR-008). Khóa không gian tên riêng nên không ảnh hưởng dữ liệu; trả về chuỗi
+   * rỗng.
+   */
+  @Query(
+      value = "select cast(pg_advisory_xact_lock(hashtextextended(:key, 0)) as text)",
+      nativeQuery = true)
+  String lockTeacherSchedule(@Param("key") String teacherScheduleKey);
+
+  /**
+   * Số buổi theo giáo viên, bắt đầu từ {@code from} tới trước {@code to}; null = không giới hạn.
+   */
+  @Query(
+      """
+      select s.teacherId as teacherId, count(s) as sessions from Session s
+      where s.status in :statuses
+        and (cast(:from as timestamp) is null or s.startsAt >= :from)
+        and (cast(:to as timestamp) is null or s.startsAt < :to)
+      group by s.teacherId
+      """)
+  List<TeacherSessionCount> countByTeacher(
+      @Param("statuses") Collection<SessionStatus> statuses,
+      @Param("from") Instant from,
       @Param("to") Instant to);
+
+  interface TeacherSessionCount {
+    UUID getTeacherId();
+
+    long getSessions();
+  }
 
   /** Buổi {@code BOOKED} đã qua giờ kết thúc nhưng chưa chốt kết quả (FR-014). */
   @Query(
@@ -63,9 +97,10 @@ public interface SessionRepository extends JpaRepository<Session, UUID> {
       select s from Session s
       where s.status = com.englishplatform.scheduling.SessionStatus.BOOKED and s.endsAt <= :now
         and (:teacherId is null or s.teacherId = :teacherId)
-      order by s.endsAt
+      order by s.endsAt, s.id
       """)
-  List<Session> findOutcomePending(@Param("now") Instant now, @Param("teacherId") UUID teacherId);
+  List<Session> findOutcomePending(
+      @Param("now") Instant now, @Param("teacherId") UUID teacherId, Pageable page);
 
   List<Session> findByEnrollmentIdAndStatusAndStartsAtAfter(
       UUID enrollmentId, SessionStatus status, Instant after);

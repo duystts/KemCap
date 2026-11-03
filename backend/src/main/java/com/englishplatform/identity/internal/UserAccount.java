@@ -67,7 +67,7 @@ public class UserAccount extends BaseEntity {
   }
 
   public UserView toView() {
-    return new UserView(getId(), email, fullName, role, status, timezone);
+    return new UserView(getId(), email, fullName, role, status, timezone, isAnonymized());
   }
 
   /** Tuổi tròn tại ngày {@code now} theo múi giờ Việt Nam; rỗng nếu không có ngày sinh. */

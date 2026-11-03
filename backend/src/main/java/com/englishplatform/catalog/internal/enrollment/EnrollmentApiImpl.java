@@ -10,6 +10,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import java.time.Clock;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import org.springframework.context.ApplicationEventPublisher;
@@ -53,6 +54,12 @@ class EnrollmentApiImpl implements EnrollmentApi {
   @Transactional(readOnly = true)
   public List<EnrollmentView> findByStudent(UUID studentId) {
     return enrollments.search(studentId, null, null).stream().map(Enrollment::toView).toList();
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Set<UUID> findCancelledIds() {
+    return Set.copyOf(enrollments.findIdsByStatusIn(List.of(EnrollmentStatus.CANCELLED)));
   }
 
   @Override

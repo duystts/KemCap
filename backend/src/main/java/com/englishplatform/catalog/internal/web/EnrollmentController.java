@@ -38,7 +38,10 @@ class EnrollmentController {
     this.service = service;
   }
 
-  /** {@code priceVnd} chỉ trả cho admin và học viên chủ ghi danh (giáo viên không cần học phí). */
+  /**
+   * {@code priceVnd} chỉ trả cho admin và học viên chủ ghi danh (giáo viên không cần học phí);
+   * thông tin hủy chỉ trả cho admin.
+   */
   record EnrollmentDto(
       UUID id,
       UUID studentId,
@@ -53,10 +56,14 @@ class EnrollmentController {
       Instant activatedAt,
       Instant expiresAt,
       EnrollmentStatus status,
+      String cancelReason,
+      UUID cancelledBy,
+      Instant cancelledAt,
       long version) {
 
     static EnrollmentDto of(Enrollment e, CurrentUser viewer) {
       boolean showPrice = !CatalogAccess.isTeacher(viewer);
+      boolean admin = CatalogAccess.isAdmin(viewer);
       return new EnrollmentDto(
           e.getId(),
           e.getStudentId(),
@@ -71,6 +78,9 @@ class EnrollmentController {
           e.getActivatedAt(),
           e.getExpiresAt(),
           e.getStatus(),
+          admin ? e.getCancelReason() : null,
+          admin ? e.getCancelledBy() : null,
+          admin ? e.getCancelledAt() : null,
           e.getVersion());
     }
   }
@@ -147,6 +157,7 @@ class EnrollmentController {
   @PostMapping("/{id}/cancel")
   @PreAuthorize("hasRole('ADMIN')")
   EnrollmentDto cancel(@PathVariable UUID id, @RequestBody(required = false) CancelRequest r) {
-    return EnrollmentDto.of(service.cancel(id), CurrentUser.require());
+    CurrentUser user = CurrentUser.require();
+    return EnrollmentDto.of(service.cancel(id, r == null ? null : r.reason(), user.id()), user);
   }
 }

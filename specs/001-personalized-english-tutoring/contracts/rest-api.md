@@ -54,12 +54,12 @@ Mật khẩu: tối thiểu 8 ký tự, có chữ và số.
 | GET/POST | `/packages?courseId=` | Any (GET); A (POST) | gói học | FR-005 |
 | PUT | `/packages/{id}` | A | sửa/ngừng gói học | FR-005 |
 | POST | `/enrollments` | A | `{studentId, packageId, teacherId, priceVnd?}` → `PENDING_PAYMENT` | FR-006 |
-| GET | `/enrollments?studentId=&teacherId=&status=` | A; T; S | danh sách ghi danh + số buổi còn lại | FR-024 |
-| GET | `/enrollments/{id}` | A; T; S | chi tiết | |
+| GET | `/enrollments?studentId=&teacherId=&status=` | A; T; S | danh sách ghi danh + số buổi còn lại; `cancelReason`, `cancelledBy`, `cancelledAt` chỉ trả cho admin | FR-024 |
+| GET | `/enrollments/{id}` | A; T; S | chi tiết; `cancelReason`, `cancelledBy`, `cancelledAt` chỉ trả cho admin | |
 | GET | `/enrollments/{id}/teacher-history` | A | lịch sử phân công giáo viên (thêm ở U2) | FR-006 |
 | PUT | `/enrollments/{id}/teacher` | A | `{teacherId, reason}` đổi giáo viên; buổi `BOOKED` tương lai với giáo viên cũ → `CANCELLED_SYSTEM` (bất đồng bộ) | FR-006 |
-| POST | `/enrollments/{id}/extend` | A | `{newExpiresAt}` gia hạn thủ công (EXPIRED/ACTIVE → ACTIVE, ghi người + thời điểm) | FR-024 |
-| POST | `/enrollments/{id}/cancel` | A | `{reason}` | |
+| POST | `/enrollments/{id}/extend` | A | `{newExpiresAt}` gia hạn thủ công (EXPIRED/ACTIVE → ACTIVE, ghi người + thời điểm); 409 `ANONYMIZED` với hồ sơ đã ẩn danh | FR-024 |
+| POST | `/enrollments/{id}/cancel` | A | `{reason?}`; lưu người hủy, thời điểm, lý do (chỉ admin thấy); hồ sơ đã ẩn danh vẫn hủy được nhưng không lưu lý do | |
 
 `EnrollmentDto` gồm: `sessionsTotal, sessionsReserved, sessionsConsumed, sessionsRemaining, expiresAt, status` (+ `priceVnd` — null khi người xem là giáo viên, `version`).
 **MVP (U2)**: các API danh sách (`/users`, `/students`, `/enrollments`, `/courses`, `/packages`) trả mảng, chưa phân trang — quy mô demo nhỏ; thêm `page/size` khi cần. `GET /students/{id}/profile`: `notes` chỉ trả cho admin.
@@ -72,8 +72,8 @@ Mật khẩu: tối thiểu 8 ký tự, có chữ và số.
 | GET/POST | `/teachers/{id}/availability/exceptions` | A; T | ngày nghỉ / khung nghỉ; 409 `EXCEPTION_OVERLAPS_SESSIONS` + `sessions[]` nếu trùng buổi `BOOKED` | FR-008 |
 | DELETE | `/teachers/{id}/availability/exceptions/{exId}` | A; T | | FR-008 |
 | GET | `/enrollments/{id}/slots?from=&to=` | A; S | khung giờ trống của giáo viên phụ trách (tối đa 30 ngày) | FR-009 |
-| POST | `/sessions` | A; S | `{enrollmentId, startsAt}` → 201 `SessionDto`; 409 `SLOT_TAKEN` / `NO_SESSIONS_LEFT` | FR-009, FR-010 |
-| GET | `/sessions?from=&to=&teacherId=&studentId=&status=` | A; T; S | lịch (lọc theo quyền) | FR-007 |
+| POST | `/sessions` | A; S | `{enrollmentId, startsAt}` → 201 `SessionDto`; 409 `SLOT_TAKEN` / `NO_SESSIONS_LEFT` / `ENROLLMENT_NOT_ACTIVE` (kể cả gói đã quá hạn mà job chưa chạy) / `ANONYMIZED` | FR-009, FR-010 |
+| GET | `/sessions?from=&to=&teacherId=&studentId=&status=&outcomePending=&page=&size=` | A; T; S | lịch (lọc theo quyền), sắp theo giờ. **Phân trang**: `page` từ 0, `size` mặc định 200, tối đa 500, ngoài khoảng → 400. Nhiều hơn một trang thì phải gọi tiếp `page` sau; hết khi trả về ít hơn `size` | FR-007 |
 | GET | `/sessions/{id}` | A; T; S | chi tiết | |
 | GET | `/sessions/{id}/cancel-preview` | A; S | → `{willConsume: bool, cutoffAt}` để frontend cảnh báo hủy muộn trước khi xác nhận | FR-011 |
 | POST | `/sessions/{id}/cancel` | A; T; S | `{reason}` → `CANCELLED_ON_TIME`/`CANCELLED_LATE` (S, A) hoặc `TEACHER_ABSENT` (T) | FR-011 |
@@ -83,7 +83,7 @@ Mật khẩu: tối thiểu 8 ký tự, có chữ và số.
 | POST | `/sessions/{id}/interruption-decision` | A | `{decision: COUNT\|MAKE_UP}` — COUNT: `INTERRUPTED` → `COMPLETED`; MAKE_UP: giữ `INTERRUPTED` | FR-014 |
 | GET | `/sessions?outcomePending=true` | A; T | buổi `BOOKED` đã qua `ends_at` chưa chốt kết quả | FR-014 |
 | POST | `/sessions/{id}/join` | T; S (của buổi đó) | → `{serverUrl, token, roomName}`; 403 `ROOM_NOT_OPEN` nếu ngoài cửa sổ [−10 phút, +15 phút sau kết thúc] | FR-012 |
-| GET | `/reports/teacher-sessions?from=&to=` | A | theo giáo viên: `sessionsTaught` (COMPLETED + STUDENT_NO_SHOW + CANCELLED_LATE), `teacherCancelRate`, `studentCancelRate` (mẫu số loại CANCELLED_ON_TIME, CANCELLED_SYSTEM) | FR-023, FR-027 |
+| GET | `/reports/teacher-sessions?from=&to=` | A | theo giáo viên: `teacherId`, `teacherName`, `sessionsTaught` (COMPLETED + STUDENT_NO_SHOW + CANCELLED_LATE, Gián đoạn tính là đã học đã thành COMPLETED). `from`/`to` là ngày giờ VN, tùy chọn, tính cả hai đầu, xét theo giờ bắt đầu buổi. Tỷ lệ hủy/vắng thuộc FR-023, GĐ2 (K1) | FR-027 |
 
 ## learning
 
@@ -117,8 +117,8 @@ Mật khẩu: tối thiểu 8 ký tự, có chữ và số.
 | GET | `/enrollments/{id}/payments` | A; S | lịch sử thanh toán + công nợ | FR-025 |
 | POST | `/enrollments/{id}/payments` | A | `{amountVnd, paidAt, method, note?}` → kích hoạt gói nếu là lần đầu | FR-025 |
 | POST | `/enrollments/{id}/payments/adjustments` | A | `{amountVnd (âm), note}` điều chỉnh nhập nhầm | FR-025 |
-| GET | `/receivables?hasDebt=true` | A | danh sách công nợ | FR-025 |
-| GET | `/reports/revenue?from=&to=` | A | tổng đã thu, tổng công nợ | FR-027 |
+| GET | `/receivables?hasDebt=` | A | `enrollmentId`, `studentId`, `studentName`, `amountDueVnd`, `amountPaidVnd`, `debtVnd`, `cancelled`; `hasDebt=true`: còn nợ và ghi danh chưa hủy; bỏ tham số: mọi bản ghi; nợ nhiều nhất trước | FR-025 |
+| GET | `/reports/revenue?from=&to=` | A | `collectedVnd`: tổng theo `paid_at` trong kỳ, kể cả điều chỉnh âm và ghi danh đã hủy; `debtVnd`: số dư **hiện tại**, không theo kỳ, không tính ghi danh đã hủy, thu vượt không bù ghi danh khác. `from`/`to` tùy chọn; `from > to` → 400 | FR-027 |
 
 ## notification
 

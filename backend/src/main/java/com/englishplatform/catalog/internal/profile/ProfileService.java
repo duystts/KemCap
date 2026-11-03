@@ -125,7 +125,7 @@ public class ProfileService {
             : new HashSet<>(enrollments.findStudentIdsByTeacher(scopeTeacher, Enrollment.ASSIGNED));
     List<UserView> students =
         userDirectory.search(Role.STUDENT, status, q).stream()
-            .filter(u -> allowed == null || allowed.contains(u.id()))
+            .filter(u -> allowed == null || (allowed.contains(u.id()) && !u.anonymized()))
             .toList();
     List<UUID> ids = students.stream().map(UserView::id).toList();
     Map<UUID, StudentProfile> profiles =
@@ -155,7 +155,10 @@ public class ProfileService {
                         ? profiles.get(u.id()).getSelfReportedLevel()
                         : null,
                     teachers.getOrDefault(u.id(), Set.of()),
-                    provider != null && studying.contains(u.id()) && !withGoal.contains(u.id())))
+                    provider != null
+                        && !u.anonymized()
+                        && studying.contains(u.id())
+                        && !withGoal.contains(u.id())))
         .filter(s -> needsConsulting == null || s.needsConsulting() == needsConsulting)
         .toList();
   }

@@ -256,7 +256,7 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 
 - [X] T104 [P] [US5] (#4·U2) Unit test `BT/billing/PaymentServiceTest.java`: `amount_vnd > 0`; `paid_at ≤ hôm nay`; công nợ = `amount_due − amount_paid`; điều chỉnh âm chỉ ADMIN, bắt buộc `note`; thanh toán đầu tiên `isFirstPayment = true`; thanh toán sau không đổi `activated_at`/`expires_at`
 - [X] T105 [P] [US5] (#4·U2) Test `BT/billing/BillingFlowTest.java` (Modulith `Scenario`): `EnrollmentCreated` → `receivable`; `PaymentRecorded` đầu tiên (số tiền bất kỳ) → enrollment `ACTIVE`, `expires_at = activated_at + validity_days`, phát `EnrollmentActivated`; học viên đọc được thanh toán của mình, không đọc được của người khác (404)
-- [ ] T106 [P] [US5] (#4·U8) Test `BT/catalog/EnrollmentLifecycleJobTest.java`: `ACTIVE` quá `expires_at` → `EXPIRED` (buổi `BOOKED` sau hạn vẫn giữ); còn ≤ **2** buổi hoặc ≤ **7** ngày → `EnrollmentRenewalDue` đúng một lần mỗi lý do; `extend` đưa `EXPIRED` → `ACTIVE`
+- [X] T106 [P] [US5] (#4·U8) Test `BT/catalog/EnrollmentLifecycleJobTest.java`: `ACTIVE` quá `expires_at` → `EXPIRED` (buổi `BOOKED` sau hạn vẫn giữ); còn ≤ **2** buổi hoặc ≤ **7** ngày → `EnrollmentRenewalDue` đúng một lần mỗi lý do; `extend` đưa `EXPIRED` → `ACTIVE` — *đặt tên `EnrollmentLifecycleJobIT` vì cần DB thật*
 
 ### Implementation for User Story 5
 
@@ -265,8 +265,8 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 - [X] T109 [US5] (#4·U2) Listener `B/billing/internal/EnrollmentCreatedListener.java`: `receivable` với `amount_due_vnd = priceVnd`
 - [X] T110 [US5] (#4·U2) `B/billing/internal/PaymentService.java` + `B/billing/internal/web/BillingController.java`: `GET /enrollments/{id}/payments` (A; S chủ ghi danh, chỉ đọc), `POST /enrollments/{id}/payments`, `POST /enrollments/{id}/payments/adjustments`; thanh toán không sửa/xóa; phát `PaymentRecorded`
 - [X] T111 [US5] (#1·U2) ~~Listener `PaymentRecordedListener`~~ → **đổi thành** `EnrollmentApi.activateOnFirstPayment` gọi đồng bộ từ `PaymentService` (tránh vòng catalog ↔ billing, events-and-ports.md §2) — bản gốc: Listener `B/catalog/internal/enrollment/PaymentRecordedListener.java`: enrollment `PENDING_PAYMENT` → `activate(now)` (`expires_at = now + validity_days`), phát `EnrollmentActivated`
-- [ ] T112 [US5] (#4·U8) Job `B/catalog/internal/jobs/EnrollmentLifecycleJob.java` (`cron = "0 5 0 * * *", zone = "Asia/Ho_Chi_Minh"` + `@SchedulerLock`): hết hạn → `EXPIRED`; nhắc theo `renewal-low-sessions` / `renewal-expiring-days`, set `renewal_*_notified_at`; phát `EnrollmentRenewalDue`
-- [ ] T113 [US5] (#4·U8) `GET /receivables?hasDebt=true` và `GET /reports/revenue?from=&to=` (tổng đã thu, tổng công nợ) trong `B/billing/internal/web/BillingReportController.java`
+- [X] T112 [US5] (#4·U8) Job `B/catalog/internal/jobs/EnrollmentLifecycleJob.java` (`cron = "0 5 0 * * *", zone = "Asia/Ho_Chi_Minh"` + `@SchedulerLock`): hết hạn → `EXPIRED`; nhắc theo `renewal-low-sessions` / `renewal-expiring-days`, set `renewal_*_notified_at`; phát `EnrollmentRenewalDue`
+- [X] T113 [US5] (#4·U8) `GET /receivables?hasDebt=true` và `GET /reports/revenue?from=&to=` (tổng đã thu, tổng công nợ) trong `B/billing/internal/web/BillingReportController.java` — *ghi danh đã hủy không tính công nợ, vẫn giữ bản ghi và số đã thu; công nợ là số dư hiện tại*
 - [ ] T114 [P] [US5] (#4·U2) Frontend `F/features/billing/PaymentsPanel.tsx` (trong `EnrollmentDetailPage`): lịch sử, `RecordPaymentDialog.tsx` (VND, ngày, phương thức, ghi chú — gợi ý "không ghi tên học viên"), `AdjustmentDialog.tsx`, nhãn công nợ
 - [ ] T115 [P] [US5] (#4·U8) Frontend `F/features/billing/ReceivablesPage.tsx`: học viên còn nợ, lọc, liên kết ghi danh
 - [ ] T116 [US5] (#4·U8) Frontend `F/features/catalog/enrollments/MyPackagesPage.tsx` (`/student/packages`): đã học/đã đặt/còn lại, hạn, trạng thái "Chờ thanh toán", lịch sử thanh toán + công nợ (chỉ đọc), banner gia hạn khi ≤ 2 buổi hoặc ≤ 7 ngày
@@ -284,13 +284,13 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 ### Tests for User Story 6 ⚠️
 
 - [ ] T117 [P] [US6] (#1·U6) Test `BT/learning/SessionFeedbackIT.java`: chỉ học viên của buổi `COMPLETED`, trong 7 ngày sau `ends_at`; lần 2 → 409 `FEEDBACK_EXISTS`; quá hạn → 409 `FEEDBACK_WINDOW_CLOSED`; giáo viên `GET /sessions/{id}/feedback` → 403
-- [ ] T118 [P] [US6] (#4·U8) Test `BT/scheduling/TeacherSessionsReportIT.java`: `sessionsTaught` = `COMPLETED` + `STUDENT_NO_SHOW` + `CANCELLED_LATE` theo giáo viên trong khoảng thời gian; `CANCELLED_SYSTEM`, `CANCELLED_ON_TIME`, `TEACHER_ABSENT`, `INTERRUPTED` không được tính
+- [X] T118 [P] [US6] (#4·U8) Test `BT/scheduling/TeacherSessionsReportIT.java`: `sessionsTaught` = `COMPLETED` + `STUDENT_NO_SHOW` + `CANCELLED_LATE` theo giáo viên trong khoảng thời gian; `CANCELLED_SYSTEM`, `CANCELLED_ON_TIME`, `TEACHER_ABSENT`, `INTERRUPTED` không được tính
 
 ### Implementation for User Story 6
 
 - [ ] T119 [US6] (#1·U6) Migration `MIG/V9__learning_feedback.sql`: `session_feedback` (`session_id` unique, `stars` `CHECK BETWEEN 1 AND 5`, `comment` nullable)
 - [ ] T120 [US6] (#1·U6) `B/learning/internal/feedback/FeedbackService.java` + controller: `POST /sessions/{id}/feedback` (S, qua `SessionQueryApi.find`: đúng học viên, `COMPLETED`, ≤ 7 ngày, một lần), `GET /sessions/{id}/feedback` (chỉ A); listener ẩn danh hóa xóa `comment`, giữ `stars`
-- [ ] T121 [US6] (#4·U8) `B/scheduling/internal/report/TeacherSessionsReportService.java` + `GET /reports/teacher-sessions?from=&to=` (A): theo giáo viên — chỉ `sessionsTaught` (K1)
+- [X] T121 [US6] (#4·U8) `B/scheduling/internal/report/TeacherSessionsReportService.java` + `GET /reports/teacher-sessions?from=&to=` (A): theo giáo viên — chỉ `sessionsTaught` (K1)
 - [ ] T122 [P] [US6] (#3·U6) Frontend `F/features/learning/feedback/SessionFeedbackPrompt.tsx`: chấm 1–5 sao + nhận xét sau buổi `COMPLETED` (trang chủ học viên, chi tiết buổi; không bắt buộc; ẩn sau khi gửi hoặc quá 7 ngày)
 - [ ] T123 [US6] (#4·U8) Frontend `F/features/admin/dashboard/DashboardPage.tsx`: chọn khoảng thời gian; thẻ tổng đã thu và công nợ (`/reports/revenue`); bảng số buổi đã dạy theo giáo viên (`/reports/teacher-sessions`); xem sao từng buổi ở chi tiết buổi (admin)
 
@@ -309,7 +309,7 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 ### Tests for User Story 1 (privacy) ⚠️
 
 - [X] T124 [P] [US1] (#1·U7) Integration test `BT/identity/GuardianConsentIT.java`: tạo học viên 12 tuổi → `AWAITING_GUARDIAN_CONSENT`, không có email mời; ghi `guardian_consent` → `INVITED` + `UserInvited`; học viên vẫn < 16 tuổi lúc accept-invite mà không có đồng ý → `GUARDIAN_CONSENT_REQUIRED`
-- [X] T125 [P] [US1] (#1·U7) Integration test xuyên module `BT/privacy/AnonymizationIT.java` (`@SpringBootTest` + Testcontainers): chụp `/reports/revenue`, `/receivables`, `/reports/teacher-sessions` → ẩn danh hóa học viên có buổi đã học, buổi `BOOKED` tương lai, thanh toán, công nợ, lộ trình, bài nộp → tên/email/ngày sinh/lộ trình/bài nộp/nhận xét mất; buổi tương lai `CANCELLED_SYSTEM`; ba báo cáo **không đổi** (SC-007); `data_subject_request` `COMPLETED` còn `requester_name`; gọi lại không lỗi — *U7 chưa có 3 báo cáo U8 nên so bằng dữ liệu gốc (payment, công nợ, đếm buổi); U8 mở rộng T125 với báo cáo thật; gọi lại API → 409 `ANONYMIZED`, phát lại event không lỗi*
+- [X] T125 [P] [US1] (#1·U7) Integration test xuyên module `BT/privacy/AnonymizationIT.java` (`@SpringBootTest` + Testcontainers): chụp `/reports/revenue`, `/receivables`, `/reports/teacher-sessions` → ẩn danh hóa học viên có buổi đã học, buổi `BOOKED` tương lai, thanh toán, công nợ, lộ trình, bài nộp → tên/email/ngày sinh/lộ trình/bài nộp/nhận xét mất; buổi tương lai `CANCELLED_SYSTEM`; ba báo cáo **không đổi** (SC-007); `data_subject_request` `COMPLETED` còn `requester_name`; gọi lại không lỗi — *U7 chưa có 3 báo cáo U8 nên so bằng dữ liệu gốc (payment, công nợ, đếm buổi); U8 mở rộng T125 với báo cáo thật; gọi lại API → 409 `ANONYMIZED`, phát lại event không lỗi* — *U8: đã mở rộng so cả 3 báo cáo thật*
 
 ### Implementation for User Story 1 (privacy)
 

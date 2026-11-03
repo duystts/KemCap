@@ -13,11 +13,13 @@ import com.englishplatform.scheduling.internal.session.SessionRepository;
 import com.englishplatform.scheduling.internal.slot.SlotGenerator.Slot;
 import com.englishplatform.scheduling.internal.slot.SlotService;
 import com.englishplatform.shared.security.CurrentUser;
+import com.englishplatform.shared.web.BusinessException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 class SessionController {
+
+  private static final int MAX_PAGE_SIZE = 500;
 
   private final BookingService booking;
   private final CancellationService cancellation;
@@ -141,20 +145,30 @@ class SessionController {
       @RequestParam(required = false) UUID teacherId,
       @RequestParam(required = false) UUID studentId,
       @RequestParam(required = false) SessionStatus status,
-      @RequestParam(required = false) Boolean outcomePending) {
+      @RequestParam(required = false) Boolean outcomePending,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "200") int size) {
+    if (size < 1 || size > MAX_PAGE_SIZE) {
+      throw BusinessException.validation("size", "Mỗi trang từ 1 đến " + MAX_PAGE_SIZE + " buổi");
+    }
+    // vị trí bắt đầu phải vừa kiểu int của truy vấn, nếu không page rất lớn sẽ thành 500
+    if (page < 0 || (long) page * size > Integer.MAX_VALUE) {
+      throw BusinessException.validation("page", "Trang không hợp lệ");
+    }
+    PageRequest pageRequest = PageRequest.of(page, size);
     CurrentUser user = CurrentUser.require();
     if (Boolean.TRUE.equals(outcomePending)) {
       if (SchedulingAccess.isStudent(user)) {
         return List.of();
       }
-      return outcomes.pending(user).stream().map(SessionDto::of).toList();
+      return outcomes.pending(user, pageRequest).stream().map(SessionDto::of).toList();
     }
     if (SchedulingAccess.isTeacher(user)) {
       teacherId = user.id();
     } else if (SchedulingAccess.isStudent(user)) {
       studentId = user.id();
     }
-    return sessions.search(teacherId, studentId, status, from, to).stream()
+    return sessions.search(teacherId, studentId, status, from, to, pageRequest).stream()
         .map(SessionDto::of)
         .toList();
   }

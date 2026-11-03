@@ -123,6 +123,7 @@ public class AvailabilityService {
         spec.startTime() == null
             ? spec.date().plusDays(1).atStartOfDay(zone).toInstant()
             : spec.date().atTime(spec.endTime()).atZone(zone).toInstant();
+    sessions.lockTeacherSchedule(teacherId.toString());
     List<Session> overlapping =
         sessions.findTeacherSessions(teacherId, SessionStatus.BOOKED, from, to);
     if (!overlapping.isEmpty()) {

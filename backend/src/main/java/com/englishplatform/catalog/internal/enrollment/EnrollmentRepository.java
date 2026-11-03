@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -36,4 +37,14 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, UUID> {
       @Param("status") EnrollmentStatus status);
 
   List<Enrollment> findByStudentIdIn(Collection<UUID> studentIds);
+
+  @Query("select e.id from Enrollment e where e.status in :statuses")
+  List<UUID> findIdsByStatusIn(@Param("statuses") Collection<EnrollmentStatus> statuses);
+
+  /** FR-031: lý do hủy là văn bản tự do, có thể nhắc học viên; giữ ai hủy và khi nào. */
+  @Modifying
+  @Query(
+      "update Enrollment e set e.cancelReason = null"
+          + " where e.studentId = :studentId and e.cancelReason is not null")
+  int clearCancelReasonsOf(@Param("studentId") UUID studentId);
 }

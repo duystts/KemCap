@@ -127,6 +127,7 @@ public class EnrollmentService {
   @Transactional
   public Enrollment extend(UUID id, Instant newExpiresAt, UUID by) {
     Enrollment enrollment = find(id);
+    userDirectory.requireNotAnonymized(enrollment.getStudentId());
     if (userDirectory
         .find(enrollment.getTeacherId())
         .filter(u -> u.status() == UserStatus.ACTIVE)
@@ -139,9 +140,11 @@ public class EnrollmentService {
   }
 
   @Transactional
-  public Enrollment cancel(UUID id) {
+  public Enrollment cancel(UUID id, String reason, UUID by) {
     Enrollment enrollment = find(id);
-    enrollment.cancel();
+    // học viên đã ẩn danh: vẫn hủy được, nhưng không lưu văn bản tự do mới (FR-031)
+    String storedReason = userDirectory.isAnonymized(enrollment.getStudentId()) ? null : reason;
+    enrollment.cancel(storedReason, by, clock.instant());
     return enrollment;
   }
 

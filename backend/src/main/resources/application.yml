@@ -83,6 +83,8 @@ app:
     guardian-consent-under-age: 16              # chờ pháp lý trung tâm xác nhận
   jobs:
     initial-delay: PT30S
+    enrollment-lifecycle-cron: "0 5 0 * * *"  # giờ VN; hết hạn gói + nhắc gia hạn
+    enrollment-lifecycle-on-startup: true     # chạy bù khi khởi động (demo trên laptop có thể tắt lúc 00:05)
   scheduling:
     cancel-cutoff-hours: 12
     min-booking-lead-hours: 2

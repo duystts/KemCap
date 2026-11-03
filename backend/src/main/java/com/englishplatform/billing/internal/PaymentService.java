@@ -3,7 +3,6 @@ package com.englishplatform.billing.internal;
 import com.englishplatform.billing.PaymentRecorded;
 import com.englishplatform.catalog.EnrollmentApi;
 import com.englishplatform.catalog.EnrollmentStatus;
-import com.englishplatform.catalog.EnrollmentView;
 import com.englishplatform.shared.web.BusinessException;
 import com.englishplatform.shared.web.ErrorCode;
 import java.time.Clock;
@@ -64,6 +63,9 @@ public class PaymentService {
     if (method == null) {
       throw BusinessException.validation("method", "Chọn phương thức thanh toán");
     }
+    if (enrollmentApi.get(enrollmentId).status() == EnrollmentStatus.CANCELLED) {
+      throw new BusinessException(ErrorCode.ENROLLMENT_NOT_ACTIVE);
+    }
     Receivable receivable = lockReceivable(enrollmentId);
     boolean first = !payments.existsByEnrollmentIdAndAdjustmentFalse(enrollmentId);
     Payment payment =
@@ -85,7 +87,10 @@ public class PaymentService {
     return payment;
   }
 
-  /** Điều chỉnh nhập nhầm: số tiền âm, ghi chú bắt buộc, tổng đã thu không âm. */
+  /**
+   * Điều chỉnh nhập nhầm: số tiền âm, ghi chú bắt buộc, tổng đã thu không âm. Được làm cả trên ghi
+   * danh đã hủy, nếu không khoản nhập nhầm sẽ không có cách sửa.
+   */
   @Transactional
   public Payment adjust(UUID enrollmentId, long amountVnd, String note, UUID recordedBy) {
     if (amountVnd >= 0) {
@@ -126,10 +131,6 @@ public class PaymentService {
   }
 
   private Receivable lockReceivable(UUID enrollmentId) {
-    EnrollmentView enrollment = enrollmentApi.get(enrollmentId);
-    if (enrollment.status() == EnrollmentStatus.CANCELLED) {
-      throw new BusinessException(ErrorCode.ENROLLMENT_NOT_ACTIVE);
-    }
     // công nợ được tạo cùng transaction với ghi danh (EnrollmentCreatedListener, BEFORE_COMMIT)
     return receivables
         .findForUpdate(enrollmentId)

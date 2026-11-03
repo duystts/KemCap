@@ -111,13 +111,17 @@ class EnrollmentTest {
   @Test
   void cancelOnlyFromPendingOrActiveWithoutBookedSessions() {
     Enrollment pending = enrollment(2);
-    pending.cancel();
+    UUID by = UUID.randomUUID();
+    pending.cancel("  Chuyển nơi học ", by, NOW);
     assertThat(pending.getStatus()).isEqualTo(EnrollmentStatus.CANCELLED);
-    assertCode(pending::cancel, ErrorCode.INVALID_STATE_TRANSITION);
+    assertThat(pending.getCancelReason()).isEqualTo("Chuyển nơi học");
+    assertThat(pending.getCancelledBy()).isEqualTo(by);
+    assertThat(pending.getCancelledAt()).isEqualTo(NOW);
+    assertCode(() -> pending.cancel(null, by, NOW), ErrorCode.INVALID_STATE_TRANSITION);
 
     Enrollment booked = active(2);
     booked.reserve(NOW);
-    assertCode(booked::cancel, ErrorCode.INVALID_STATE_TRANSITION);
+    assertCode(() -> booked.cancel(null, by, NOW), ErrorCode.INVALID_STATE_TRANSITION);
   }
 
   @Test

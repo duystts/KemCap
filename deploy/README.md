@@ -84,7 +84,7 @@ người khác** (R18).
   1. **Trước khi khôi phục**, lưu log lại:
      `docker compose -f docker-compose.prod.yml logs backend | grep "Đã ẩn danh hóa học viên" > erasures.log`.
      Dòng log chỉ chứa UUID học viên và UUID yêu cầu.
-  2. Chạy khôi phục, nhưng **chặn truy cập công khai** (dừng `caddy`) cho tới khi xong bước 3.
+  2. Chạy khôi phục, nhưng **chặn truy cập công khai** (dừng `caddy`) cho tới khi xong bước 3. Đặt `APP_JOBS_ENROLLMENT_LIFECYCLE_ON_STARTUP=false` và cấu hình SMTP giả trong lúc này: job nhắc lịch và job gia hạn chạy bù có thể gửi email tới học viên đã yêu cầu xóa (R16 U8).
   3. Với mỗi học viên trong `erasures.log` từ thời điểm dump trở đi: nếu DB vừa khôi phục đã có yêu cầu
      `ERASURE` đang `RECEIVED` thì dùng lại, nếu không thì tạo bằng `POST /data-subject-requests`; rồi gọi
      `POST /data-subject-requests/{id}/anonymize`. Gọi API trực tiếp vào backend trong mạng Docker.

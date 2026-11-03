@@ -76,10 +76,19 @@ class AnonymizationIT extends ApiTestSupport {
   }
 
   /** Số liệu SC-007 có sẵn trước U8: đã thu, công nợ, số buổi đã dạy, bộ đếm ghi danh đã học. */
-  private record Figures(String paid, String debt, long taught, int consumed) {}
+  private record Figures(
+      String paid,
+      String debt,
+      long taught,
+      int consumed,
+      String revenueCollected,
+      String revenueDebt,
+      String receivableDebt,
+      String reportTaught) {}
 
   private Figures figures(TestUser admin, TestUser teacher, UUID enrollmentId) throws Exception {
     var statement = call(get("/api/v1/enrollments/" + enrollmentId + "/payments"), admin);
+    var revenue = call(get("/api/v1/reports/revenue"), admin).andExpect(status().isOk());
     return new Figures(
         read(statement, "$.amountPaidVnd"),
         read(statement, "$.debtVnd"),
@@ -87,7 +96,15 @@ class AnonymizationIT extends ApiTestSupport {
             "select count(*) from session where teacher_id = ? and status = 'COMPLETED'",
             Long.class,
             teacher.id()),
-        enrollmentApi.get(enrollmentId).sessionsConsumed());
+        enrollmentApi.get(enrollmentId).sessionsConsumed(),
+        read(revenue, "$.collectedVnd"),
+        read(revenue, "$.debtVnd"),
+        read(
+            call(get("/api/v1/receivables?hasDebt=true"), admin),
+            "$[?(@.enrollmentId == '" + enrollmentId + "')].debtVnd"),
+        read(
+            call(get("/api/v1/reports/teacher-sessions"), admin),
+            "$[?(@.teacherId == '" + teacher.id() + "')].sessionsTaught"));
   }
 
   private void availableAllWeek(TestUser teacher) {
@@ -195,6 +212,12 @@ class AnonymizationIT extends ApiTestSupport {
     awaitListenersDone(student.id());
     Instant pastStart = at(2, 10);
     UUID done = book(student, enrollmentId, pastStart);
+    UUID cancelledEnrollment = enrollWithPartialPayment(admin, teacher, student);
+    call(
+            post("/api/v1/enrollments/" + cancelledEnrollment + "/cancel"),
+            admin,
+            "{\"reason\":\"" + name + " chuyển nơi học\"}")
+        .andExpect(status().isOk());
     UUID cancelled = book(student, enrollmentId, at(4, 10));
     UUID future = book(student, enrollmentId, at(6, 10));
     call(
@@ -230,6 +253,8 @@ class AnonymizationIT extends ApiTestSupport {
     assertThat(before.debt()).isEqualTo("600000");
     assertThat(before.taught()).isEqualTo(1);
     assertThat(before.consumed()).isEqualTo(1);
+    assertThat(before.receivableDebt()).isEqualTo("[600000]");
+    assertThat(before.reportTaught()).isEqualTo("[1]");
     assertThat(enrollmentApi.get(enrollmentId).sessionsReserved()).isEqualTo(1);
 
     // chờ listener để không có dữ liệu ghi muộn; quét phải thấy dữ liệu thì "không còn" mới có
@@ -484,6 +509,31 @@ class AnonymizationIT extends ApiTestSupport {
         .isEqualTo("Học viên đã ẩn danh");
   }
 
+  /**
+   * R8, N2: học viên đã ẩn danh không còn giữ giáo viên, không còn trong danh sách của giáo viên.
+   */
+  @Test
+  void anonymizedStudentNoLongerAffectsTeacherWork() throws Exception {
+    TestUser admin = user(Role.ADMIN);
+    TestUser teacher = user(Role.TEACHER);
+    TestUser student = user(Role.STUDENT);
+    enrollWithPartialPayment(admin, teacher, student);
+    call(patch("/api/v1/users/" + teacher.id() + "/status"), admin, "{\"status\":\"INACTIVE\"}")
+        .andExpect(status().isConflict())
+        .andExpect(jsonPath("$.code").value("TEACHER_HAS_STUDENTS"));
+    call(get("/api/v1/students"), teacher).andExpect(jsonPath("$.length()").value(1));
+
+    anonymize(admin, request(admin, student.id(), "ERASURE")).andExpect(status().isOk());
+    awaitListenersDone(student.id());
+
+    call(get("/api/v1/students"), teacher).andExpect(jsonPath("$.length()").value(0));
+    // giáo vụ vẫn thấy hồ sơ để đối soát, nhưng không gắn cờ "Cần tư vấn" dù mục tiêu đã bị xóa
+    call(get("/api/v1/students?needsConsulting=true"), admin)
+        .andExpect(jsonPath("$[?(@.id == '" + student.id() + "')]").isEmpty());
+    call(patch("/api/v1/users/" + teacher.id() + "/status"), admin, "{\"status\":\"INACTIVE\"}")
+        .andExpect(status().isOk());
+  }
+
   /** R4: không ghi được dữ liệu cá nhân mới vào hồ sơ đã ẩn danh. */
   @Test
   void anonymizedStudentCannotReceiveNewData() throws Exception {
@@ -516,6 +566,24 @@ class AnonymizationIT extends ApiTestSupport {
         .andExpect(jsonPath("$.code").value("ANONYMIZED"));
     // đọc vẫn được để đối soát số liệu
     call(get(base + "/goals"), admin).andExpect(status().isOk());
+
+    // F1 (U8): không gia hạn gói của hồ sơ đã ẩn danh
+    call(
+            post("/api/v1/enrollments/" + enrollmentId + "/extend"),
+            admin,
+            "{\"newExpiresAt\":\"" + clock.instant().plus(Duration.ofDays(30)) + "\"}")
+        .andExpect(status().isConflict())
+        .andExpect(jsonPath("$.code").value("ANONYMIZED"));
+    // R1 (U8): vẫn hủy được ghi danh nhưng không lưu văn bản tự do mới
+    call(
+            post("/api/v1/enrollments/" + enrollmentId + "/cancel"),
+            admin,
+            "{\"reason\":\"Lý do nhắc tên học viên\"}")
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("CANCELLED"))
+        .andExpect(jsonPath("$.cancelReason").isEmpty())
+        .andExpect(jsonPath("$.cancelledBy").value(admin.id().toString()));
+    assertThat(columnsContaining("Lý do nhắc tên học viên")).isEmpty();
   }
 
   @Test
