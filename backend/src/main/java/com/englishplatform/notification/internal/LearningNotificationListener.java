@@ -91,7 +91,7 @@ class LearningNotificationListener {
     model.put("link", link);
 
     dispatchService.notify(
-        "learning:assignment-submitted:" + event.assignmentId(),
+        "learning:assignment-submitted:" + event.assignmentId() + ":" + teacher.id(),
         teacher.id(),
         teacher.email(),
         "Học viên " + student.fullName() + " đã nộp bài tập",

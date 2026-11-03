@@ -93,7 +93,7 @@ class LearningNotificationListenerTest {
 
     verify(dispatchService)
         .notify(
-            eq("learning:assignment-submitted:" + assignmentId),
+            eq("learning:assignment-submitted:" + assignmentId + ":" + teacherId),
             eq(teacherId),
             any(),
             any(),

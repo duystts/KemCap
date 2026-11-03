@@ -225,19 +225,19 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T091 [P] [US4] (#1·U6) Test `BT/learning/SessionReportFlowTest.java` (`@ApplicationModuleTest` + `Scenario`): `SessionFinished(COMPLETED)` → phiếu `PENDING`, `due_at = endsAt + 24h`; phát lại không tạo trùng; outcome khác COMPLETED không tạo phiếu; nộp thiếu `comment` hoặc không có điểm kỹ năng nào → 400; topic ngoài lộ trình `ACTIVE` → 400
-- [ ] T092 [P] [US4] (#1·U6) Unit test `BT/learning/AssignmentServiceTest.java`: bài nộp cần `textAnswer` khác rỗng; nộp lại được tới khi đã chấm; `due_at` null không đánh dấu muộn; nộp sau `due_at` vẫn nhận và đánh dấu muộn; điểm ngoài 0–10 → 400
+- [X] T091 [P] [US4] (#1·U6) Test `BT/learning/SessionReportFlowTest.java` (`@ApplicationModuleTest` + `Scenario`): `SessionFinished(COMPLETED)` → phiếu `PENDING`, `due_at = endsAt + 24h`; phát lại không tạo trùng; outcome khác COMPLETED không tạo phiếu; nộp thiếu `comment` hoặc không có điểm kỹ năng nào → 400; topic ngoài lộ trình `ACTIVE` → 400 — *làm thành `SessionReportFlowIT` (DB thật)*
+- [X] T092 [P] [US4] (#1·U6) Unit test `BT/learning/AssignmentServiceTest.java`: bài nộp cần `textAnswer` khác rỗng; nộp lại được tới khi đã chấm; `due_at` null không đánh dấu muộn; nộp sau `due_at` vẫn nhận và đánh dấu muộn; điểm ngoài 0–10 → 400 — *làm thành `AssignmentFlowIT` (DB thật)*
 
 ### Implementation for User Story 4
 
-- [ ] T093 [US4] (#1·U6) Migration `MIG/V7__learning_reports.sql`: `session_report` (`session_id` unique; `status` ∈ `PENDING`,`SUBMITTED`; `due_at`; `taught_topic_ids uuid[]`; `score_listening`…`score_grammar_vocab` smallint `CHECK BETWEEN 1 AND 5` nullable; `comment`; `submitted_at`; `overdue_notified_at`), `assignment` (`due_at` nullable), `submission` (`assignment_id` unique; `text_answer` NOT NULL — K2; `score` `CHECK BETWEEN 0 AND 10`; `graded_by`, `graded_at`)
-- [ ] T094 [P] [US4] (#1·U6) Entity + repository trong `B/learning/internal/report/` (`SessionReport`) và `B/learning/internal/assignment/` (`Assignment`, `Submission`)
-- [ ] T095 [US4] (#1·U6) Listener `B/learning/internal/report/SessionFinishedListener.java`: tạo phiếu `PENDING` khi outcome `COMPLETED` (idempotent nhờ unique `session_id`)
-- [ ] T096 [US4] (#1·U6) `B/learning/internal/report/SessionReportService.java` + `B/learning/internal/web/SessionReportController.java`: `GET /session-reports?status=PENDING`, `GET/PUT /sessions/{id}/report` (chỉ giáo viên của buổi nộp): chủ đề đã dạy, `completedTopicIds` → `DONE`, điểm, nhận xét, tạo bài tập; `SUBMITTED`, `submitted_at`; phát `SessionReportSubmitted`
-- [ ] T097 [US4] (#1·U6) Job `B/learning/internal/jobs/ReportOverdueJob.java` (`cron = "0 0 * * * *"` + `@SchedulerLock`): `PENDING` quá `due_at`, `overdue_notified_at IS NULL` → `SessionReportOverdue`
-- [ ] T098 [US4] (#1·U6) `B/learning/internal/assignment/AssignmentService.java` + `B/learning/internal/web/AssignmentController.java`: `GET /assignments?studentId=&status=`, `PUT /assignments/{id}/submission` (`{textAnswer}`), `POST /assignments/{id}/grade` (`{score, feedback}`); phát `AssignmentSubmitted`, `AssignmentGraded`; **không** làm upload-url/download-url (K2)
-- [ ] T099 [US4] (#1·U6) `B/learning/internal/progress/ProgressService.java` + `GET /students/{id}/progress`: `skillSeries` (điểm từng kỹ năng theo ngày từ phiếu `SUBMITTED`), `pathCompletion`, `recentReports` (5 phiếu gần nhất); không có `attendanceRate`, `assignmentRate` ([GĐ2])
-- [ ] T100 [US4] (#1·U6) Listener `B/learning/internal/ReportAnonymizationListener.java` (`StudentAnonymized`, idempotent): xóa `assignment` + `submission` của học viên; trong `session_report` xóa điểm kỹ năng, `comment`, `taught_topic_ids` (giữ `submitted_at`, `due_at`, `status`)
+- [X] T093 [US4] (#1·U6) Migration `MIG/V7__learning_reports.sql`: `session_report` (`session_id` unique; `status` ∈ `PENDING`,`SUBMITTED`; `due_at`; `taught_topic_ids uuid[]`; `score_listening`…`score_grammar_vocab` smallint `CHECK BETWEEN 1 AND 5` nullable; `comment`; `submitted_at`; `overdue_notified_at`), `assignment` (`due_at` nullable), `submission` (`assignment_id` unique; `text_answer` NOT NULL — K2; `score` `CHECK BETWEEN 0 AND 10`; `graded_by`, `graded_at`)
+- [X] T094 [P] [US4] (#1·U6) Entity + repository trong `B/learning/internal/report/` (`SessionReport`) và `B/learning/internal/assignment/` (`Assignment`, `Submission`)
+- [X] T095 [US4] (#1·U6) Listener `B/learning/internal/report/SessionFinishedListener.java`: tạo phiếu `PENDING` khi outcome `COMPLETED` (idempotent nhờ unique `session_id`)
+- [X] T096 [US4] (#1·U6) `B/learning/internal/report/SessionReportService.java` + `B/learning/internal/web/SessionReportController.java`: `GET /session-reports?status=PENDING`, `GET/PUT /sessions/{id}/report` (chỉ giáo viên của buổi nộp): chủ đề đã dạy, `completedTopicIds` → `DONE`, điểm, nhận xét, tạo bài tập; `SUBMITTED`, `submitted_at`; phát `SessionReportSubmitted`
+- [X] T097 [US4] (#1·U6) Job `B/learning/internal/jobs/ReportOverdueJob.java` (`cron = "0 0 * * * *"` + `@SchedulerLock`): `PENDING` quá `due_at`, `overdue_notified_at IS NULL` → `SessionReportOverdue`
+- [X] T098 [US4] (#1·U6) `B/learning/internal/assignment/AssignmentService.java` + `B/learning/internal/web/AssignmentController.java`: `GET /assignments?studentId=&status=`, `PUT /assignments/{id}/submission` (`{textAnswer}`), `POST /assignments/{id}/grade` (`{score, feedback}`); phát `AssignmentSubmitted`, `AssignmentGraded`; **không** làm upload-url/download-url (K2) — *đã chấm thì không chấm lại trong MVP*
+- [X] T099 [US4] (#1·U6) `B/learning/internal/progress/ProgressService.java` + `GET /students/{id}/progress`: `skillSeries` (điểm từng kỹ năng theo ngày từ phiếu `SUBMITTED`), `pathCompletion`, `recentReports` (5 phiếu gần nhất); không có `attendanceRate`, `assignmentRate` ([GĐ2])
+- [X] T100 [US4] (#1·U6) Listener `B/learning/internal/ReportAnonymizationListener.java` (`StudentAnonymized`, idempotent): xóa `assignment` + `submission` của học viên; trong `session_report` xóa điểm kỹ năng, `comment`, `taught_topic_ids` (giữ `submitted_at`, `due_at`, `status`)
 - [ ] T101 [P] [US4] (#3·U6) Frontend `F/features/learning/report/PendingReportsList.tsx` (trang chủ giáo viên) + `SessionReportForm.tsx`: chủ đề từ lộ trình, điểm 1–5 từng kỹ năng (bỏ trống được), nhận xét, nhiều bài tập (hạn nộp tùy chọn); điền dưới 3 phút (SC-008)
 - [ ] T102 [P] [US4] (#3·U6) Frontend `F/features/learning/assignments/AssignmentsPage.tsx`: học viên nộp văn bản (nhãn "Nộp muộn" khi quá hạn); giáo viên đọc bài, chấm 0–10 kèm phản hồi
 - [ ] T103 [US4] (#3·U6) Frontend `F/features/learning/progress/ProgressPage.tsx`: thẻ CEFR hiện tại, biểu đồ đường Recharts 5 kỹ năng theo thời gian, % hoàn thành lộ trình, nhận xét gần nhất; dùng cho `/student/progress` và tab "Tiến bộ"
@@ -283,13 +283,13 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 
 ### Tests for User Story 6 ⚠️
 
-- [ ] T117 [P] [US6] (#1·U6) Test `BT/learning/SessionFeedbackIT.java`: chỉ học viên của buổi `COMPLETED`, trong 7 ngày sau `ends_at`; lần 2 → 409 `FEEDBACK_EXISTS`; quá hạn → 409 `FEEDBACK_WINDOW_CLOSED`; giáo viên `GET /sessions/{id}/feedback` → 403
+- [X] T117 [P] [US6] (#1·U6) Test `BT/learning/SessionFeedbackIT.java`: chỉ học viên của buổi `COMPLETED`, trong 7 ngày sau `ends_at`; lần 2 → 409 `FEEDBACK_EXISTS`; quá hạn → 409 `FEEDBACK_WINDOW_CLOSED`; giáo viên `GET /sessions/{id}/feedback` → 403
 - [X] T118 [P] [US6] (#4·U8) Test `BT/scheduling/TeacherSessionsReportIT.java`: `sessionsTaught` = `COMPLETED` + `STUDENT_NO_SHOW` + `CANCELLED_LATE` theo giáo viên trong khoảng thời gian; `CANCELLED_SYSTEM`, `CANCELLED_ON_TIME`, `TEACHER_ABSENT`, `INTERRUPTED` không được tính
 
 ### Implementation for User Story 6
 
-- [ ] T119 [US6] (#1·U6) Migration `MIG/V9__learning_feedback.sql`: `session_feedback` (`session_id` unique, `stars` `CHECK BETWEEN 1 AND 5`, `comment` nullable)
-- [ ] T120 [US6] (#1·U6) `B/learning/internal/feedback/FeedbackService.java` + controller: `POST /sessions/{id}/feedback` (S, qua `SessionQueryApi.find`: đúng học viên, `COMPLETED`, ≤ 7 ngày, một lần), `GET /sessions/{id}/feedback` (chỉ A); listener ẩn danh hóa xóa `comment`, giữ `stars`
+- [X] T119 [US6] (#1·U6) Migration `MIG/V9__learning_feedback.sql`: `session_feedback` (`session_id` unique, `stars` `CHECK BETWEEN 1 AND 5`, `comment` nullable)
+- [X] T120 [US6] (#1·U6) `B/learning/internal/feedback/FeedbackService.java` + controller: `POST /sessions/{id}/feedback` (S, qua `SessionQueryApi.find`: đúng học viên, `COMPLETED`, ≤ 7 ngày, một lần), `GET /sessions/{id}/feedback` (chỉ A); listener ẩn danh hóa xóa `comment`, giữ `stars`
 - [X] T121 [US6] (#4·U8) `B/scheduling/internal/report/TeacherSessionsReportService.java` + `GET /reports/teacher-sessions?from=&to=` (A): theo giáo viên — chỉ `sessionsTaught` (K1)
 - [ ] T122 [P] [US6] (#3·U6) Frontend `F/features/learning/feedback/SessionFeedbackPrompt.tsx`: chấm 1–5 sao + nhận xét sau buổi `COMPLETED` (trang chủ học viên, chi tiết buổi; không bắt buộc; ẩn sau khi gửi hoặc quá 7 ngày)
 - [ ] T123 [US6] (#4·U8) Frontend `F/features/admin/dashboard/DashboardPage.tsx`: chọn khoảng thời gian; thẻ tổng đã thu và công nợ (`/reports/revenue`); bảng số buổi đã dạy theo giáo viên (`/reports/teacher-sessions`); xem sao từng buổi ở chi tiết buổi (admin)

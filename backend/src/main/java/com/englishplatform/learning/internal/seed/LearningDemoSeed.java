@@ -63,7 +63,11 @@ class LearningDemoSeed implements ApplicationRunner {
   @Override
   @Transactional
   public void run(ApplicationArguments args) {
-    UserView first = user("student1@demo.local");
+    // tài khoản demo đã bị ẩn danh hóa (đổi email): không còn gì để seed, không chặn app khởi động
+    UserView first = userDirectory.findByEmail("student1@demo.local").orElse(null);
+    if (first == null) {
+      return;
+    }
     if (!assessments.findByStudentIdOrderByAssessedAtDescCreatedAtDesc(first.id()).isEmpty()) {
       return;
     }

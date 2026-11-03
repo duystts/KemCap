@@ -22,6 +22,12 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, UUID> {
   List<UUID> findStudentIdsByTeacher(
       @Param("teacherId") UUID teacherId, @Param("statuses") Collection<EnrollmentStatus> statuses);
 
+  @Query(
+      "select distinct e.teacherId from Enrollment e"
+          + " where e.studentId = :studentId and e.status in :statuses")
+  List<UUID> findTeacherIdsByStudent(
+      @Param("studentId") UUID studentId, @Param("statuses") Collection<EnrollmentStatus> statuses);
+
   /** Mọi tham số tùy chọn (null = bỏ qua); mới nhất trước. */
   @Query(
       """

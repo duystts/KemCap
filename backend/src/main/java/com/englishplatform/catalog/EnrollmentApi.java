@@ -17,6 +17,12 @@ public interface EnrollmentApi {
   /** Mọi ghi danh của học viên, mới nhất trước. */
   List<EnrollmentView> findByStudent(UUID studentId);
 
+  /** Học viên đang được giáo viên phụ trách (cùng phạm vi với {@link #isAssigned}). */
+  List<UUID> findAssignedStudentIds(UUID teacherId);
+
+  /** Giáo viên đang phụ trách học viên (cùng phạm vi với {@link #isAssigned}). */
+  List<UUID> findAssignedTeacherIds(UUID studentId);
+
   /** Ghi danh đã hủy; billing loại khỏi tổng công nợ (FR-025, chốt khi duyệt U8). */
   Set<UUID> findCancelledIds();
 

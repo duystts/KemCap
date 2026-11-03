@@ -97,15 +97,16 @@ Mật khẩu: tối thiểu 8 ký tự, có chữ và số.
 | POST | `/students/{id}/learning-path` | A; T | tạo lộ trình | FR-017 |
 | PUT | `/learning-paths/{id}` | A; T | sửa toàn bộ cây chặng/chủ đề, `{…, reason}` bắt buộc | FR-018 |
 | GET | `/learning-paths/{id}/revisions` | A; T | lịch sử điều chỉnh | FR-018 |
-| GET | `/session-reports?status=PENDING` | T; A | phiếu cần nộp | FR-019 |
-| GET | `/sessions/{id}/report` | A; T; S | phiếu đánh giá buổi | FR-019 |
-| PUT | `/sessions/{id}/report` | T | `{taughtTopicIds, completedTopicIds, scores, comment, assignments[]}` → SUBMITTED | FR-019 |
-| GET | `/assignments?studentId=&status=` | A; T; S | bài tập | FR-020 |
+| GET | `/session-reports?status=` | T; A | danh sách phiếu kèm tên, `dueAt`, `overdue`, `onTime`; không gồm học viên đã ẩn danh; giáo viên đã bị đổi chỉ thấy phiếu chưa nộp | FR-019 |
+| GET | `/sessions/{id}/report` | A; T; S | phiếu đánh giá buổi; giáo viên đã bị đổi chỉ đọc được phiếu chưa nộp của buổi mình dạy | FR-019 |
+| PUT | `/sessions/{id}/report` | T | `{taughtTopicIds?, completedTopicIds?, scores{listening?, speaking?, reading?, writing?, grammarVocab?}, comment, assignments?[{title, instructions?, dueAt?}]}` → SUBMITTED; chỉ giáo viên của buổi, nộp một lần; 409 `ANONYMIZED` | FR-019 |
+| GET | `/assignments?studentId=&status=` | A; T; S | bài tập kèm `sessionId` và `submission{textAnswer, submittedAt, late, score, feedback}`; `status`: PENDING, SUBMITTED, GRADED | FR-020 |
 | POST | [GĐ2 — K2] `/assignments/{id}/upload-url` | S | `{fileName, contentType, size}` → pre-signed PUT URL + `fileKey` | FR-020 |
 | PUT | `/assignments/{id}/submission` | S | MVP: `{textAnswer}` (bắt buộc); [GĐ2 — K2]: `fileKey?, fileName?` | FR-020 |
 | GET | [GĐ2 — K2] `/assignments/{id}/submission/download-url` | A; T; S | pre-signed GET URL | FR-020 |
-| POST | `/assignments/{id}/grade` | T | `{score, feedback}` | FR-020 |
-| GET | `/students/{id}/progress` | A; T; S | `{skillSeries[], pathCompletion, recentReports[]}` ([GĐ2]: `attendanceRate`, `assignmentRate`) | FR-021 |
+| POST | `/assignments/{id}/grade` | T | `{score, feedback}`; giáo viên đang phụ trách; đã chấm thì 409 (MVP không chấm lại) | FR-020 |
+| GET | `/students/{id}/progress` | A; T; S | `{skillSeries[{sessionId, date, listening, speaking, reading, writing, grammarVocab}], pathCompletion (phần trăm, null khi chưa có chủ đề), recentReports[5]}` ([GĐ2]: `attendanceRate`, `assignmentRate`) | FR-021 |
+| GET | `/session-feedback/mine` | S | đánh giá của chính học viên, để FE ẩn lời mời chấm sao | FR-022 |
 | POST | `/sessions/{id}/feedback` | S | `{stars, comment?}` (buổi COMPLETED, trong 7 ngày; một lần, không sửa) → 409 `FEEDBACK_EXISTS` / `FEEDBACK_WINDOW_CLOSED` | FR-022 |
 | GET | `/sessions/{id}/feedback` | A | xem đánh giá của buổi (giáo viên không có quyền trong MVP) | FR-022 |
 | GET | [GĐ2 — K1] `/reports/teacher-quality?from=&to=` | A | theo giáo viên: điểm hài lòng TB (trung bình sao), tỷ lệ nộp phiếu đúng hạn (nộp <= 24h / buổi COMPLETED) | FR-023 |

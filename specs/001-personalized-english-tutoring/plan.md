@@ -172,7 +172,9 @@ rỗng trả dữ liệu mẫu) của mỗi module trước khi cài thật, fro
 
 ## Complexity Tracking
 
-Không có vi phạm cần biện minh.
+| Vi phạm | Lý do cần | Phương án đơn giản hơn bị loại vì | Trạng thái |
+|---|---|---|---|
+| Constitution V "giáo viên chỉ truy cập học viên được phân công": giáo viên đã bị đổi vẫn thấy tên học viên, đọc và nộp phiếu `PENDING` của **buổi chính mình đã dạy** (FR-019). Giới hạn: không đọc được phiếu đã nộp, tiến bộ, bài tập; không chọn được chủ đề lộ trình. | Chỉ người đã dạy mới đánh giá được buổi đó; đổi giáo viên không được làm mất nghĩa vụ nộp phiếu. | Giao phiếu cho giáo viên mới: người chưa dạy phải chấm điểm buổi đó. Hủy phiếu: mất dữ liệu đánh giá của buổi đã học. | **Đề xuất, chờ leader xác nhận** (phát hiện ở review U6, 2026-11-04) |
 
 **Ngưỡng kích hoạt** (khi xảy ra phải thêm dòng biện minh vào bảng này): tự host LiveKit khi dùng > 80%
 quota free; cache phân tán cho rate limit khi chạy > 1 instance; hoãn FR-030/FR-031 khỏi MVP (vi

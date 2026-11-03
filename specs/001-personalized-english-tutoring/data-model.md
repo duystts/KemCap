@@ -355,18 +355,20 @@ Hồ sơ năng lực hiện tại = bản ghi mới nhất; lịch sử = toàn 
 | session_id | UUID | unique — tạo tự động (PENDING) khi nhận event `SessionFinished` (outcome COMPLETED) |
 | teacher_id, student_id | UUID | |
 | status | enum `PENDING`, `SUBMITTED` | |
+| session_ends_at | timestamptz | giờ kết thúc buổi, dùng cho biểu đồ tiến bộ |
 | due_at | timestamptz | = ends_at + 24h |
 | taught_topic_ids | UUID[] | topic thuộc path ACTIVE của học viên |
 | score_listening … score_grammar_vocab | smallint 1–5 | bắt buộc ít nhất 1 kỹ năng khi SUBMITTED; kỹ năng không đánh giá = null |
 | comment | text | bắt buộc khi SUBMITTED |
 | submitted_at | timestamptz | đúng hạn nếu ≤ due_at |
 | overdue_notified_at | timestamptz | đã phát `SessionReportOverdue` |
+| session_voided_at | timestamptz | buổi đã nộp phiếu được giáo vụ sửa thành không hoàn thành: giữ phiếu, không tính vào tiến bộ |
 
 ### assignment & submission
 
 | Bảng | Field chính | Rule |
 |---|---|---|
-| assignment | id, session_report_id, student_id, title, instructions, due_at (tùy chọn) | tạo kèm phiếu đánh giá (0..n) |
+| assignment | id, session_report_id, session_id, student_id, teacher_id, title, instructions, due_at (tùy chọn) | tạo kèm phiếu đánh giá (0..n) |
 | submission | id, assignment_id (unique), text_answer, file_key, file_name, submitted_at, score (0–10), feedback, graded_by, graded_at | cần text hoặc file (<= 20 MB; pdf/doc/docx/jpg/png/mp3/m4a/wav/webm); nộp lại được tới khi đã chấm; nộp sau `due_at` vẫn nhận và được đánh dấu "muộn" |
 
 ### session_feedback

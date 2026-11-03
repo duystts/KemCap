@@ -235,6 +235,14 @@ class AnonymizationIT extends ApiTestSupport {
             teacher,
             "{\"type\":\"IELTS\",\"target\":\"6.5\"}")
         .andExpect(status().isCreated());
+    call(
+            post("/api/v1/students/" + student.id() + "/learning-path"),
+            teacher,
+            "{\"title\":\"Lộ trình của "
+                + name
+                + "\",\"milestones\":[{\"title\":\"Chặng\",\"topics\":"
+                + "[{\"title\":\"Chủ đề\"}]}]}")
+        .andExpect(status().isCreated());
     mvc.perform(
             post("/api/v1/auth/forgot-password")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -247,6 +255,31 @@ class AnonymizationIT extends ApiTestSupport {
             teacher,
             "{\"outcome\":\"COMPLETED\",\"note\":\"" + name + " học tốt\"}")
         .andExpect(jsonPath("$.status").value("COMPLETED"));
+
+    // U6: phiếu, bài tập, bài nộp, đánh giá sao đều nhắc tên
+    awaitListenersDone(student.id());
+    call(
+            put("/api/v1/sessions/" + done + "/report"),
+            teacher,
+            "{\"scores\":{\"listening\":3},\"comment\":\""
+                + name
+                + " tiến bộ\","
+                + "\"assignments\":[{\"title\":\"Bài của "
+                + name
+                + "\"}]}")
+        .andExpect(status().isOk());
+    String assignmentId =
+        read(call(get("/api/v1/assignments?studentId=" + student.id()), student), "$[0].id");
+    call(
+            put("/api/v1/assignments/" + assignmentId + "/submission"),
+            student,
+            "{\"textAnswer\":\"Tôi là " + name + "\"}")
+        .andExpect(status().isOk());
+    call(
+            post("/api/v1/sessions/" + done + "/feedback"),
+            student,
+            "{\"stars\":4,\"comment\":\"" + name + " rất hài lòng\"}")
+        .andExpect(status().isCreated());
 
     Figures before = figures(admin, teacher, enrollmentId);
     assertThat(before.paid()).isEqualTo("400000");
@@ -263,6 +296,13 @@ class AnonymizationIT extends ApiTestSupport {
     assertThat(columnsContaining(student.email())).contains("user_account.email");
     assertThat(columnsContaining(name)).contains("user_account.full_name", "session.cancel_reason");
     assertThat(columnsContaining(phone)).contains("user_account.phone");
+    assertThat(columnsContaining(name))
+        .contains(
+            "session_report.comment",
+            "assignment.title",
+            "submission.text_answer",
+            "session_feedback.comment",
+            "learning_path.title");
 
     UUID requestId = request(admin, student.id(), "ERASURE");
     anonymize(admin, requestId)
@@ -326,6 +366,28 @@ class AnonymizationIT extends ApiTestSupport {
                 student.id()))
         .isZero();
 
+    // U6: bài tập mất; phiếu và đánh giá sao còn ở dạng không định danh
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from assignment where student_id = ?", Long.class, student.id()))
+        .isZero();
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from session_report where session_id = ? and status = 'SUBMITTED'"
+                    + " and comment is null and score_listening is null and taught_topic_ids is null"
+                    + " and submitted_at is not null",
+                Long.class,
+                done))
+        .isEqualTo(1);
+    call(get("/api/v1/sessions/" + done + "/feedback"), admin)
+        .andExpect(jsonPath("$.stars").value(4))
+        .andExpect(jsonPath("$.comment").isEmpty());
+    call(get("/api/v1/session-reports"), admin)
+        .andExpect(jsonPath("$[?(@.studentId == '" + student.id() + "')]").isEmpty());
+    call(get("/api/v1/students/" + student.id() + "/progress"), admin)
+        .andExpect(jsonPath("$.pathCompletion").isEmpty())
+        .andExpect(jsonPath("$.skillSeries.length()").value(0));
+
     // SC-007: số liệu không đổi
     assertThat(figures(admin, teacher, enrollmentId)).isEqualTo(before);
 
@@ -360,14 +422,14 @@ class AnonymizationIT extends ApiTestSupport {
     jdbc.queryForList(
             "select table_name, column_name from information_schema.columns"
                 + " where table_schema = 'public'"
-                + " and data_type in ('text', 'character varying')"
+                + " and data_type in ('text', 'character varying', 'jsonb', 'ARRAY')"
                 + " and table_name <> 'flyway_schema_history'")
         .forEach(
             c -> {
               String column = c.get("table_name") + "." + c.get("column_name");
               if (!Set.of("data_subject_request.requester_name", "payment.note").contains(column)
                   && jdbc.queryForObject(
-                          "select count(*) from \"%s\" where \"%s\" like ?"
+                          "select count(*) from \"%s\" where \"%s\"::text like ?"
                               .formatted(c.get("table_name"), c.get("column_name")),
                           Long.class,
                           "%" + value + "%")
@@ -474,6 +536,12 @@ class AnonymizationIT extends ApiTestSupport {
         .andExpect(status().isOk());
 
     assertThat(columnsContaining("Nhắc tên học viên")).isEmpty();
+    // U6: buổi chốt sau khi ẩn danh không sinh phiếu mới
+    awaitListenersDone(student.id());
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from session_report where session_id = ?", Long.class, completed))
+        .isZero();
     assertThat(enrollmentApi.get(enrollmentId).sessionsConsumed()).isEqualTo(1);
   }
 

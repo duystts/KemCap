@@ -58,6 +58,18 @@ class EnrollmentApiImpl implements EnrollmentApi {
 
   @Override
   @Transactional(readOnly = true)
+  public List<UUID> findAssignedStudentIds(UUID teacherId) {
+    return enrollments.findStudentIdsByTeacher(teacherId, Enrollment.ASSIGNED);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<UUID> findAssignedTeacherIds(UUID studentId) {
+    return enrollments.findTeacherIdsByStudent(studentId, Enrollment.ASSIGNED);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
   public Set<UUID> findCancelledIds() {
     return Set.copyOf(enrollments.findIdsByStatusIn(List.of(EnrollmentStatus.CANCELLED)));
   }
