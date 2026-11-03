@@ -1,6 +1,7 @@
 package com.englishplatform.scheduling.internal.session;
 
 import com.englishplatform.catalog.EnrollmentApi;
+import com.englishplatform.identity.UserDirectory;
 import com.englishplatform.scheduling.SchedulingEvents.SessionCancelled;
 import com.englishplatform.scheduling.SchedulingEvents.SessionRescheduled;
 import com.englishplatform.scheduling.internal.SchedulingAccess;
@@ -27,6 +28,7 @@ public class CancellationService {
   private final BookingService bookingService;
   private final EnrollmentApi enrollmentApi;
   private final SchedulingProperties props;
+  private final UserDirectory userDirectory;
   private final ApplicationEventPublisher events;
   private final Clock clock;
 
@@ -36,6 +38,7 @@ public class CancellationService {
       BookingService bookingService,
       EnrollmentApi enrollmentApi,
       SchedulingProperties props,
+      UserDirectory userDirectory,
       ApplicationEventPublisher events,
       Clock clock) {
     this.sessions = sessions;
@@ -43,6 +46,7 @@ public class CancellationService {
     this.bookingService = bookingService;
     this.enrollmentApi = enrollmentApi;
     this.props = props;
+    this.userDirectory = userDirectory;
     this.events = events;
     this.clock = clock;
   }
@@ -60,10 +64,12 @@ public class CancellationService {
   @Transactional
   public Session cancel(CurrentUser actor, UUID sessionId, String reason) {
     Session session = lookup.visible(actor, sessionId);
+    // học viên đã ẩn danh: vẫn xử lý được buổi đã qua, nhưng không lưu văn bản tự do mới (FR-031)
+    String storedReason = userDirectory.isAnonymized(session.getStudentId()) ? null : reason;
     CounterAction action =
         SchedulingAccess.isTeacher(actor)
-            ? session.cancelByTeacher(actor.id(), reason)
-            : session.cancel(clock.instant(), props.cancelCutoff(), actor.id(), reason);
+            ? session.cancelByTeacher(actor.id(), storedReason)
+            : session.cancel(clock.instant(), props.cancelCutoff(), actor.id(), storedReason);
     action.apply(enrollmentApi, session.getEnrollmentId());
     events.publishEvent(
         new SessionCancelled(

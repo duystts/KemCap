@@ -135,6 +135,8 @@ class SchedulingNotificationIT extends SchedulingTestSupport {
     awaitEmails(s.student().email(), 1);
     assertThat(notifications.countByUserIdAndReadAtIsNull(s.teacher().id())).isEqualTo(1);
 
+    // phát 2 lần: listener idempotent (F5)
+    inTx(() -> publisher.publishEvent(new StudentAnonymized(s.student().id(), UUID.randomUUID())));
     inTx(() -> publisher.publishEvent(new StudentAnonymized(s.student().id(), UUID.randomUUID())));
 
     await()
@@ -157,6 +159,43 @@ class SchedulingNotificationIT extends SchedulingTestSupport {
                           s.student().id()))
                   .isZero();
             });
+  }
+
+  /** Email chờ gửi lại cho GV có tên học viên: thôi gửi, xóa nội dung, giữ địa chỉ GV (R3). */
+  @Test
+  void anonymizationScrubsPendingEmailToTeacherMentioningStudent() throws Exception {
+    Setup s = setup(4);
+    emailSender.failNext(1000); // SMTP sập, bản ghi còn PENDING kèm nội dung
+    UUID sessionId = bookOk(s.student(), s.enrollmentId(), at(3, 10, 0));
+    String key = "session:" + sessionId + ":booked:" + s.teacher().id();
+    await()
+        .atMost(Duration.ofSeconds(10))
+        .untilAsserted(
+            () ->
+                assertThat(dispatches.findByDedupeKey(key))
+                    .get()
+                    .extracting(NotificationDispatch::getError)
+                    .isNotNull());
+    emailSender.clear();
+
+    inTx(() -> publisher.publishEvent(new StudentAnonymized(s.student().id(), UUID.randomUUID())));
+
+    await()
+        .atMost(Duration.ofSeconds(10))
+        .untilAsserted(
+            () -> {
+              NotificationDispatch d = dispatches.findByDedupeKey(key).orElseThrow();
+              assertThat(d.getStatus()).isEqualTo(NotificationDispatch.Status.FAILED);
+              assertThat(d.getSubject()).isEqualTo("[đã xóa sau khi xử lý]");
+              assertThat(d.getBodyHtml()).isEqualTo("[đã xóa sau khi xử lý]");
+              assertThat(d.getError()).isNull();
+              assertThat(d.getNextAttemptAt()).isNull();
+              assertThat(d.getRecipient()).isEqualTo(s.teacher().email());
+            });
+    // GV vẫn nhận email hủy buổi (không nêu tên HV), nhưng email cũ có tên HV không gửi lại
+    assertThat(to(s.teacher().email()))
+        .extracting(EmailMessage::subject)
+        .noneMatch(subject -> subject.startsWith("Xác nhận buổi học"));
   }
 
   private void awaitEmails(String email, int count) {

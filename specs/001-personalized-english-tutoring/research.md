@@ -217,8 +217,11 @@ xuyên — kiểm tra lại trang giá nhà cung cấp trước khi đăng ký (
   liệu tài chính và thù lao vẫn đối chiếu được (SC-007); không thêm hạ tầng (constitution III).
 - **Alternatives**: xóa cứng (phá SC-007); một service trung tâm xóa trực tiếp bảng của mọi module
   (vi phạm constitution I); mã hóa dữ liệu rồi hủy khóa (crypto-shredding — mạnh hơn nhưng thừa cho MVP).
-- **Rủi ro còn lại**: `payment.note` do giáo vụ nhập có thể chứa tên → hướng dẫn giáo vụ không ghi
-  tên vào ghi chú thanh toán; mốc 16 tuổi và nội dung chính sách chờ pháp lý trung tâm; việc dữ liệu
+- **Rủi ro còn lại**: `payment.note` do giáo vụ nhập có thể chứa tên → **giữ nguyên khi ẩn danh hóa**
+  vì là chứng từ tài chính chỉ thêm (chốt 2026-11-03), hướng dẫn giáo vụ không ghi tên vào ghi chú
+  thanh toán (gợi ý ở T114); các ô tự do khác (`session.cancel_reason`, `session_outcome_change.note`,
+  `teacher_assignment_history.reason`) bị xóa khi ẩn danh hóa; `data_subject_request.requester_name`
+  có thể chính là tên học viên, cần pháp lý xác nhận (OQ-7); mốc 16 tuổi và nội dung chính sách chờ pháp lý trung tâm; việc dữ liệu
   nằm ở nhà cung cấp nước ngoài (Oracle, R2, LiveKit, Brevo) cần được nêu trong chính sách (aidlc/nfr.md Q3).
 
 ## R17. Sao lưu & khôi phục

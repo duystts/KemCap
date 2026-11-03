@@ -3,6 +3,7 @@ package com.englishplatform.scheduling.internal.session;
 import com.englishplatform.catalog.EnrollmentApi;
 import com.englishplatform.catalog.EnrollmentStatus;
 import com.englishplatform.catalog.EnrollmentView;
+import com.englishplatform.identity.UserDirectory;
 import com.englishplatform.scheduling.SchedulingEvents.SessionBooked;
 import com.englishplatform.scheduling.internal.SchedulingAccess;
 import com.englishplatform.scheduling.internal.slot.SlotService;
@@ -30,16 +31,19 @@ public class BookingService {
   private final SessionRepository sessions;
   private final EnrollmentApi enrollmentApi;
   private final SlotService slotService;
+  private final UserDirectory userDirectory;
   private final ApplicationEventPublisher events;
 
   BookingService(
       SessionRepository sessions,
       EnrollmentApi enrollmentApi,
       SlotService slotService,
+      UserDirectory userDirectory,
       ApplicationEventPublisher events) {
     this.sessions = sessions;
     this.enrollmentApi = enrollmentApi;
     this.slotService = slotService;
+    this.userDirectory = userDirectory;
     this.events = events;
   }
 
@@ -67,6 +71,7 @@ public class BookingService {
     if (!SchedulingAccess.isAdmin(actor) && !actor.id().equals(enrollment.studentId())) {
       throw SchedulingAccess.notFound();
     }
+    userDirectory.requireNotAnonymized(enrollment.studentId());
     if (enrollment.status() != EnrollmentStatus.ACTIVE) {
       throw new BusinessException(ErrorCode.ENROLLMENT_NOT_ACTIVE);
     }

@@ -77,6 +77,22 @@ người khác** (R18).
   docker compose -f docker-compose.prod.yml start backend
   ```
   Thay `latest` bằng tên file (ví dụ `english_20261105_020000.dump`) để chọn một bản cụ thể.
+- **Khôi phục làm dữ liệu đã xóa xuất hiện lại (FR-031):** bản sao lưu giữ dữ liệu của học viên đã ẩn
+  danh hóa tối đa **7 ngày** (R2 giữ 7 bản), cần nêu thời hạn này trong thông báo xử lý dữ liệu.
+  Yêu cầu xóa đến sau thời điểm dump cũng mất khỏi DB vừa khôi phục, nên không tra lại được từ DB.
+  Vì vậy:
+  1. **Trước khi khôi phục**, lưu log lại:
+     `docker compose -f docker-compose.prod.yml logs backend | grep "Đã ẩn danh hóa học viên" > erasures.log`.
+     Dòng log chỉ chứa UUID học viên và UUID yêu cầu.
+  2. Chạy khôi phục, nhưng **chặn truy cập công khai** (dừng `caddy`) cho tới khi xong bước 3.
+  3. Với mỗi học viên trong `erasures.log` từ thời điểm dump trở đi: nếu DB vừa khôi phục đã có yêu cầu
+     `ERASURE` đang `RECEIVED` thì dùng lại, nếu không thì tạo bằng `POST /data-subject-requests`; rồi gọi
+     `POST /data-subject-requests/{id}/anonymize`. Gọi API trực tiếp vào backend trong mạng Docker.
+  4. Mở lại `caddy`.
+
+  **Giới hạn:** log chỉ xoay vòng 3 × 10 MB. Nếu log của khoảng thời gian đó đã bị xoay mất, phải đối
+  chiếu với sổ yêu cầu giấy/email của trung tâm. Khi tái tạo container, log cũng mất. Runbook này chưa
+  được diễn tập.
 
 ## 6. Diễn tập khôi phục (T144)
 

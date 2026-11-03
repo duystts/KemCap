@@ -32,6 +32,24 @@ public interface NotificationDispatchRepository extends JpaRepository<Notificati
       @Param("userId") UUID userId, @Param("scrubbed") String scrubbed, @Param("now") Instant now);
 
   /**
+   * FR-031 (R3): email cho GV/admin nhắc tới học viên — xóa nội dung, bản PENDING thôi gửi; giữ địa
+   * chỉ vì đó là của người nhận, không phải của học viên.
+   */
+  @Modifying
+  @Query(
+      value =
+          "UPDATE notification_dispatch SET subject = :scrubbed,"
+              + " body_html = :scrubbed, error = NULL, next_attempt_at = NULL,"
+              + " status = CASE WHEN status = 'PENDING' THEN 'FAILED' ELSE status END,"
+              + " version = version + 1, updated_at = :now"
+              + " WHERE about_student_id = :studentId",
+      nativeQuery = true)
+  int scrubMentionsOf(
+      @Param("studentId") UUID studentId,
+      @Param("scrubbed") String scrubbed,
+      @Param("now") Instant now);
+
+  /**
    * Ghi bản PENDING nếu {@code dedupe_key} chưa có; trả 0 nếu đã có. Hai transaction cùng khóa:
    * Postgres bắt bên sau chờ bên trước kết thúc rồi bỏ qua — chỉ một bên được gửi (NFR-REL-05).
    */

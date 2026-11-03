@@ -4,7 +4,7 @@
 - **Profile**: classic
 - **Workspace**: greenfield
 - **Created**: 2026-10-17
-- **Current stage**: Construction — U5 unit gate (`/speckit-aidlc-unit-gate`)
+- **Current stage**: Construction — U8 unit gate (`/speckit-aidlc-unit-gate`)
 
 ## Stage progress
 
@@ -28,7 +28,7 @@ Ký hiệu: `[ ]` chưa làm · `[~]` đang chờ duyệt · `[x]` đã duyệt 
 | U3 Lịch, đặt lịch, trạng thái buổi, phòng học (B3, 27/10–1/11; BE #1, FE #2) | [x] 2026-10-18 — BE T056–T074 do Claude; FE T075–T079 để #2 | [x] 2026-10-18 (19/19 task BE; verify xanh 54 unit + 67 IT; sửa bug refresh làm mất thay đổi bộ đếm cùng transaction) | [x] 2026-10-18 **Verified** — PASS_WITH_NOTES sau sửa R1–R5, R7, R9, F5, F7 (57 unit + 68 IT); R6, R8, F1, F3, F6 → U8; F4 go/no-go LiveKit → #2 (1/11); FE U3 (T075–T079) còn mở cho #2 | build-test-U3.md | |
 | U4 Năng lực, mục tiêu, lộ trình (B3, 27–28/10; BE #3, FE #3) | [x] 2026-10-18 — BE T080–T087, T090 do Claude (thay D1); FE T088–T089 để #3; OQ-4 giải bằng SPI GoalStatusProvider | [x] 2026-10-18 (9/9 task BE; verify xanh 61 unit + 73 IT; smoke seed + cờ Cần tư vấn) | [x] 2026-10-18 **Verified** — PASS_WITH_NOTES sau sửa R1–R5, F1, F3–F5, R7 (64 unit + 73 IT); R6, F2, F6, F7 → U8; FE U4 (T088–T089) còn mở cho #3 | build-test-U4.md | |
 | U5 Thông báo, nhắc, vận hành/sao lưu (B4, 2–4/11; BE #1, FE #3) | [x] 2026-10-21 — BE T132–T135, T137–T139, T144 + listener StudentAnonymized + R11/R12/R18 (từ U1) do Claude, dùng BE PR #6 làm nháp; T136 FE để #3 (PR #6). Chốt: hủy buổi chỉ báo bên còn lại (`cancelledBy`); đổi GV gộp 1 thông báo (`SessionCancelled.cause` + event `ReassignmentSessionsCancelled` — đổi contract); backup R2 bắt buộc, endpoint cấu hình được, 02:00 giờ VN; LiveKit Cloud free + Brevo free; deploy VPS VN theo tháng **gần ngày demo (~5/11)**, Caddy phục vụ FE + API cùng domain, cấu hình tối thiểu cho người dùng (điền `.env` + 1 lệnh) | [x] 2026-10-21 (T132–T135, T138, T139 + StudentAnonymized + R11/R12/R18; T137/T144 code + diễn tập local đạt, chờ deploy VPS; verify xanh 89 unit + 82 IT; sửa thêm: dedupe dispatch dùng `ON CONFLICT` (race gửi trùng có từ U1), tắt mail health indicator) | [x] 2026-10-21 **Verified** — PASS_WITH_NOTES sau sửa R1 (chọn b: demo laptop 0 đ), R2, R3 (một phần), R4, R6, R11, R15, F3 (88 unit + 83 IT); chuyển U7: R3 còn lại, R10 · U8: R5, R7, R14, F1, F2, F4–F7 · T140: R13 · U6: chấm lại bài · khi deploy VPS: R8, R9, R12; FE T136 còn mở cho #3 (PR #6) | build-test-U5.md |
-| U7 Quyền riêng tư FR-030/031 (B5, 5–7/11; BE #1, FE #2 + #4) | [ ] | [ ] | [ ] | |
+| U7 Quyền riêng tư FR-030/031 (B5, 5–7/11; BE #1, FE #2 + #4) | [x] 2026-11-03 — BE T124, T125, T127–T129 + tick T126 (đã có từ U5) + R14, R3 còn lại, R10, F5 do Claude; FE T130, T131 để #4, R17 (FE) để #2. Chốt: T125 so SC-007 bằng dữ liệu sẵn có, U8 chạy lại với 3 báo cáo thật; `anonymize` lần hai → 409 `ANONYMIZED`, phát lại event không lỗi; thu hồi cả token INVITE + PASSWORD_RESET; R10 chỉ làm tài liệu + log `studentId` | [x] 2026-11-03 (T124–T129 + R14, R3 còn lại, R10, F5; verify xanh 94 unit + 96 IT; thêm migration `notification_dispatch.about_student_id` cho R3 — sai lệch so với plan "không cần migration"; `DispatchService` bỏ qua địa chỉ `@invalid`; xóa `password_hash`) | [x] 2026-11-03 **Verified** — PASS_WITH_NOTES sau sửa F1, R1–R4, F4 (3 cột), F2 (một phần), N1, N3, N5, N6(a,b), R10–R12 (95 unit + 105 IT; thêm migration `user_account.version`); N1/N3/N5/N6 chưa qua review độc lập lần 3; chuyển U6, U8, T140, trước deploy, pháp lý theo build-test-U7.md mục 7; FE T130, T131 còn mở cho #4, R17 (FE) cho #2 | build-test-U7.md |
 | U8 Gia hạn, công nợ, báo cáo (B5, 5–6/11; BE #4, FE #4) | [ ] | [ ] | [ ] | |
 | U6 Phiếu đánh giá, bài tập, tiến bộ, đánh giá sao (B6, 8–10/11; BE #1, FE #3) | [ ] | [ ] | [ ] | |
 
@@ -38,4 +38,4 @@ Ký hiệu: `[ ]` chưa làm · `[~]` đang chờ duyệt · `[x]` đã duyệt 
 
 ## Next step
 
-`/speckit-aidlc-unit-gate` cho U7 (B5: quyền riêng tư FR-030/031 — gồm R3 còn lại, R10 từ verify U5) → `/speckit-implement` → `/speckit-aidlc-verify`. Song song: PR #6 (FE U2–U5) chờ #2–#4 tách phần backend.
+`/speckit-aidlc-unit-gate` cho U8 (B5: gia hạn, công nợ, báo cáo — gồm chạy lại T125 với báo cáo thật, R8, N2 từ verify U7; R5, R7, R14, F1, F2, F4–F7 từ verify U5) → `/speckit-implement` → `/speckit-aidlc-verify`. Sau đó U6. Song song: PR #6/#7 (FE U2–U5) chờ #2–#4 tách phần backend và state; FE U7 (T130, T131 cho #4; R17 cho #2) còn mở.

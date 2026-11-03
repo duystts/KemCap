@@ -67,7 +67,10 @@ public class AuthService {
                 () ->
                     new BusinessException(
                         ErrorCode.UNAUTHENTICATED, "Email hoặc mật khẩu không đúng"));
-    user.recordLogin(clock.instant());
+    // 0 dòng: hồ sơ vừa bị ẩn danh hóa sau lúc đọc ở trên, không tạo phiên mới
+    if (users.recordLogin(user.getId(), clock.instant()) == 0) {
+      throw new BusinessException(ErrorCode.UNAUTHENTICATED, "Email hoặc mật khẩu không đúng");
+    }
     return newSession(user);
   }
 

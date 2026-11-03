@@ -96,6 +96,13 @@ public interface SessionRepository extends JpaRepository<Session, UUID> {
   // người dùng trên cùng buổi (vd. giáo viên + học viên vào phòng cùng lúc), và chỉ một lượt thắng
   // nếu job chạy chồng (trả 1 = lượt này đánh dấu đầu tiên).
 
+  /** FR-031: lý do hủy là văn bản tự do, có thể nhắc học viên. */
+  @Modifying
+  @Query(
+      "update Session s set s.cancelReason = null"
+          + " where s.studentId = :studentId and s.cancelReason is not null")
+  int clearCancelReasonsOf(@Param("studentId") UUID studentId);
+
   @Modifying
   @Query(
       "update Session s set s.teacherJoinedAt = :now where s.id = :id and s.teacherJoinedAt is null")

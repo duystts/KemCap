@@ -46,6 +46,10 @@ public class NotificationDispatch extends BaseEntity {
   @Column(name = "user_id")
   private UUID userId;
 
+  /** Học viên được nhắc tới khi người nhận là GV/admin (để xóa nội dung khi ẩn danh hóa). */
+  @Column(name = "about_student_id")
+  private UUID aboutStudentId;
+
   @Column(nullable = false)
   private String subject;
 
@@ -85,6 +89,10 @@ public class NotificationDispatch extends BaseEntity {
     this.subject = subject;
     this.bodyHtml = bodyHtml;
     this.nextAttemptAt = now;
+  }
+
+  void mentionStudent(UUID studentId) {
+    this.aboutStudentId = studentId;
   }
 
   void markSent(Instant now) {

@@ -29,7 +29,8 @@ Quy ước chung:
 | date_of_birth | date | **bắt buộc khi role = STUDENT** (CHECK), null với role khác; dùng xác định học viên dưới 16 tuổi (FR-030) |
 | status | enum `AWAITING_GUARDIAN_CONSENT`, `INVITED`, `ACTIVE`, `INACTIVE` | |
 | last_login_at | timestamptz | |
-| anonymized_at | timestamptz | set khi ẩn danh hóa (FR-031); khi đó `email` = `anonymized+{id}@invalid`, `full_name` = "Học viên đã ẩn danh", `phone`/`date_of_birth` = null, `status` = INACTIVE vĩnh viễn |
+| anonymized_at | timestamptz | set khi ẩn danh hóa (FR-031); khi đó `email` = `anonymized+{id}@invalid`, `full_name` = "Học viên đã ẩn danh", `phone`/`date_of_birth`/`password_hash` = null, `status` = INACTIVE vĩnh viễn |
+| version | bigint | khóa lạc quan: request đọc hồ sơ trước lúc ẩn danh hóa không ghi đè định danh trở lại (R1 U7); đăng nhập chỉ ghi `last_login_at`, không tăng version |
 
 **State**:
 
@@ -38,6 +39,7 @@ Quy ước chung:
 (các trường hợp khác)     → INVITED
 INVITED --đặt mật khẩu qua link mời + đồng ý chính sách hiện hành--> ACTIVE
 ACTIVE <-> INACTIVE       (giáo vụ ngừng/kích hoạt lại; không áp dụng cho bản ghi đã ẩn danh hóa)
+AWAITING_GUARDIAN_CONSENT | INVITED --ngừng--> INACTIVE --kích hoạt lại, chưa có mật khẩu--> AWAITING_GUARDIAN_CONSENT nếu còn thiếu đồng ý, ngược lại INVITED
 * --ẩn danh hóa--> INACTIVE (anonymized_at != null, không kích hoạt lại được)
 ```
 
@@ -431,7 +433,7 @@ bản ghi thường.
 | link | varchar(300) | đường dẫn trong app |
 | read_at | timestamptz | |
 
-Khi ẩn danh hóa: xóa `notification` của học viên; `notification_dispatch.recipient` của học viên thay bằng `anonymized`.
+Khi ẩn danh hóa: xóa `notification` của học viên (và thông báo GV/admin nhắc tới học viên); `notification_dispatch.recipient` của học viên thay bằng `anonymized`; email cho GV/admin có `about_student_id` = học viên bị xóa nội dung, bản `PENDING` thôi gửi, giữ `recipient`.
 
 ### notification_dispatch (nhật ký gửi email, chống trùng)
 
@@ -441,6 +443,7 @@ Khi ẩn danh hóa: xóa `notification` của học viên; `notification_dispatc
 | dedupe_key | varchar(200) | unique, ví dụ `session:{id}:reminder:1h:{userId}` |
 | channel | enum `EMAIL` | (SMS/Zalo để sau) |
 | recipient | varchar(255) | |
+| about_student_id | UUID, nullable | học viên được nhắc tới khi người nhận là GV/admin (R3, FR-031) |
 | subject | text | |
 | body_html | text | nội dung đã render để thử lại; **ghi đè thành `[đã xóa sau khi xử lý]` khi `SENT`/`FAILED`** (có thể chứa token một lần và họ tên — NFR-SEC-03) |
 | status | enum `PENDING`, `SENT`, `FAILED` | |

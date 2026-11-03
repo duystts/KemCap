@@ -30,5 +30,7 @@ class NotificationAnonymizationListener {
     notifications.deleteForStudent(event.studentId());
     dispatches.anonymizeForUser(
         event.studentId(), NotificationDispatch.SCRUBBED_BODY, clock.instant());
+    dispatches.scrubMentionsOf(
+        event.studentId(), NotificationDispatch.SCRUBBED_BODY, clock.instant());
   }
 }

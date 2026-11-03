@@ -25,16 +25,19 @@ import org.springframework.stereotype.Component;
 class SystemCancelListener {
 
   private final SessionRepository sessions;
+  private final SessionOutcomeChangeRepository outcomeChanges;
   private final EnrollmentApi enrollmentApi;
   private final ApplicationEventPublisher events;
   private final Clock clock;
 
   SystemCancelListener(
       SessionRepository sessions,
+      SessionOutcomeChangeRepository outcomeChanges,
       EnrollmentApi enrollmentApi,
       ApplicationEventPublisher events,
       Clock clock) {
     this.sessions = sessions;
+    this.outcomeChanges = outcomeChanges;
     this.enrollmentApi = enrollmentApi;
     this.events = events;
     this.clock = clock;
@@ -74,6 +77,8 @@ class SystemCancelListener {
   @ApplicationModuleListener
   void on(StudentAnonymized event) {
     cancelStudentSessions(event.studentId(), CancelCause.ANONYMIZED);
+    sessions.clearCancelReasonsOf(event.studentId());
+    outcomeChanges.clearNotesOf(event.studentId());
   }
 
   private void cancelStudentSessions(java.util.UUID studentId, CancelCause cause) {

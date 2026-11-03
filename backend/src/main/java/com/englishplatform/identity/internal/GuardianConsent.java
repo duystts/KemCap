@@ -47,7 +47,40 @@ public class GuardianConsent extends BaseEntity {
     this.recordedBy = recordedBy;
   }
 
+  public void update(
+      String guardianName,
+      String relationship,
+      String guardianContact,
+      LocalDate consentedOn,
+      UUID recordedBy) {
+    this.guardianName = guardianName;
+    this.relationship = relationship;
+    this.guardianContact = guardianContact;
+    this.consentedOn = consentedOn;
+    this.recordedBy = recordedBy;
+  }
+
   public UUID getStudentId() {
     return studentId;
+  }
+
+  public String getGuardianName() {
+    return guardianName;
+  }
+
+  public String getRelationship() {
+    return relationship;
+  }
+
+  public String getGuardianContact() {
+    return guardianContact;
+  }
+
+  public LocalDate getConsentedOn() {
+    return consentedOn;
+  }
+
+  public UUID getRecordedBy() {
+    return recordedBy;
   }
 }

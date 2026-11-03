@@ -101,6 +101,7 @@ public class ProfileService {
   public StudentProfile updateStudentProfile(
       UUID studentId, StudentProfile.CefrLevel level, String occupation, String notes) {
     requireUser(studentId, Role.STUDENT);
+    userDirectory.requireNotAnonymized(studentId);
     StudentProfile profile =
         studentProfiles.findById(studentId).orElseGet(() -> new StudentProfile(studentId));
     profile.update(level, occupation, notes);

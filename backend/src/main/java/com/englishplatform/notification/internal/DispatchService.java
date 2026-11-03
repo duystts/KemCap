@@ -22,6 +22,8 @@ public class DispatchService {
 
   private static final Logger log = LoggerFactory.getLogger(DispatchService.class);
 
+  private static final String ANONYMIZED_EMAIL_SUFFIX = "@invalid";
+
   private final NotificationDispatchRepository dispatches;
   private final NotificationRepository notifications;
   private final EmailSender emailSender;
@@ -61,7 +63,8 @@ public class DispatchService {
       String templateName,
       Map<String, Object> model,
       InApp inApp) {
-    if (dispatches.existsByDedupeKey(dedupeKey)) {
+    // event tới sau lúc ẩn danh hóa: địa chỉ đã bị ghi đè, không có ai để gửi (FR-031)
+    if (email.endsWith(ANONYMIZED_EMAIL_SUFFIX) || dispatches.existsByDedupeKey(dedupeKey)) {
       return;
     }
     Context context = new Context();
@@ -74,6 +77,9 @@ public class DispatchService {
       return; // transaction song song đã ghi cùng khóa
     }
     NotificationDispatch dispatch = dispatches.findById(id).orElseThrow();
+    if (inApp != null && inApp.aboutStudentId() != null) {
+      dispatch.mentionStudent(inApp.aboutStudentId());
+    }
     if (inApp != null && userId != null) {
       notifications.save(
           new Notification(
@@ -107,7 +113,8 @@ public class DispatchService {
               dispatch.getRecipient(), dispatch.getSubject(), dispatch.getBodyHtml()));
       dispatch.markSent(clock.instant());
     } catch (RuntimeException e) {
-      log.warn("Gửi email {} lỗi: {}", dispatch.getDedupeKey(), e.getMessage());
+      // không log message: lỗi SMTP thường nhắc địa chỉ người nhận (NFR-PRIV-02)
+      log.warn("Gửi email {} lỗi: {}", dispatch.getDedupeKey(), e.getClass().getSimpleName());
       dispatch.markFailed(clock.instant(), e.getMessage());
     }
   }

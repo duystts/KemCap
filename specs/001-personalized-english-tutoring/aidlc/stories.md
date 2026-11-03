@@ -240,7 +240,7 @@
 
 **Acceptance (Given/When/Then)**:
 1. Given hồ sơ học viên có ngày sinh cho thấy dưới 16 tuổi tại thời điểm kích hoạt, When giáo vụ lưu hồ sơ, Then hồ sơ được tạo nhưng tài khoản ở trạng thái chưa kích hoạt (không gửi lời mời, không đăng nhập được) và hiển thị "Chờ đồng ý của người giám hộ".
-2. Given học viên dưới 16 tuổi chưa có đồng ý, When giáo vụ ghi nhận đồng ý với họ tên người giám hộ, quan hệ, liên hệ và ngày đồng ý, Then bản ghi đồng ý được lưu kèm phiên bản chính sách, người ghi nhận và thời điểm ghi nhận, và tài khoản học viên được phép kích hoạt (gửi lời mời).
+2. Given học viên dưới 16 tuổi chưa có đồng ý, When giáo vụ ghi nhận đồng ý với họ tên người giám hộ, quan hệ, liên hệ và ngày đồng ý, Then bản ghi đồng ý được lưu kèm người ghi nhận và thời điểm ghi nhận, và tài khoản học viên được phép kích hoạt (gửi lời mời). *(chốt 2026-11-03: không lưu phiên bản chính sách, theo FR-030)*
 3. Given thiếu họ tên, quan hệ, liên hệ hoặc ngày đồng ý, When lưu, Then báo lỗi trường bắt buộc.
 4. Given học viên từ 16 tuổi trở lên, When tạo hồ sơ, Then không yêu cầu đồng ý của người giám hộ; chỉ cần đồng ý của chính học viên (S-US1.11).
 5. Given giáo viên hoặc học viên, When cố xem/ghi đồng ý của người giám hộ, Then backend từ chối.

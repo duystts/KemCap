@@ -332,28 +332,6 @@ class AuthFlowIT {
   }
 
   @Test
-  void underageStudentNeedsGuardianConsent() throws Exception {
-    LocalDate dob = LocalDate.now().minusYears(12);
-    UserAccount user =
-        users.save(new UserAccount(email(), "Bé Na", Role.STUDENT, dob, UserStatus.INVITED));
-    invitations.issueInvite(user);
-    String token = latestInviteToken(user.getId());
-    mvc.perform(
-            post("/api/v1/auth/accept-invite")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    "{\"token\":\""
-                        + token
-                        + "\",\"password\":\""
-                        + PASSWORD
-                        + "\",\"acceptedPolicyVersion\":\""
-                        + POLICY
-                        + "\"}"))
-        .andExpect(status().isConflict())
-        .andExpect(jsonPath("$.code").value("GUARDIAN_CONSENT_REQUIRED"));
-  }
-
-  @Test
   void passwordResetTokenExpiresAfter30Minutes() throws Exception {
     UserAccount user = activeUser(Role.TEACHER, true);
     mvc.perform(

@@ -113,6 +113,7 @@ public class EnrollmentService {
     }
     userDirectory.requireActive(newTeacherId, Role.TEACHER);
     Enrollment enrollment = find(id);
+    userDirectory.requireNotAnonymized(enrollment.getStudentId());
     UUID from = enrollment.getTeacherId();
     enrollment.changeTeacher(newTeacherId);
     TeacherAssignmentHistory entry =

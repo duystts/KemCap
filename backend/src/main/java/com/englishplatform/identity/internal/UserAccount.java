@@ -9,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
@@ -51,6 +52,9 @@ public class UserAccount extends BaseEntity {
   @Column(name = "anonymized_at")
   private Instant anonymizedAt;
 
+  /** Request đọc hồ sơ trước lúc ẩn danh hóa không được ghi đè định danh trở lại (FR-031). */
+  @Version private long version;
+
   protected UserAccount() {}
 
   public UserAccount(
@@ -92,10 +96,6 @@ public class UserAccount extends BaseEntity {
     this.passwordHash = passwordHash;
   }
 
-  public void recordLogin(Instant at) {
-    this.lastLoginAt = at;
-  }
-
   public void updateProfile(String fullName, String phone, String timezone) {
     if (fullName != null && !fullName.isBlank()) {
       this.fullName = fullName.trim();
@@ -106,6 +106,17 @@ public class UserAccount extends BaseEntity {
     if (timezone != null) {
       this.timezone = timezone;
     }
+  }
+
+  /** FR-031: ghi đè định danh, ngừng kích hoạt vĩnh viễn (data-model.md). Không khôi phục được. */
+  public void anonymize(Instant now) {
+    this.email = "anonymized+" + getId() + "@invalid";
+    this.fullName = "Học viên đã ẩn danh";
+    this.phone = null;
+    this.dateOfBirth = null;
+    this.passwordHash = null;
+    this.status = UserStatus.INACTIVE;
+    this.anonymizedAt = now;
   }
 
   public void setStatus(UserStatus status) {

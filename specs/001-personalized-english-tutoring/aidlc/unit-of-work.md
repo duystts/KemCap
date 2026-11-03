@@ -352,6 +352,8 @@ hoàn; định danh không còn; phát lại event không lỗi; hồ sơ ẩn d
 GV/HV gọi endpoint privacy → bị từ chối; log không chứa mật khẩu/token (NFR-PRIV-02). IT này được U6
 chạy lại sau khi mở rộng listener learning.
 
+**Việc chuyển từ verify U7** (build-test-U7.md mục 7): U6 — chặn ghi mới hoặc bỏ văn bản tự do ở phiếu, bài tập, bài nộp, feedback khi học viên đã ẩn danh (`requireWrite` dùng chung đã chặn phần learning qua guard); test F6, F12; quét thêm `jsonb`/`text[]` (N6c). U8 — R8, N2 (ghi danh của học viên ẩn danh trong guard ngừng GV, danh sách GV, cờ tư vấn, job gia hạn); ảnh hưởng của ghi danh CANCELLED lên công nợ. T140 — ma trận phân quyền, `curl` kiểm R3 trên server thật, F5, F7, mở rộng `LogPrivacyIT`. FE — mã lỗi mới, 404 của F12, gợi ý `payment.note` ở T114. Trước deploy — diễn tập runbook khôi phục; R5, R6, N4, F3, F8, F9; CI, gitleaks, leader review.
+
 ### U6 — Phiếu đánh giá, bài tập, tiến bộ & đánh giá sao (B6 · 08–10/11 · BE #1 2,5 · FE #3 3,5)
 
 **BE (#1)**
@@ -397,7 +399,9 @@ danh hóa (U7) vẫn xanh sau mở rộng.
 
 **DoD riêng**: hết hạn gói với `TestClock` (EXPIRED, BOOKED giữ, gia hạn → ACTIVE, đặt lại được);
 nhắc gia hạn đúng 1 lần mỗi lý do; doanh thu/công nợ = tổng payment/receivable (NFR-REL-03,
-quickstart.md:63); số buổi dạy đúng định nghĩa FR-027; endpoint báo cáo chỉ admin.
+quickstart.md:63); số buổi dạy đúng định nghĩa FR-027; endpoint báo cáo chỉ admin. **Từ U7 (2026-11-03):**
+mở rộng `AnonymizationIT` (T125) để chụp `/reports/revenue`, `/receivables`, `/reports/teacher-sessions`
+trước/sau ẩn danh hóa — U7 mới so bằng dữ liệu gốc vì các báo cáo này chưa có.
 
 ---
 
@@ -609,7 +613,7 @@ U1,U3 · UX-03 mọi unit FE + B7 · OBS-01 U1,U5 · **OBS-02 hoãn một phần
 | OQ-4 | Cờ "Cần tư vấn" (QĐ-5) chưa có trong contracts: cần endpoint (ví dụ trong `learning`, trả danh sách `studentId` chưa có mục tiêu, FE ghép với danh sách HV của catalog) và quy tắc "HV đang học" (có ghi danh ACTIVE/PENDING_PAYMENT?) | U4, FE #3/#4 | Bổ sung vào rest-api.md cùng lần cập nhật spec của orchestrator | **Đã giải ở U4 (2026-10-18)**: SPI `catalog.GoalStatusProvider` (learning cài); "đang học" = ghi danh ACTIVE/PENDING_PAYMENT; `GET /students?needsConsulting=` + `needsConsulting` trong `/proficiency`.
 | OQ-5 | **Mâu thuẫn**: S-US1.14 AC1 (stories.md:265) chặn ẩn danh hóa khi còn buổi Đã đặt; spec FR-031 (spec.md:247), Edge Case (spec.md:180) và events-and-ports.md:16 tự chuyển sang `CANCELLED_SYSTEM` | U7, U3 | Theo spec; sửa S-US1.14 AC1 |
 | OQ-6 | Nếu không duyệt K2: R2/MinIO có ép `Content-Length` trong pre-signed PUT không (nfr.md Q9) | U6 | Spike trong B1 chỉ khi K2 bị từ chối |
-| OQ-7 | Mốc 16 tuổi và nội dung chính sách chờ pháp lý (spec.md:296; research.md:208) | U7 (nội dung; code dùng cấu hình) | Cần văn bản chính thức trước khi dùng dữ liệu thật |
+| OQ-7 | Mốc 16 tuổi, nội dung chính sách và việc giữ `requester_name` (có thể chính là tên học viên) sau ẩn danh hóa chờ pháp lý (spec.md:296; research.md:208; R7 verify U7) | U7 (nội dung; code dùng cấu hình) | Cần văn bản chính thức trước khi dùng dữ liệu thật |
 | OQ-8 | plan.md "Phân công module" (plan.md:141-153) và tasks.md chưa phản ánh QĐ-1 | `/speckit-tasks`, map-tasks | Owner plan cập nhật trước khi chạy lại `/speckit-tasks` |
 
 **Bước tiếp theo**: leader chốt OQ-1 … OQ-3 → orchestrator cập nhật spec/stories (QĐ-3 … QĐ-5, K1/K2

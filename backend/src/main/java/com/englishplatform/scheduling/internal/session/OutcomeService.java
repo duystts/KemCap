@@ -1,6 +1,7 @@
 package com.englishplatform.scheduling.internal.session;
 
 import com.englishplatform.catalog.EnrollmentApi;
+import com.englishplatform.identity.UserDirectory;
 import com.englishplatform.scheduling.SchedulingEvents.SessionFinished;
 import com.englishplatform.scheduling.SessionStatus;
 import com.englishplatform.scheduling.internal.SchedulingAccess;
@@ -27,6 +28,7 @@ public class OutcomeService {
   private final SessionRepository sessions;
   private final SessionOutcomeChangeRepository changes;
   private final EnrollmentApi enrollmentApi;
+  private final UserDirectory userDirectory;
   private final ApplicationEventPublisher events;
   private final Clock clock;
 
@@ -35,12 +37,14 @@ public class OutcomeService {
       SessionRepository sessions,
       SessionOutcomeChangeRepository changes,
       EnrollmentApi enrollmentApi,
+      UserDirectory userDirectory,
       ApplicationEventPublisher events,
       Clock clock) {
     this.lookup = lookup;
     this.sessions = sessions;
     this.changes = changes;
     this.enrollmentApi = enrollmentApi;
+    this.userDirectory = userDirectory;
     this.events = events;
     this.clock = clock;
   }
@@ -62,7 +66,9 @@ public class OutcomeService {
           ErrorCode.INVALID_STATE_TRANSITION, "Buổi đã chốt kết quả; liên hệ giáo vụ để sửa");
     }
     applyAndFlush(session, action);
-    changes.save(new SessionOutcomeChange(session.getId(), from, outcome, actor.id(), note));
+    // học viên đã ẩn danh: vẫn chốt được để giữ số liệu (SC-007), nhưng không lưu văn bản tự do mới
+    String storedNote = userDirectory.isAnonymized(session.getStudentId()) ? null : note;
+    changes.save(new SessionOutcomeChange(session.getId(), from, outcome, actor.id(), storedNote));
     publishFinished(session);
     return session;
   }

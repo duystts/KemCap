@@ -26,7 +26,6 @@ public class UserAdminService {
   private final InvitationService invitations;
   private final AuthService authService;
   private final List<UserDeactivationGuard> deactivationGuards;
-  private final PrivacyProperties privacy;
   private final ApplicationEventPublisher events;
   private final Clock clock;
 
@@ -35,14 +34,12 @@ public class UserAdminService {
       InvitationService invitations,
       AuthService authService,
       List<UserDeactivationGuard> deactivationGuards,
-      PrivacyProperties privacy,
       ApplicationEventPublisher events,
       Clock clock) {
     this.users = users;
     this.invitations = invitations;
     this.authService = authService;
     this.deactivationGuards = deactivationGuards;
-    this.privacy = privacy;
     this.events = events;
     this.clock = clock;
   }
@@ -83,7 +80,7 @@ public class UserAdminService {
             request.dateOfBirth(),
             UserStatus.INVITED);
     user.updateProfile(null, request.phone(), null);
-    if (isUnderage(user)) {
+    if (invitations.needsGuardianConsent(user)) {
       // chưa gửi mời cho tới khi giáo vụ ghi nhận đồng ý của người giám hộ (U7)
       user.setStatus(UserStatus.AWAITING_GUARDIAN_CONSENT);
       return users.save(user);
@@ -121,7 +118,7 @@ public class UserAdminService {
         if (user.getStatus() != UserStatus.INACTIVE) {
           throw new BusinessException(ErrorCode.INVALID_STATE_TRANSITION);
         }
-        user.setStatus(user.getPasswordHash() == null ? UserStatus.INVITED : UserStatus.ACTIVE);
+        user.setStatus(reactivatedStatus(user));
       }
       default ->
           throw BusinessException.validation("status", "Chỉ chuyển được sang ACTIVE hoặc INACTIVE");
@@ -132,14 +129,22 @@ public class UserAdminService {
   @Transactional
   public void resendInvite(UUID id) {
     UserAccount user = get(id);
+    if (user.getStatus() == UserStatus.AWAITING_GUARDIAN_CONSENT) {
+      throw new BusinessException(ErrorCode.GUARDIAN_CONSENT_REQUIRED);
+    }
     if (user.getStatus() != UserStatus.INVITED) {
       throw new BusinessException(ErrorCode.INVALID_STATE_TRANSITION);
     }
     invitations.issueInvite(user);
   }
 
-  private boolean isUnderage(UserAccount user) {
-    Integer age = user.ageAt(clock.instant());
-    return user.getRole() == Role.STUDENT && age != null && age < privacy.guardianConsentUnderAge();
+  /** Chưa đặt mật khẩu thì quay về bước trước đó, không vòng qua đồng ý người giám hộ (FR-030). */
+  private UserStatus reactivatedStatus(UserAccount user) {
+    if (user.getPasswordHash() != null) {
+      return UserStatus.ACTIVE;
+    }
+    return invitations.missingGuardianConsent(user)
+        ? UserStatus.AWAITING_GUARDIAN_CONSENT
+        : UserStatus.INVITED;
   }
 }

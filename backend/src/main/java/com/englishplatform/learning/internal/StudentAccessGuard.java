@@ -42,6 +42,7 @@ public class StudentAccessGuard {
     if (actor.hasRole(Role.STUDENT.name())) {
       throw new BusinessException(ErrorCode.FORBIDDEN);
     }
+    userDirectory.requireNotAnonymized(studentId);
   }
 
   private void requireStudent(UUID studentId) {

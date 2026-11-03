@@ -57,6 +57,9 @@ public class InvitationService {
     if (user.getStatus() != UserStatus.INVITED) {
       throw new BusinessException(ErrorCode.INVALID_STATE_TRANSITION);
     }
+    if (missingGuardianConsent(user)) {
+      throw new BusinessException(ErrorCode.GUARDIAN_CONSENT_REQUIRED);
+    }
     Instant now = clock.instant();
     tokens.revokeAll(user.getId(), AuthToken.Type.INVITE, now);
     String token = TokenHasher.newToken();
@@ -101,7 +104,7 @@ public class InvitationService {
             .findById(invite.getUserId())
             .filter(u -> u.getStatus() == UserStatus.INVITED)
             .orElseThrow(InvitationService::invalidInvite);
-    if (needsGuardianConsent(user, now) && !guardianConsents.existsByStudentId(user.getId())) {
+    if (missingGuardianConsent(user)) {
       throw new BusinessException(ErrorCode.GUARDIAN_CONSENT_REQUIRED);
     }
     invite.markUsed(now);
@@ -111,14 +114,16 @@ public class InvitationService {
     }
   }
 
-  /**
-   * Học viên dưới {@code app.privacy.guardian-consent-under-age} tuổi tại thời điểm {@code now}.
-   */
-  boolean needsGuardianConsent(UserAccount user, Instant now) {
+  /** Học viên dưới {@code app.privacy.guardian-consent-under-age} tuổi và chưa có đồng ý. */
+  public boolean missingGuardianConsent(UserAccount user) {
+    return needsGuardianConsent(user) && !guardianConsents.existsByStudentId(user.getId());
+  }
+
+  boolean needsGuardianConsent(UserAccount user) {
     if (user.getRole() != Role.STUDENT) {
       return false;
     }
-    Integer age = user.ageAt(now);
+    Integer age = user.ageAt(clock.instant());
     return age != null && age < privacy.guardianConsentUnderAge();
   }
 

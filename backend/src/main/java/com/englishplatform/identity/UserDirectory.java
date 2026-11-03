@@ -13,6 +13,11 @@ public interface UserDirectory {
   /** Ném {@code VALIDATION_FAILED} nếu người dùng không tồn tại, sai vai trò hoặc không ACTIVE. */
   UserView requireActive(UUID userId, Role role);
 
+  boolean isAnonymized(UUID userId);
+
+  /** Ném 409 {@code ANONYMIZED} nếu hồ sơ đã ẩn danh hóa: không ghi thêm dữ liệu mới (FR-031). */
+  void requireNotAnonymized(UUID userId);
+
   List<UserView> findAdmins();
 
   Optional<UserView> findByEmail(String email);

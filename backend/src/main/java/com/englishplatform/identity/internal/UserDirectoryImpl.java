@@ -5,6 +5,7 @@ import com.englishplatform.identity.UserDirectory;
 import com.englishplatform.identity.UserStatus;
 import com.englishplatform.identity.UserView;
 import com.englishplatform.shared.web.BusinessException;
+import com.englishplatform.shared.web.ErrorCode;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +39,18 @@ class UserDirectoryImpl implements UserDirectory {
                 BusinessException.validation(
                     role == Role.TEACHER ? "teacherId" : "userId",
                     "Người dùng không tồn tại, sai vai trò hoặc chưa kích hoạt"));
+  }
+
+  @Override
+  public boolean isAnonymized(UUID userId) {
+    return users.findById(userId).filter(UserAccount::isAnonymized).isPresent();
+  }
+
+  @Override
+  public void requireNotAnonymized(UUID userId) {
+    if (isAnonymized(userId)) {
+      throw new BusinessException(ErrorCode.ANONYMIZED);
+    }
   }
 
   @Override

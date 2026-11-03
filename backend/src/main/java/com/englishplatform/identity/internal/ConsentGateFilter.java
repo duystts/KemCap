@@ -13,9 +13,10 @@ import java.util.Optional;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.UrlPathHelper;
 
 /**
- * Chặn theo trạng thái tài khoản mỗi request {@code /api/v1/**} (trừ {@code /auth/*}):
+ * Chặn theo trạng thái tài khoản mỗi request có token (trừ các đường dẫn công khai):
  *
  * <ul>
  *   <li>tài khoản không còn {@code ACTIVE} (ngừng kích hoạt, ẩn danh hóa) → 401 {@code
@@ -26,6 +27,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 @Component
 class ConsentGateFilter implements SecurityFilterContributor {
+
+  private static final UrlPathHelper PATHS = new UrlPathHelper();
 
   private static final String INACTIVE_BODY =
       "{\"type\":\"about:blank\",\"title\":\"Unauthorized\",\"status\":401,"
@@ -75,13 +78,19 @@ class ConsentGateFilter implements SecurityFilterContributor {
     response.getWriter().write(body);
   }
 
+  /** Đường dẫn đã giải mã như Spring MVC khớp route; URI thô bị vượt qua bằng {@code /api/v%31}. */
   private static String path(HttpServletRequest request) {
-    return request.getRequestURI().substring(request.getContextPath().length());
+    return PATHS.getPathWithinApplication(request);
   }
 
+  /** Mặc định phải kiểm; chỉ miễn các đường dẫn công khai đã liệt kê trong SecurityConfig. */
   static boolean checked(HttpServletRequest request) {
     String path = path(request);
-    return path.startsWith("/api/v1/") && !path.startsWith("/api/v1/auth/");
+    return !path.startsWith("/api/v1/auth/")
+        && !path.startsWith("/actuator/health")
+        && !path.startsWith("/v3/api-docs")
+        && !path.startsWith("/swagger-ui")
+        && !path.equals("/error");
   }
 
   static boolean guarded(HttpServletRequest request) {

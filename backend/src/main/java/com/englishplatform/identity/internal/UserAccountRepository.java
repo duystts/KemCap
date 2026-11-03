@@ -2,11 +2,15 @@ package com.englishplatform.identity.internal;
 
 import com.englishplatform.identity.Role;
 import com.englishplatform.identity.UserStatus;
+import jakarta.persistence.LockModeType;
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -14,6 +18,16 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, UUID> 
 
   @Query("select u from UserAccount u where lower(u.email) = lower(?1)")
   Optional<UserAccount> findByEmailIgnoreCase(String email);
+
+  /** Khóa dòng để ghi nhận đồng ý giám hộ / ẩn danh hóa song song không giẫm lên nhau. */
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("select u from UserAccount u where u.id = ?1")
+  Optional<UserAccount> findForUpdate(UUID id);
+
+  /** Chỉ ghi một cột: đăng nhập song song không va {@code version} và không ghi lại cả hồ sơ. */
+  @Modifying
+  @Query("update UserAccount u set u.lastLoginAt = :at where u.id = :id and u.anonymizedAt is null")
+  int recordLogin(@Param("id") UUID id, @Param("at") Instant at);
 
   List<UserAccount> findByRoleAndStatus(Role role, UserStatus status);
 
