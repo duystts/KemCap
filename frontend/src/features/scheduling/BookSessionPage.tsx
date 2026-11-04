@@ -3,7 +3,13 @@ import { useNavigate } from 'react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useAuth } from '@/app/AuthProvider'
-import { fetchEnrollments, bookSession, type Slot, type EnrollmentItem } from '@/lib/api/scheduling'
+import {
+  fetchEnrollments,
+  bookSession,
+  slotMinutes,
+  type Slot,
+  type EnrollmentItem,
+} from '@/lib/api/scheduling'
 import SlotPicker from './SlotPicker'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
@@ -181,7 +187,7 @@ export default function BookSessionPage() {
                   </div>
                   <div className="text-sm text-indigo-200">
                     Thời gian: {formatSlotDisplay(selectedSlot).timeStr} (
-                    {selectedSlot.durationMinutes} phút)
+                    {slotMinutes(selectedSlot)} phút)
                   </div>
                 </div>
 

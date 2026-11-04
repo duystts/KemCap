@@ -105,12 +105,12 @@ export default function LearningPathView({ studentId, canEdit = true }: Learning
           <div className="pt-4 space-y-2">
             <div className="flex items-center justify-between text-xs font-semibold">
               <span className="text-slate-600">Tiến độ hoàn thành lộ trình</span>
-              <span className="text-indigo-600 font-bold">{path.progressPercent || 0}%</span>
+              <span className="text-indigo-600 font-bold">{path.completionPercent || 0}%</span>
             </div>
             <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
               <div
                 className="h-full bg-linear-to-r from-indigo-500 to-indigo-600 rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(100, Math.max(0, path.progressPercent || 0))}%` }}
+                style={{ width: `${Math.min(100, Math.max(0, path.completionPercent || 0))}%` }}
               />
             </div>
           </div>

@@ -9,12 +9,10 @@ const mockSlots: schedulingApi.Slot[] = [
   {
     startsAt: '2026-11-01T09:00:00Z',
     endsAt: '2026-11-01T10:00:00Z',
-    durationMinutes: 60,
   },
   {
     startsAt: '2026-11-01T14:00:00Z',
     endsAt: '2026-11-01T15:00:00Z',
-    durationMinutes: 60,
   },
 ]
 

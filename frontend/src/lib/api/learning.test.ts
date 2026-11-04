@@ -100,10 +100,10 @@ describe('learning API client', () => {
     const fetchMock = vi
       .spyOn(globalThis, 'fetch')
       .mockResolvedValueOnce(
-        json(200, { id: 'lp-1', title: 'Roadmap to B2', milestones: [], progressPercent: 25 }),
+        json(200, { id: 'lp-1', title: 'Roadmap to B2', milestones: [], completionPercent: 25 }),
       )
     const res = await fetchLearningPath('s-1')
-    expect(res?.progressPercent).toBe(25)
+    expect(res?.completionPercent).toBe(25)
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining('/students/s-1/learning-path'),
       expect.any(Object),
