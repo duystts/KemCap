@@ -335,6 +335,6 @@ GV đang phụ trách và admin không bị ảnh hưởng. GV của buổi còn
 
 - **Bản cuối:** `./mvnw clean verify` xanh **98 unit + 159 IT**, `spotless:check` PASS; smoke bản cuối (R20, F2 và các luồng U6) đạt, xem build-test-all.md.
 - **Đã sửa sau review:** R1, R2, R3, R4, R9, R14 (phần thu hẹp), R16, F1–F7, dọn code thừa R17.
-- **Chưa đóng, cần leader:** ngoại lệ constitution V trong plan.md (Complexity Tracking) đang ở trạng thái chờ xác nhận; R5 (phiếu treo khi giáo viên nghỉ việc); R18/F3 build-test-all (giáo viên cũ vẫn đọc `GET /sessions`, chưa nằm trong ngoại lệ).
+- **Leader chấp nhận 2026-11-04:** ngoại lệ constitution V trong plan.md (Complexity Tracking), gồm cả R18/F3 build-test-all (giáo viên cũ vẫn đọc `GET /sessions`). R5 (phiếu treo khi giáo viên nghỉ việc) để sau demo theo khuyến nghị.
 - **Chuyển tiếp:** T140: R18, F11, G6. B7: R6, R8, R10, R13, R15, R17, R19, F10, các G còn lại. FE: T101–T103, T122 (có `GET /session-feedback/mine`, `sessionId` trên bài tập), F8 cho T131.
-- **Verdict: PASS_WITH_NOTES, có điều kiện leader xác nhận ngoại lệ trên; nếu không xác nhận thì phải đổi thiết kế phiếu treo.**
+- **Verdict: PASS_WITH_NOTES.**
