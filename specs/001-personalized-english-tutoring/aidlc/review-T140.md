@@ -246,3 +246,20 @@ Ba điểm nhỏ:
 - Chưa xem được diff của hai commit, nên "mới hay cũ" dựa trên audit.md và tasks.md.
 - Không rà file `frontend/` ngoài `client.ts`, `package.json`.
 - R1, R6, R7, R9 nên được tái hiện bằng test hoặc thử tay trước khi coi là đã đóng.
+
+## Trạng thái xử lý (2026-11-05)
+
+| Mục | Trạng thái |
+|---|---|
+| R1 | Đã sửa (`9db8a4a`) |
+| R2 | Một phần: có test xóa ngày nghỉ, chú thích đã sửa; các lệnh ghi được phép khác để sau demo |
+| R3, R9 | Đã sửa: `OwnershipHardeningIT` |
+| R6 | Đã sửa: test preflight trong `OwnershipHardeningIT`, checklist ở `quickstart.md` mục 5 |
+| R7 | Đã xử lý bằng checklist ở `quickstart.md` mục 5 |
+| R8 | Đã sửa phần ứng dụng; giới hạn thân request ở Caddy để lúc lên VPS |
+| R13 | Đã sửa phần test thiếu `exp`; lỗi `nbf` để sau demo |
+| R14 | Đã xử lý: `perf/` có thật (T141) |
+| R15, R16, R17.1 | Đã sửa (`aaea037`) |
+| R17.2 | Đã sửa phần mapping thiếu method; trường ẩn theo vai trò để sau demo |
+| R17.3 | Để lúc lên VPS |
+| R4, R5, R10, R11, R12 | NOTE, không làm trước demo |

@@ -76,6 +76,14 @@ Mỗi bước nêu kết quả mong đợi; tất cả phải đúng trước kh
 
 ## 5. Triển khai bản demo (miễn phí)
 
-Xem [research.md](./research.md) R13. Tóm tắt: frontend → Cloudflare Pages; backend + PostgreSQL →
-Docker Compose trên Oracle Cloud Always Free VM (Caddy làm HTTPS); LiveKit Cloud free; Brevo/Gmail
-SMTP; Cloudflare R2. Secret đặt qua biến môi trường, không commit (`.env.example` liệt kê tên biến).
+Xem [research.md](./research.md) R13. Demo 12/11 chạy trên laptop theo mục 2, chi phí 0 đ. Muốn có email và
+video thật thì điền `SMTP_*` (Brevo free) và `LIVEKIT_*` (LiveKit Cloud free) vào biến môi trường của backend.
+Secret đặt qua biến môi trường, không commit. Triển khai lên VPS sau này xem `deploy/README.md`, và phải sửa
+constitution trước vì đó là hosting trả phí.
+
+**Checklist trước khi demo trên laptop:**
+
+- Đặt `JWT_SECRET` ngẫu nhiên, dài ít nhất 32 byte: giá trị trong `application-local.yml` công khai trong repo.
+- Đặt `SERVER_ADDRESS=127.0.0.1` để backend chỉ nghe trên máy này, vì profile `local` bật Swagger.
+- Mở đúng `http://localhost:5173`: CORS chỉ nhận một origin, nên `127.0.0.1` hoặc IP LAN sẽ bị chặn, và cookie refresh `Secure` không lưu được qua HTTP trên IP LAN.
+- Chạy thử trên đúng trình duyệt sẽ dùng để demo. Safari có thể từ chối cookie `Secure` trên `localhost` (chưa kiểm).

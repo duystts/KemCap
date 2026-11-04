@@ -33,9 +33,9 @@ Ký hiệu: `[ ]` chưa làm · `[~]` đang chờ duyệt · `[x]` đã duyệt 
 | U6 Phiếu đánh giá, bài tập, tiến bộ, đánh giá sao (B6, 8–10/11; BE #1, FE #3) | [x] 2026-11-04 (người dùng ủy quyền tự duyệt, sẽ review sau) — BE T091–T100, T117, T119, T120 + mở rộng T125 (N6c, F6, F12 từ U7), chấm lại bài (R6 U5: chốt không cho chấm lại trong MVP) do Claude; FE T101–T103, T122 để #3 | [x] 2026-11-04 (T091–T100, T117, T119, T120 + mở rộng T125; migration V7, V9) | [x] 2026-11-04 **Verified** — PASS_WITH_NOTES (98 unit + 159 IT, smoke đạt), tự duyệt theo ủy quyền; ngoại lệ constitution V ở plan.md Complexity Tracking được leader chấp nhận 2026-11-04; FE T101–T103, T122 còn mở cho #3 | build-test-U6.md |
 
 ### Construction (once)
-- [~] 3.6 Build & Test toàn bộ (`verify --all`) — backend đạt 2026-11-04 (build-test-all.md); chờ FE của #2–#4, CI, k6, Playwright
+- [~] 3.6 Build & Test toàn bộ (`verify --all`) — backend đạt 2026-11-04 (build-test-all.md); chờ FE của #2–#4, Playwright; k6 đạt 2026-11-05
 - [ ] Converge (`/speckit-converge`)
 
 ## Next step
 
-Việc #1 còn lại: T146. FE: tách và merge PR #6/#7, rồi T101–T103, T115, T116, T122, T123, T130, T131, R17. Sau đó `verify --all` trọn vẹn và `/speckit-converge`.
+Backend xong T141 (2026-11-05). Việc #1 còn lại: T146. FE: tách và merge PR #6/#7, rồi T101–T103, T115, T116, T122, T123, T130, T131, R17. Sau đó `verify --all` trọn vẹn và `/speckit-converge`.

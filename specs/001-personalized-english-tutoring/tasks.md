@@ -25,10 +25,10 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 - **[P]**: làm song song được (khác file, không phụ thuộc task chưa xong)
 - **[Story]**: US1…US6 theo spec.md
 - **(Người·Unit)**: người phụ trách và unit trong `aidlc/unit-of-work.md`
-  - **#1** (leader): toàn bộ backend, trừ ngoại lệ D1 · hạ tầng, CI, deploy, sao lưu
+  - **#1** (leader): toàn bộ backend (D1 không áp dụng; nhãn #3, #4 trên các task backend là lịch sử, xem `aidlc/aidlc-state.md`) · hạ tầng, CI, deploy, sao lưu
   - **#2**: frontend app shell, auth, consent gate, `features/scheduling`, `features/classroom`; k6, Playwright (P2)
-  - **#3**: frontend `features/learning`, `features/notifications`; **D1**: backend U4 (learning profile/path)
-  - **#4**: frontend `features/catalog`, `features/billing`, `features/admin` (gồm users, privacy); **D1**: backend billing core (U2) + U8
+  - **#3**: frontend `features/learning`, `features/notifications`
+  - **#4**: frontend `features/catalog`, `features/billing`, `features/admin` (gồm users, privacy)
 
 ## Path Conventions
 
@@ -56,7 +56,7 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 - [X] T003 [P] (#1·U1) Kiểm tra tương thích Spring Boot 4.1 của springdoc-openapi, ShedLock, `io.livekit:livekit-server`; ghi phiên bản chọn và vấn đề gặp vào mục R1 của `specs/001-personalized-english-tutoring/research.md`; thư viện không tương thích → đề xuất thay thế, không hạ phiên bản Boot
 - [X] T004 [P] (#2·U1) Tạo frontend Vite React TypeScript trong `frontend/`: Tailwind CSS, shadcn/ui (init), react-router, @tanstack/react-query, react-hook-form, zod, @hookform/resolvers, recharts, @fullcalendar/react + daygrid + timegrid + interaction, @livekit/components-react, livekit-client, msw (dev), openapi-typescript (dev), vitest + @testing-library/react (dev); script `dev`, `build`, `lint`, `test`, `gen:api` trong `frontend/package.json`
 - [X] T005 [P] (#1·U1) `docker-compose.yml` ở thư mục gốc: `postgres:16` (db `english`, user `app`), `axllent/mailpit` (SMTP 1025, UI 8025), `livekit/livekit-server --dev` (7880); **không** có MinIO (K2); cổng khớp `quickstart.md`
-- [X] T006 [P] (#2·U1) ESLint + Prettier trong `frontend/eslint.config.js`, `frontend/.prettierrc`; Spotless (google-java-format) trong `backend/pom.xml` (#1 review)
+- [X] T006 [P] (#2·U1) ESLint + Prettier trong `frontend/eslint.config.js`, `frontend/.prettierrc`; Spotless (google-java-format) trong `backend/pom.xml` (#1 review) — *lint thực tế dùng oxlint: `frontend/.oxlintrc.json`*
 - [X] T007 [P] (#1·U1) CI `.github/workflows/ci.yml` trên mọi PR vào `main`: job backend (`./mvnw -B verify`, Testcontainers dùng Docker có sẵn của runner), job frontend (`npm ci`, `npm run lint`, `npm run test -- --run`, `npm run build`), job `gitleaks/gitleaks-action` quét secret
 - [X] T008 [P] (#1·U1) `backend/src/main/resources/application.yml` + `application-local.yml`: `spring.datasource`, `spring.jpa.open-in-view=false`, `spring.modulith.events.republish-outstanding-events-on-restart=true`, `app.security.jwt-secret`, `app.frontend-url`, `app.providers.{video,email}`, `app.scheduling.*` (`cancel-cutoff-hours: 12`, `min-booking-lead-hours: 2`, `booking-horizon-days: 30`, `room-open-before-minutes: 10`, `room-close-after-minutes: 15`), `app.privacy.{policy-version, guardian-consent-under-age: 16}`, `app.reminders.*` (`session-windows: [24h, 1h]`, `report-overdue-hours: 24`, `outcome-overdue-hours: 24`, `renewal-low-sessions: 2`, `renewal-expiring-days: 7`) đúng `contracts/events-and-ports.md`; `deploy/.env.example` liệt kê mọi biến (không có giá trị thật)
 
@@ -192,7 +192,7 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 
 ## Phase 5: User Story 3 - Hồ sơ năng lực và lộ trình học cá nhân hóa (Priority: P2)
 
-**Goal**: Hồ sơ năng lực CEFR 5 kỹ năng, mục tiêu tùy chọn + "Cần tư vấn", lộ trình có lịch sử điều chỉnh. **Backend do #3 (D1), #1 review.**
+**Goal**: Hồ sơ năng lực CEFR 5 kỹ năng, mục tiêu tùy chọn + "Cần tư vấn", lộ trình có lịch sử điều chỉnh. **Backend do #1.**
 
 **Independent Test**: Ghi kết quả đầu vào, tạo lộ trình 3 chặng; học viên xem được trình độ, mục tiêu, lộ trình; học viên chưa có mục tiêu hiện "Cần tư vấn".
 
@@ -345,7 +345,7 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 ### Ổn định (B6–B7)
 
 - [X] T140 (#1) Rà soát bảo mật: mọi controller method có `@PreAuthorize` hoặc kiểm tra sở hữu; không có quyền → 404; secret chỉ qua env; CORS đúng domain demo; `BT/security/AuthorizationMatrixIT.java` (mỗi vai trò × endpoint chính, gồm privacy và feedback) — *đạt 2026-11-04: ma trận mọi endpoint × 5 đối tượng + 401, test đỏ nếu thiếu endpoint; thêm kiểm token thiếu hạn, giới hạn độ dài văn bản, tắt tài liệu API ngoài profile local*
-- [ ] T141 [P] (#2) Kịch bản k6 `perf/booking-and-join.js` (P2): p95 < 500 ms, p99 < 1 s cho slot/đặt lịch trên dữ liệu 1.000 HV / 50 GV; 400 lượt `join` trong 60 s + 200 người dùng ảo, container 1 GB RAM (NFR-PERF-01/02, NFR-SCAL-01); thêm index nếu chậm bằng migration `V{yyyyMMddHHmm}__perf_indexes.sql` (#1)
+- [X] T141 [P] (#1, thay #2) Kịch bản k6 `perf/booking-and-join.js` (P2): p95 < 500 ms, p99 < 1 s cho slot/đặt lịch trên dữ liệu 1.000 HV / 50 GV; 400 lượt `join` trong 60 s + 200 người dùng ảo, container 1 GB RAM (NFR-PERF-01/02, NFR-SCAL-01); thêm index nếu chậm bằng migration `V{yyyyMMddHHmm}__perf_indexes.sql` (#1) — *đạt 2026-11-05, không cần index; số liệu và giới hạn ở `perf/README.md`*
 - [ ] T142 [P] (#2) Smoke test Playwright `frontend/e2e/demo.spec.ts` theo quickstart bước 1–5, 8, 11, 15–17 (`app.providers.video=fake`)
 - [ ] T143 [P] (#3, #4) Kiểm tra giao diện điện thoại và Lighthouse mobile (LCP ≤ 3 s) cho trang học viên (đặt lịch, phòng học, tiến bộ, bài tập, gói học); test usability đặt lịch < 1 phút (SC-001), phiếu đánh giá < 3 phút (SC-008); sửa layout trong `F/features/**`
 - [X] T144 (#1) Diễn tập khôi phục sao lưu trên VM (NFR-REL-10) trước 2026-11-11; ghi kết quả vào `deploy/README.md` — *`deploy/drill.sh`; đạt trên Docker local 2026-10-21 (13 s), không có VPS theo R1-(b)*
