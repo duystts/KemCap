@@ -5,15 +5,10 @@ contracts/rest-api.md, contracts/events-and-ports.md, research.md (R1–R17), ai
 aidlc/nfr.md (53 NFR), `.specify/memory/constitution.md` v1.0.1 (ưu tiên cao nhất); quyết định của
 leader (#1) ngày 2026-10-18 (phân công mới, ngày bắt đầu, 3 quyết định đã chốt — xem mục Quyết định).
 **Stage**: AI-DLC 2.7 + 2.9 (Units Generation + Delivery Planning) · **Ngày**: 2026-10-18 · **Bản**: 2
-(re-plan theo phân công mới) · **Trạng thái**: Draft, chờ duyệt
+(re-plan theo phân công mới) · **Trạng thái**: Đã duyệt 2026-10-18 (S2); backend U1–U8 Verified, xem aidlc-state.md
 
-> **⚠ Lưu ý trước khi map task**: `tasks.md` hiện có là **bản cũ** (viết trước Clarifications
-> 2026-10-18, trước bản plan cập nhật và trước phân công mới): thiếu FR-030/FR-031, `CANCELLED_SYSTEM`,
-> chốt kết quả/chốt thay, quyết định Gián đoạn, chặn đổi lịch muộn, sao lưu R17, k6, gitleaks, rate
-> limit; phân công theo module full-stack và lịch tuần 1 = 12–18/10 (tasks.md:356-363) không còn
-> đúng. **MUST chạy lại `/speckit-tasks`** theo plan/spec hiện hành và phân công trong file này **trước
-> khi** chạy `/speckit-aidlc-map-tasks`. Phân công trong plan.md:141-153 ("Phân công module") cũng đã
-> lỗi thời so với quyết định mới — cần owner plan cập nhật.
+> **Lưu ý**: bản này viết lúc lập kế hoạch 2026-10-18. Trạng thái thực tế ở aidlc-state.md; thực tế Claude/#1
+> làm toàn bộ backend, gồm cả phần D1 từng giao #3 và #4.
 
 Quy ước:
 
@@ -616,6 +611,4 @@ U1,U3 · UX-03 mọi unit FE + B7 · OBS-01 U1,U5 · **OBS-02 hoãn một phần
 | OQ-7 | Mốc 16 tuổi, nội dung chính sách và việc giữ `requester_name` (có thể chính là tên học viên) sau ẩn danh hóa chờ pháp lý (spec.md:296; research.md:208; R7 verify U7) | U7 (nội dung; code dùng cấu hình) | Cần văn bản chính thức trước khi dùng dữ liệu thật |
 | OQ-8 | plan.md "Phân công module" (plan.md:141-153) và tasks.md chưa phản ánh QĐ-1 | `/speckit-tasks`, map-tasks | Owner plan cập nhật trước khi chạy lại `/speckit-tasks` |
 
-**Bước tiếp theo**: leader chốt OQ-1 … OQ-3 → orchestrator cập nhật spec/stories (QĐ-3 … QĐ-5, K1/K2
-nếu duyệt, OQ-5) và plan (OQ-8) → điền cột "Unit" trong story map của stories.md → **chạy lại
-`/speckit-tasks`** → `/speckit-aidlc-map-tasks`.
+**Bước tiếp theo**: xem mục "Next step" trong aidlc-state.md.

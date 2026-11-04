@@ -14,7 +14,6 @@ học viên. Đặc tả đầy đủ ở [spec.md](specs/001-personalized-engli
 | `frontend/` | React + Vite + TypeScript + Tailwind |
 | `deploy/` | Docker Compose production, Caddy, sao lưu và khôi phục ([hướng dẫn](deploy/README.md)) |
 | `specs/001-personalized-english-tutoring/` | Spec, plan, tasks, contract API, trạng thái AI-DLC |
-| `perf/` | Kịch bản k6 |
 
 ## Kiến trúc
 
@@ -42,12 +41,15 @@ chạy local và test. Quy tắc bắt buộc của dự án nằm trong
 Cần JDK 21, Node.js 22 LTS, Docker Desktop.
 
 ```bash
+# Terminal 1, thư mục gốc
 docker compose up -d                    # PostgreSQL, Mailpit (http://localhost:8025), LiveKit dev
 
+# Terminal 2
 cd backend
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=local,demo-seed
 # API http://localhost:8080/api/v1, Swagger UI http://localhost:8080/swagger-ui.html
 
+# Terminal 3
 cd frontend
 npm install
 npm run gen:api                         # sinh type từ backend đang chạy
@@ -64,11 +66,12 @@ Swagger và `/v3/api-docs` chỉ mở ở profile `local`. Kịch bản kiểm c
 
 ```bash
 cd backend  && ./mvnw verify && ./mvnw spotless:check   # cần Docker: IT chạy PostgreSQL thật qua Testcontainers
-cd frontend && npm run lint && npm run test -- --run && npm run build
+cd frontend && npm run lint && npx prettier --check src && npm run test -- --run && npm run build
 ```
 
-CI chạy các lệnh trên và gitleaks trên mỗi PR và khi push `main`. Phân quyền của mọi endpoint nằm trong
-`AuthorizationMatrixIT`: thêm endpoint mới mà chưa khai báo vào ma trận thì test đỏ.
+CI chạy các lệnh trên và gitleaks trên mỗi PR và khi push `main`. Các endpoint nghiệp vụ (`/api/v1`, trừ `/auth`) được
+khai báo trong `AuthorizationMatrixIT`: thêm endpoint mới mà chưa khai báo thì test đỏ. Ma trận kiểm chiều từ chối
+của mọi endpoint; lệnh ghi được phép chạy ở IT của từng module.
 
 Javadoc được Spring Modulith đọc bằng parser đơn giản, nên **không viết ngoặc không đóng** như `[a, b)` trong
 Javadoc; nếu không, `ModularityTests.writesModuleDocumentation` sẽ lỗi với thông báo khó hiểu.
