@@ -27,7 +27,7 @@
 | **Rút gọn** | FR-007: tìm theo tên + lọc theo trạng thái/giáo viên · FR-017–FR-018: lộ trình do giáo viên tự soạn (chưa có mẫu lộ trình), sửa có ghi lý do · FR-020: nộp bài dạng văn bản (tệp, tệp âm thanh, ghi âm trực tiếp: GĐ2) · FR-021: lịch sử buổi + biểu đồ điểm kỹ năng + % hoàn thành lộ trình · FR-023: không có trong demo (GĐ2); demo chỉ thu đánh giá sao (FR-022) · FR-027: tổng đã thu, công nợ, số buổi theo giáo viên |
 | **Để sau (GĐ2+)** | Mẫu lộ trình · ghi âm trực tiếp · thanh toán trực tuyến · ghi hình buổi học · nhắc qua SMS/Zalo · xuất dữ liệu học tập cho AI (FR-028 chỉ cần lưu có cấu trúc; không gồm trang tóm tắt dữ liệu cá nhân của FR-031) · ứng dụng di động · AI |
 
-SC-002, SC-004 và SC-009 cần dữ liệu vận hành thực tế (vài tháng), nên được đo sau khi ra mắt, không đo trong bản demo.
+SC-002, SC-004, SC-005, SC-006 và SC-009 cần dữ liệu vận hành thực tế (vài tháng), nên được đo sau khi ra mắt, không đo trong bản demo.
 
 **Ngoài phạm vi MVP**: nhu cầu (6) – các tính năng AI (đánh giá năng lực tự động, đề xuất bài tập, tự điều chỉnh lộ trình). MVP chỉ cần lưu dữ liệu có cấu trúc (điểm kỹ năng, nhận xét, kết quả bài tập) để giai đoạn sau có thể khai thác.
 
@@ -77,6 +77,16 @@ SC-002, SC-004 và SC-009 cần dữ liệu vận hành thực tế (vài tháng
 - Q: Ẩn danh hóa xóa và giữ những dữ liệu nào? → A: Xóa: họ tên, liên hệ, ngày sinh, đồng ý của người giám hộ, hồ sơ năng lực, mục tiêu, lộ trình, điểm kỹ năng và nhận xét trong phiếu đánh giá, bài tập/bài nộp (nội dung, tệp, điểm, phản hồi), nhận xét kèm đánh giá sao. Giữ không định danh: buổi học (thời gian, giáo viên, trạng thái), thời điểm nộp phiếu, số sao, ghi danh, thanh toán, công nợ. Bản ghi yêu cầu xóa (người yêu cầu, ngày, kết quả) được giữ làm bằng chứng tuân thủ. *(mặc định theo khuyến nghị, người dùng chấp nhận gộp)*
 - Q: Mẫu số tỷ lệ hủy/vắng trong báo cáo chất lượng là gì? → A: Mẫu số = số buổi đã đặt trong kỳ, loại bỏ Hủy đúng hạn và Hủy hệ thống. *(mặc định theo khuyến nghị, người dùng chấp nhận gộp)*
 - Q: Bản tóm tắt dữ liệu cá nhân (yêu cầu xem) có định dạng gì, có mâu thuẫn với "xuất dữ liệu GĐ2" không? → A: Trang tóm tắt in được (lưu PDF qua trình duyệt) liệt kê dữ liệu cá nhân đang lưu; thuộc MVP. "Xuất dữ liệu" ở GĐ2 chỉ là xuất dữ liệu học tập cho AI (FR-028). *(mặc định theo khuyến nghị, người dùng chấp nhận gộp)*
+
+### Session 2026-11-05
+
+- Q: Ghi danh đã hủy có tính vào công nợ không? → A: Không tính vào tổng công nợ và cờ "còn nợ"; học phí và số đã thu của ghi danh đó vẫn giữ để đối chiếu, không thu thêm được. *(Claude đề xuất và đã làm; leader chấp nhận 2026-11-05)*
+- Q: Báo cáo đã thu và công nợ tính thế nào? → A: Đã thu tính theo ngày thanh toán trong kỳ, gồm cả điều chỉnh âm và ghi danh đã hủy. Công nợ là số dư hiện tại, không theo kỳ. Thu vượt ở một ghi danh không bù cho ghi danh khác. *(Claude đề xuất và đã làm; leader chấp nhận 2026-11-05)*
+- Q: Bài tập đã chấm có chấm lại được không? → A: Không trong MVP; chấm lần hai bị từ chối. *(Claude đề xuất và đã làm; leader chấp nhận 2026-11-05)*
+- Q: Giáo vụ sửa buổi đã hoàn thành thành không hoàn thành thì phiếu đánh giá xử lý thế nào? → A: Phiếu chưa nộp bị xóa. Phiếu đã nộp được giữ nhưng không tính vào tiến bộ. *(Claude đề xuất và đã làm; leader chấp nhận 2026-11-05)*
+- Q: Học viên dưới mốc tuổi chưa có đồng ý của người giám hộ có nhận thông báo không? → A: Không nhận email hay thông báo trong hệ thống, ở mọi trạng thái. Thông báo bị chặn không gửi bù sau khi có đồng ý; giáo vụ báo lịch cho phụ huynh khi ghi nhận đồng ý. *(Claude đề xuất và đã làm; leader chấp nhận 2026-11-05)*
+- Q: "Mọi học viên" khi chặn ngừng giáo viên (Session 2026-10-18) gồm những ai? → A: Học viên có ghi danh đang dùng hoặc chờ thanh toán, hoặc còn buổi đã đặt. Không gồm học viên đã ẩn danh hóa và gói đã hết hạn, hết buổi không còn buổi đã đặt. *(Claude đề xuất và đã làm; leader chấp nhận 2026-11-05)*
+- Q: Laptop demo tắt qua giờ chạy job hằng ngày thì sao? → A: Job hết hạn gói và nhắc gia hạn chạy bù khi khởi động lại. *(Claude đề xuất và đã làm; leader chấp nhận 2026-11-05)*
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -187,7 +197,7 @@ Sau mỗi buổi, học viên đánh giá buổi học (1–5 sao và nhận xé
 - Giáo viên quên đánh dấu kết quả buổi: buổi giữ trạng thái Đã đặt (chưa trừ); sau 24 giờ hệ thống nhắc giáo viên và giáo vụ, giáo vụ chốt kết quả thay.
 - Sự cố kết nối giữa buổi học: giáo viên có thể đánh dấu buổi "Gián đoạn". Buổi Gián đoạn mặc định không bị trừ; giáo vụ xem xét và chọn tính là buổi đã học (trừ buổi) hoặc xếp buổi bù (không trừ).
 - Học viên và giáo viên ở các múi giờ khác nhau: lịch luôn hiển thị theo múi giờ của người xem.
-- Giáo viên nghỉ việc/đổi giáo viên phụ trách: lịch sử học tập, đánh giá và lộ trình của học viên được giữ nguyên và chuyển cho giáo viên mới.
+- Giáo viên nghỉ việc/đổi giáo viên phụ trách: lịch sử học tập, đánh giá và lộ trình của học viên được giữ nguyên, giáo viên mới tiếp tục dùng. Phiếu chưa nộp của buổi đã dạy vẫn thuộc giáo viên đã dạy. Giới hạn MVP: nếu tài khoản giáo viên đó đã ngừng thì phiếu treo, không ai nộp được và vẫn bị nhắc; xử lý sau demo.
 - Gói học hết hạn khi vẫn còn buổi: không đặt được buổi mới; các buổi Đã đặt trước đó vẫn giữ. Giáo vụ có thể gia hạn thủ công (FR-024).
 - Giáo viên thay đổi lịch rảnh định kỳ khi đã có buổi được đặt trong khung đó: các buổi đã đặt không bị ảnh hưởng. Riêng ngày nghỉ ngoại lệ trùng buổi Đã đặt thì bị chặn (xem FR-008).
 
@@ -203,7 +213,7 @@ Sau mỗi buổi, học viên đánh giá buổi học (1–5 sao và nhận xé
 
 **Quản lý dữ liệu tập trung (nhu cầu 1)**
 
-- **FR-004**: Giáo vụ MUST tạo, sửa, ngừng kích hoạt (không xóa vĩnh viễn) hồ sơ học viên, giáo viên. Hồ sơ đã ngừng kích hoạt có thể được kích hoạt lại. Ngừng kích hoạt học viên thì các buổi Đã đặt trong tương lai chuyển Hủy hệ thống (không trừ buổi); ngừng kích hoạt giáo viên bị chặn cho tới khi mọi học viên của giáo viên đó được đổi giáo viên phụ trách. Ngoại lệ duy nhất cho việc không xóa là ẩn danh hóa theo yêu cầu xóa hợp lệ (FR-031).
+- **FR-004**: Giáo vụ MUST tạo, sửa, ngừng kích hoạt (không xóa vĩnh viễn) hồ sơ học viên, giáo viên. Hồ sơ đã ngừng kích hoạt có thể được kích hoạt lại. Ngừng kích hoạt học viên thì các buổi Đã đặt trong tương lai chuyển Hủy hệ thống (không trừ buổi); ngừng kích hoạt giáo viên bị chặn khi giáo viên còn học viên có ghi danh đang dùng hoặc chờ thanh toán, hoặc còn buổi đã đặt trên ghi danh bất kỳ; học viên đã ẩn danh hóa không tính. Ngoại lệ duy nhất cho việc không xóa là ẩn danh hóa theo yêu cầu xóa hợp lệ (FR-031).
 - **FR-005**: Giáo vụ MUST định nghĩa khóa học (chương trình) và gói học (số buổi, thời lượng mỗi buổi, thời hạn sử dụng, giá).
 - **FR-006**: Giáo vụ MUST ghi danh học viên vào gói học và phân công giáo viên phụ trách; có thể đổi giáo viên mà không mất dữ liệu học tập. Khi đổi giáo viên, các buổi Đã đặt trong tương lai với giáo viên cũ chuyển Hủy hệ thống (không trừ buổi, không tính vào tỷ lệ hủy); học viên và cả hai giáo viên được thông báo.
 - **FR-007**: Hệ thống MUST cho phép tìm kiếm và lọc học viên/giáo viên/buổi học theo tên, trạng thái, khóa học, giáo viên và khoảng thời gian.
@@ -236,13 +246,13 @@ Sau mỗi buổi, học viên đánh giá buổi học (1–5 sao và nhận xé
 **Số buổi & học phí (nhu cầu 5)**
 
 - **FR-024**: Hệ thống MUST tự động cập nhật số buổi đã học/đã đặt/còn lại theo trạng thái buổi học (buổi Đã đặt giữ chỗ ngay; còn lại = tổng − đã học − đã đặt; không cho đặt vượt số còn lại; hủy đúng hạn, Giáo viên vắng/hủy, Hủy hệ thống hoặc Gián đoạn thì trả lại chỗ). Giáo vụ MUST gia hạn thủ công được ghi danh đã hết hạn bằng cách đặt ngày hết hạn mới; hệ thống ghi lại người thực hiện và thời điểm và chặn đặt lịch khi gói chưa kích hoạt ("Chờ thanh toán"), hết buổi hoặc hết hạn.
-- **FR-025**: Giáo vụ MUST ghi nhận thanh toán học phí (số tiền, ngày, phương thức, ghi chú) và xem công nợ theo học viên. Công nợ của một ghi danh = học phí của ghi danh (mặc định sao từ giá gói; giáo vụ chỉ nhập giá khác — ví dụ giảm giá — lúc tạo ghi danh, không sửa sau; sửa giá gói không ảnh hưởng ghi danh đã có) − tổng đã thanh toán. Học viên xem được (chỉ đọc) lịch sử thanh toán và công nợ của mình. Khoản thanh toán đầu tiên của một ghi danh kích hoạt gói (ngày kích hoạt là mốc tính hạn sử dụng); thanh toán chưa đủ học phí vẫn kích hoạt, phần còn thiếu là công nợ. Trong MVP, thanh toán được ghi nhận thủ công (chuyển khoản, tiền mặt); thanh toán trực tuyến qua cổng thanh toán thuộc giai đoạn 2.
+- **FR-025**: Giáo vụ MUST ghi nhận thanh toán học phí (số tiền, ngày, phương thức, ghi chú) và xem công nợ theo học viên. Công nợ của một ghi danh = học phí của ghi danh (mặc định sao từ giá gói; giáo vụ chỉ nhập giá khác — ví dụ giảm giá — lúc tạo ghi danh, không sửa sau; sửa giá gói không ảnh hưởng ghi danh đã có) − tổng đã thanh toán. Học viên xem được (chỉ đọc) lịch sử thanh toán và công nợ của mình. Khoản thanh toán đầu tiên của một ghi danh kích hoạt gói (ngày kích hoạt là mốc tính hạn sử dụng); thanh toán chưa đủ học phí vẫn kích hoạt, phần còn thiếu là công nợ. Trong MVP, thanh toán được ghi nhận thủ công (chuyển khoản, tiền mặt); thanh toán trực tuyến qua cổng thanh toán thuộc giai đoạn 2. Ghi danh đã hủy không tính vào tổng công nợ và không thu thêm được.
 - **FR-026**: Hệ thống MUST nhắc học viên và giáo vụ (qua email và thông báo trong hệ thống) khi gói còn ≤ 2 buổi hoặc còn ≤ 7 ngày đến hạn; mỗi lý do chỉ nhắc một lần cho mỗi ghi danh.
 - **FR-027**: Giáo vụ MUST xem báo cáo tổng hợp: doanh thu đã thu, công nợ, số buổi đã dạy theo giáo viên (phục vụ tính thù lao giáo viên) trong khoảng thời gian chọn. "Buổi đã dạy" là mọi buổi mà học viên bị trừ: Hoàn thành, Học viên vắng, Hủy muộn, và Gián đoạn được giáo vụ tính là đã học; buổi Giáo viên vắng/hủy, Hủy đúng hạn, Hủy hệ thống và Gián đoạn được xếp bù không được tính.
 
 **Chuẩn bị cho AI (nhu cầu 6 – giai đoạn sau)**
 
-- **FR-028**: Dữ liệu năng lực, điểm kỹ năng từng buổi, nhận xét, kết quả bài tập và lịch sử lộ trình MUST được lưu dưới dạng có cấu trúc, xuất được, để phục vụ các tính năng AI giai đoạn sau. MVP không bao gồm tính năng AI.
+- **FR-028**: Dữ liệu năng lực, điểm kỹ năng từng buổi, nhận xét, kết quả bài tập và lịch sử lộ trình MUST được lưu dưới dạng có cấu trúc để phục vụ các tính năng AI giai đoạn sau. [GĐ2]: xuất dữ liệu. MVP không bao gồm tính năng AI.
 
 **Khả năng thay thế dịch vụ bên ngoài**
 
