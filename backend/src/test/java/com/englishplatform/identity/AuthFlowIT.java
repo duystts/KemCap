@@ -244,6 +244,24 @@ class AuthFlowIT {
         .andExpect(jsonPath("$.code").value("UNAUTHENTICATED"));
   }
 
+  /** R13 (U5): token hợp lệ chữ ký nhưng không có hạn thì không được dùng mãi mãi. */
+  @Test
+  void tokenWithoutExpiryIsRejected() throws Exception {
+    UserAccount user = activeUser(Role.TEACHER, true);
+    JwtClaimsSet noExpiry =
+        JwtClaimsSet.builder()
+            .issuer(com.englishplatform.shared.security.CurrentUser.JWT_ISSUER)
+            .subject(user.getId().toString())
+            .claim("role", "TEACHER")
+            .build();
+    String token =
+        jwtEncoder
+            .encode(JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), noExpiry))
+            .getTokenValue();
+    mvc.perform(get("/api/v1/me").header("Authorization", "Bearer " + token))
+        .andExpect(status().isUnauthorized());
+  }
+
   @Test
   void acceptInviteRequiresPolicyConsentThenActivates() throws Exception {
     UserAccount user =

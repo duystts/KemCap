@@ -159,6 +159,19 @@ class AssignmentFlowIT extends LearningFlowSupport {
         .isEqualTo(1);
   }
 
+  /** F11: phản hồi khi chấm có giới hạn độ dài. */
+  @Test
+  void oversizedFeedbackIsRejected() throws Exception {
+    Setup s = setup();
+    UUID id = assignment(s, "");
+    submit(s.student(), id, "Bài").andExpect(status().isOk());
+    call(
+            post("/api/v1/assignments/" + id + "/grade"),
+            s.teacher(),
+            "{\"score\":5,\"feedback\":\"" + "x".repeat(5001) + "\"}")
+        .andExpect(status().isBadRequest());
+  }
+
   @Test
   void cannotGradeBeforeSubmission() throws Exception {
     Setup s = setup();

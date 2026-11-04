@@ -34,6 +34,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class SessionReportService {
 
+  static final int MAX_TEXT_LENGTH = 5000;
+
   private final SessionReportRepository reports;
   private final AssignmentRepository assignments;
   private final LearningPathRepository paths;
@@ -139,6 +141,10 @@ public class SessionReportService {
     if (input.comment() == null || input.comment().isBlank()) {
       throw BusinessException.validation("comment", "Cần nhận xét buổi học");
     }
+    if (input.comment().length() > MAX_TEXT_LENGTH) {
+      throw BusinessException.validation(
+          "comment", "Nhận xét tối đa " + MAX_TEXT_LENGTH + " ký tự");
+    }
     if (input.scores() == null || input.scores().isEmpty()) {
       throw BusinessException.validation("scores", "Cần chấm ít nhất một kỹ năng");
     }
@@ -148,6 +154,10 @@ public class SessionReportService {
     for (NewAssignment a : input.assignments()) {
       if (a.title() == null || a.title().isBlank() || a.title().length() > 200) {
         throw BusinessException.validation("assignments", "Bài tập cần tiêu đề, tối đa 200 ký tự");
+      }
+      if (a.instructions() != null && a.instructions().length() > MAX_TEXT_LENGTH) {
+        throw BusinessException.validation(
+            "assignments", "Hướng dẫn bài tập tối đa " + MAX_TEXT_LENGTH + " ký tự");
       }
     }
   }

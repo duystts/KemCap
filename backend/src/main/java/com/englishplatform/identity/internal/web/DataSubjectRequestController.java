@@ -70,7 +70,7 @@ class DataSubjectRequestController {
       @NotNull DataSubjectRequest.Type type,
       @NotNull LocalDate receivedOn) {}
 
-  record RejectRequest(@NotBlank String resolutionNote) {}
+  record RejectRequest(@NotBlank @Size(max = 2000) String resolutionNote) {}
 
   record AnonymizeRequest(boolean confirm) {}
 

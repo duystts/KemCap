@@ -38,7 +38,10 @@ class ProfileController {
     }
   }
 
-  record TeacherProfileRequest(String bio, List<String> specialties, String certificates) {}
+  record TeacherProfileRequest(
+      @Size(max = 5000) String bio,
+      List<@Size(max = 100) String> specialties,
+      @Size(max = 5000) String certificates) {}
 
   record StudentProfileDto(
       UUID userId, StudentProfile.CefrLevel selfReportedLevel, String occupation, String notes) {
@@ -54,7 +57,7 @@ class ProfileController {
   record StudentProfileRequest(
       StudentProfile.CefrLevel selfReportedLevel,
       @Size(max = 100) String occupation,
-      String notes) {}
+      @Size(max = 5000) String notes) {}
 
   record StudentListItem(
       UUID id,

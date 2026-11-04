@@ -344,12 +344,12 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 
 ### Ổn định (B6–B7)
 
-- [ ] T140 (#1) Rà soát bảo mật: mọi controller method có `@PreAuthorize` hoặc kiểm tra sở hữu; không có quyền → 404; secret chỉ qua env; CORS đúng domain demo; `BT/security/AuthorizationMatrixIT.java` (mỗi vai trò × endpoint chính, gồm privacy và feedback)
+- [X] T140 (#1) Rà soát bảo mật: mọi controller method có `@PreAuthorize` hoặc kiểm tra sở hữu; không có quyền → 404; secret chỉ qua env; CORS đúng domain demo; `BT/security/AuthorizationMatrixIT.java` (mỗi vai trò × endpoint chính, gồm privacy và feedback) — *đạt 2026-11-04: ma trận mọi endpoint × 5 đối tượng + 401, test đỏ nếu thiếu endpoint; thêm kiểm token thiếu hạn, giới hạn độ dài văn bản, tắt tài liệu API ngoài profile local*
 - [ ] T141 [P] (#2) Kịch bản k6 `perf/booking-and-join.js` (P2): p95 < 500 ms, p99 < 1 s cho slot/đặt lịch trên dữ liệu 1.000 HV / 50 GV; 400 lượt `join` trong 60 s + 200 người dùng ảo, container 1 GB RAM (NFR-PERF-01/02, NFR-SCAL-01); thêm index nếu chậm bằng migration `V{yyyyMMddHHmm}__perf_indexes.sql` (#1)
 - [ ] T142 [P] (#2) Smoke test Playwright `frontend/e2e/demo.spec.ts` theo quickstart bước 1–5, 8, 11, 15–17 (`app.providers.video=fake`)
 - [ ] T143 [P] (#3, #4) Kiểm tra giao diện điện thoại và Lighthouse mobile (LCP ≤ 3 s) cho trang học viên (đặt lịch, phòng học, tiến bộ, bài tập, gói học); test usability đặt lịch < 1 phút (SC-001), phiếu đánh giá < 3 phút (SC-008); sửa layout trong `F/features/**`
 - [X] T144 (#1) Diễn tập khôi phục sao lưu trên VM (NFR-REL-10) trước 2026-11-11; ghi kết quả vào `deploy/README.md` — *`deploy/drill.sh`; đạt trên Docker local 2026-10-21 (13 s), không có VPS theo R1-(b)*
-- [ ] T145 (#1) Hoàn thiện `README.md` gốc: kiến trúc module, cách chạy (dẫn `quickstart.md`), bảng phân công, quy trình PR
+- [X] T145 (#1) Hoàn thiện `README.md` gốc: kiến trúc module, cách chạy (dẫn `quickstart.md`), bảng phân công, quy trình PR
 - [ ] T146 (#1, cả team) Chạy toàn bộ 24 bước `specs/001-personalized-english-tutoring/quickstart.md` trên môi trường demo (bỏ phần đã cắt theo K1/K2); ghi lỗi thành issue, sửa trước 2026-11-11; tổng duyệt 2026-11-11, demo 2026-11-12
 
 ---

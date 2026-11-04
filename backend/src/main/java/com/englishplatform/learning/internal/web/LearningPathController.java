@@ -9,6 +9,7 @@ import com.englishplatform.learning.internal.path.Topic;
 import com.englishplatform.shared.security.CurrentUser;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -92,7 +93,7 @@ class LearningPathController {
   record UpdatePathRequest(
       @NotNull String title,
       List<PathSpec.MilestoneSpec> milestones,
-      String reason,
+      @Size(max = 2000) String reason,
       @NotNull Long version) {}
 
   record RevisionDto(UUID id, UUID changedBy, String reason, String summary, Instant changedAt) {

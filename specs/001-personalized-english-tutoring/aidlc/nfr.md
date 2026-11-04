@@ -304,3 +304,5 @@ Chỉ là đề xuất — architect **không** sửa plan.md; owner plan (leade
   port/adapter (FR-029).
 - **R13, cookie khác site**: FE và API cùng domain do Caddy phục vụ (bỏ Cloudflare Pages). Đã kiểm
   login + refresh qua HTTPS cùng domain trên Docker local.
+
+> **T140 (2026-11-04):** NFR-SEC-01, NFR-SEC-02 có `AuthorizationMatrixIT` phủ mọi endpoint nghiệp vụ. Tài liệu API chỉ mở ở profile `local`. NFR-SEC-06 (rate limit) vẫn hoãn theo K3.

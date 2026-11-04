@@ -6,6 +6,7 @@ import com.englishplatform.shared.security.CurrentUser;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -64,9 +65,12 @@ class BillingController {
       List<PaymentDto> payments) {}
 
   record PaymentRequest(
-      long amountVnd, @NotNull LocalDate paidAt, @NotNull Payment.Method method, String note) {}
+      long amountVnd,
+      @NotNull LocalDate paidAt,
+      @NotNull Payment.Method method,
+      @Size(max = 2000) String note) {}
 
-  record AdjustmentRequest(long amountVnd, @NotBlank String note) {}
+  record AdjustmentRequest(long amountVnd, @NotBlank @Size(max = 2000) String note) {}
 
   @GetMapping
   @PreAuthorize("hasAnyRole('ADMIN','STUDENT')")

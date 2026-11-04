@@ -6,6 +6,7 @@ import com.englishplatform.learning.internal.assignment.Submission;
 import com.englishplatform.shared.security.CurrentUser;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -77,7 +78,7 @@ class AssignmentController {
 
   record SubmitRequest(String textAnswer) {}
 
-  record GradeRequest(@NotNull Integer score, String feedback) {}
+  record GradeRequest(@NotNull Integer score, @Size(max = 5000) String feedback) {}
 
   @GetMapping
   @PreAuthorize("isAuthenticated()")

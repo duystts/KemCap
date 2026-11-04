@@ -47,6 +47,12 @@ spring:
 server:
   port: ${PORT:8080}
 
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
 management:
   health:
     # SMTP lỗi chỉ làm email chờ thử lại (NFR-REL-06), không được coi là app chết

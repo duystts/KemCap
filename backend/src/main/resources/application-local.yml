@@ -3,6 +3,13 @@ spring:
   datasource:
     password: ${DB_PASSWORD:app}
 
+# tài liệu API chỉ mở ở dev; frontend cần để chạy gen:api
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
 app:
   livekit:
     url: ${LIVEKIT_URL:ws://localhost:7880}

@@ -2,7 +2,9 @@ package com.englishplatform.shared.security;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import java.time.Clock;
+import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +24,8 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtClaimNames;
+import org.springframework.security.oauth2.jwt.JwtClaimValidator;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
@@ -140,7 +144,9 @@ class SecurityConfig {
                 : OAuth2TokenValidatorResult.success();
     decoder.setJwtValidator(
         new DelegatingOAuth2TokenValidator<>(
-            notExpired, new JwtIssuerValidator(CurrentUser.JWT_ISSUER)));
+            notExpired,
+            new JwtClaimValidator<Instant>(JwtClaimNames.EXP, Objects::nonNull),
+            new JwtIssuerValidator(CurrentUser.JWT_ISSUER)));
     return decoder;
   }
 

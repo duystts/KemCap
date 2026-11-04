@@ -9,6 +9,7 @@ import com.englishplatform.shared.security.CurrentUser;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -100,11 +101,11 @@ class EnrollmentController {
   record CreateEnrollmentRequest(
       @NotNull UUID studentId, @NotNull UUID packageId, @NotNull UUID teacherId, Long priceVnd) {}
 
-  record ChangeTeacherRequest(@NotNull UUID teacherId, @NotBlank String reason) {}
+  record ChangeTeacherRequest(@NotNull UUID teacherId, @NotBlank @Size(max = 2000) String reason) {}
 
   record ExtendRequest(@NotNull Instant newExpiresAt) {}
 
-  record CancelRequest(String reason) {}
+  record CancelRequest(@Size(max = 2000) String reason) {}
 
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
@@ -156,7 +157,8 @@ class EnrollmentController {
 
   @PostMapping("/{id}/cancel")
   @PreAuthorize("hasRole('ADMIN')")
-  EnrollmentDto cancel(@PathVariable UUID id, @RequestBody(required = false) CancelRequest r) {
+  EnrollmentDto cancel(
+      @PathVariable UUID id, @Valid @RequestBody(required = false) CancelRequest r) {
     CurrentUser user = CurrentUser.require();
     return EnrollmentDto.of(service.cancel(id, r == null ? null : r.reason(), user.id()), user);
   }

@@ -440,6 +440,31 @@ class AnonymizationIT extends ApiTestSupport {
     return found;
   }
 
+  /** F7 (U7): refresh token đã cấp không dùng được sau ẩn danh hóa. */
+  @Test
+  void refreshTokenStopsWorkingAfterAnonymization() throws Exception {
+    TestUser admin = user(Role.ADMIN);
+    TestUser student = user(Role.STUDENT);
+    jakarta.servlet.http.Cookie refresh =
+        mvc.perform(
+                post("/api/v1/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        "{\"email\":\""
+                            + student.email()
+                            + "\",\"password\":\""
+                            + PASSWORD
+                            + "\"}"))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getCookies()[0];
+
+    anonymize(admin, request(admin, student.id(), "ERASURE")).andExpect(status().isOk());
+
+    mvc.perform(post("/api/v1/auth/refresh").cookie(refresh)).andExpect(status().isUnauthorized());
+  }
+
   /** R1: ghi của một request đã đọc hồ sơ từ trước không được khôi phục định danh. */
   @Test
   void staleWriteCannotRestoreIdentity() throws Exception {

@@ -373,6 +373,23 @@ class SessionReportFlowIT extends LearningFlowSupport {
         .andExpect(jsonPath("$.pathCompletion").value(67));
   }
 
+  /** F11: nhận xét trong phiếu có giới hạn độ dài. */
+  @Test
+  void oversizedCommentIsRejected() throws Exception {
+    Setup s = setup();
+    UUID sessionId = completedWithPendingReport(s, 2);
+    submitReport(s.teacher(), sessionId, SCORES + ",\"comment\":\"" + "x".repeat(5001) + "\"")
+        .andExpect(status().isBadRequest());
+    submitReport(
+            s.teacher(),
+            sessionId,
+            SCORES
+                + ",\"comment\":\"Tốt\",\"assignments\":[{\"title\":\"B\",\"instructions\":\""
+                + "x".repeat(5001)
+                + "\"}]")
+        .andExpect(status().isBadRequest());
+  }
+
   @Test
   void nullAssignmentIsRejected() throws Exception {
     Setup s = setup();

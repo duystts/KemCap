@@ -76,7 +76,7 @@ class ProficiencyController {
       @NotNull Cefr reading,
       @NotNull Cefr writing,
       @NotNull Cefr grammarVocab,
-      String notes) {}
+      @Size(max = 5000) String notes) {}
 
   record ProfileDto(AssessmentDto current, List<AssessmentDto> history, boolean needsConsulting) {}
 

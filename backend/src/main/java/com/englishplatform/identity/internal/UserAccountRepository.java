@@ -26,7 +26,9 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, UUID> 
 
   /** Chỉ ghi một cột: đăng nhập song song không va {@code version} và không ghi lại cả hồ sơ. */
   @Modifying
-  @Query("update UserAccount u set u.lastLoginAt = :at where u.id = :id and u.anonymizedAt is null")
+  @Query(
+      "update UserAccount u set u.lastLoginAt = :at where u.id = :id"
+          + " and u.anonymizedAt is null and u.status = com.englishplatform.identity.UserStatus.ACTIVE")
   int recordLogin(@Param("id") UUID id, @Param("at") Instant at);
 
   List<UserAccount> findByRoleAndStatus(Role role, UserStatus status);

@@ -38,4 +38,4 @@ Ký hiệu: `[ ]` chưa làm · `[~]` đang chờ duyệt · `[x]` đã duyệt 
 
 ## Next step
 
-Việc #1 còn lại: T140, T145, T146. FE: tách và merge PR #6/#7, rồi T101–T103, T115, T116, T122, T123, T130, T131, R17. Sau đó `verify --all` trọn vẹn và `/speckit-converge`.
+Việc #1 còn lại: T146. FE: tách và merge PR #6/#7, rồi T101–T103, T115, T116, T122, T123, T130, T131, R17. Sau đó `verify --all` trọn vẹn và `/speckit-converge`.

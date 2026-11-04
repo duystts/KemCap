@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
@@ -98,6 +99,35 @@ class SchedulingHardeningIT extends SchedulingTestSupport {
     call(get("/api/v1/sessions?size=0"), s.student()).andExpect(status().isBadRequest());
     call(get("/api/v1/sessions?page=-1"), s.student()).andExpect(status().isBadRequest());
     call(get("/api/v1/sessions?page=2147483647"), s.student()).andExpect(status().isBadRequest());
+  }
+
+  /** F11 (U6): ô văn bản tự do có giới hạn độ dài. */
+  @Test
+  void oversizedFreeTextIsRejected() throws Exception {
+    Setup s = setup(4);
+    UUID sessionId = bookOk(s.student(), s.enrollmentId(), at(3, 10, 0));
+    String tooLong = "x".repeat(2001);
+
+    call(
+            post("/api/v1/sessions/" + sessionId + "/cancel"),
+            s.student(),
+            "{\"reason\":\"" + tooLong + "\"}")
+        .andExpect(status().isBadRequest());
+    call(
+            post("/api/v1/sessions/" + sessionId + "/outcome"),
+            s.teacher(),
+            "{\"outcome\":\"COMPLETED\",\"note\":\"" + tooLong + "\"}")
+        .andExpect(status().isBadRequest());
+    call(
+            post("/api/v1/enrollments/" + s.enrollmentId() + "/cancel"),
+            s.admin(),
+            "{\"reason\":\"" + tooLong + "\"}")
+        .andExpect(status().isBadRequest());
+    call(
+            post("/api/v1/enrollments/" + s.enrollmentId() + "/payments/adjustments"),
+            s.admin(),
+            "{\"amountVnd\":-1,\"note\":\"" + tooLong + "\"}")
+        .andExpect(status().isBadRequest());
   }
 
   /** F4: danh sách buổi chưa chốt cũng có giới hạn. */

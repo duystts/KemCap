@@ -136,6 +136,24 @@ class EnrollmentLifecycleJobIT extends ApiTestSupport {
         .andExpect(status().isCreated());
   }
 
+  /** R3 (U8): gói đã hết hạn nhưng còn buổi đã đặt thì giáo viên vẫn đang có việc (FR-004). */
+  @Test
+  void teacherWithBookedSessionOnExpiredEnrollmentCannotBeDeactivated() throws Exception {
+    Setup s = setup(6);
+    call(post("/api/v1/sessions"), s.student(), bookBody(s.enrollmentId(), daysFromClock(3, 10)))
+        .andExpect(status().isCreated());
+    clock.advance(Duration.ofDays(VALIDITY_DAYS + 1));
+    job.run();
+    assertThat(enrollmentApi.get(s.enrollmentId()).status()).isEqualTo(EnrollmentStatus.EXPIRED);
+
+    call(
+            patch("/api/v1/users/" + s.teacher().id() + "/status"),
+            s.admin(),
+            "{\"status\":\"INACTIVE\"}")
+        .andExpect(status().isConflict())
+        .andExpect(jsonPath("$.code").value("TEACHER_HAS_STUDENTS"));
+  }
+
   /** F3 (U2): hết hạn chặn đặt lịch ngay cả khi job chưa chạy. */
   @Test
   void reserveIsBlockedAfterExpiryBeforeJobRuns() throws Exception {

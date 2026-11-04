@@ -16,6 +16,7 @@ import com.englishplatform.shared.security.CurrentUser;
 import com.englishplatform.shared.web.BusinessException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -103,11 +104,11 @@ class SessionController {
 
   record BookRequest(@NotNull UUID enrollmentId, @NotNull Instant startsAt) {}
 
-  record CancelRequest(String reason) {}
+  record CancelRequest(@Size(max = 2000) String reason) {}
 
   record RescheduleRequest(@NotNull Instant newStartsAt) {}
 
-  record OutcomeRequest(@NotNull SessionStatus outcome, String note) {}
+  record OutcomeRequest(@NotNull SessionStatus outcome, @Size(max = 2000) String note) {}
 
   enum Decision {
     COUNT,
@@ -188,7 +189,7 @@ class SessionController {
 
   @PostMapping("/sessions/{id}/cancel")
   @PreAuthorize("isAuthenticated()")
-  SessionDto cancel(@PathVariable UUID id, @RequestBody(required = false) CancelRequest r) {
+  SessionDto cancel(@PathVariable UUID id, @Valid @RequestBody(required = false) CancelRequest r) {
     return SessionDto.of(
         cancellation.cancel(CurrentUser.require(), id, r == null ? null : r.reason()));
   }
