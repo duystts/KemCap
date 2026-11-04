@@ -44,7 +44,8 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  * request hợp lệ để kết quả do phân quyền quyết định, không phải do kiểm tra dữ liệu.
  *
  * <p>Endpoint mới chưa khai báo ở đây làm {@link #everyEndpointIsInTheMatrix} đỏ. Lệnh ghi được
- * phép không chạy ở đây (đổi dữ liệu dùng chung của ma trận); đã có test ở IT của từng module.
+ * phép không chạy ở đây (đổi dữ liệu dùng chung của ma trận): IT của từng module và {@link
+ * OwnershipHardeningIT} phủ phần này.
  */
 class AuthorizationMatrixIT extends ApiTestSupport {
 
@@ -547,10 +548,14 @@ class AuthorizationMatrixIT extends ApiTestSupport {
                 info.getPatternValues().stream()
                     .filter(p -> p.startsWith("/api/v1/") && !p.startsWith("/api/v1/auth/"))
                     .forEach(
-                        p ->
-                            info.getMethodsCondition()
-                                .getMethods()
-                                .forEach(m -> actual.add(m.name() + " " + p))));
+                        p -> {
+                          assertThat(info.getMethodsCondition().getMethods())
+                              .as("mapping phải khai method: " + p)
+                              .isNotEmpty();
+                          info.getMethodsCondition()
+                              .getMethods()
+                              .forEach(m -> actual.add(m.name() + " " + p));
+                        }));
 
     assertThat(declared()).containsExactlyInAnyOrderElementsOf(actual);
   }

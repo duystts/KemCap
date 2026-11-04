@@ -5,6 +5,8 @@ import com.englishplatform.identity.UserView;
 import com.englishplatform.learning.internal.report.SessionReport;
 import com.englishplatform.learning.internal.report.SessionReportService;
 import com.englishplatform.shared.security.CurrentUser;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
@@ -88,7 +90,7 @@ class SessionReportController {
       List<UUID> completedTopicIds,
       SessionReport.Scores scores,
       String comment,
-      List<AssignmentRequest> assignments) {}
+      @Size(max = 20) List<AssignmentRequest> assignments) {}
 
   /** Phiếu của học viên đã ẩn danh không còn việc để làm nên không hiện trong danh sách. */
   @GetMapping("/session-reports")
@@ -137,7 +139,7 @@ class SessionReportController {
 
   @PutMapping("/sessions/{sessionId}/report")
   @PreAuthorize("hasRole('TEACHER')")
-  ReportDto submit(@PathVariable UUID sessionId, @RequestBody SubmitRequest r) {
+  ReportDto submit(@PathVariable UUID sessionId, @Valid @RequestBody SubmitRequest r) {
     SessionReportService.Submission input =
         new SessionReportService.Submission(
             r.taughtTopicIds() == null ? List.of() : r.taughtTopicIds(),
