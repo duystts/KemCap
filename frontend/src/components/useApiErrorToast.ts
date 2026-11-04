@@ -29,6 +29,20 @@ export const ERROR_MESSAGES: Record<string, string> = {
 
 export function errorMessage(error: unknown): string {
   if (error instanceof ApiError) {
+    // 1. Nếu có lỗi theo từng trường cụ thể (Validation fields)
+    if (error.errors && error.errors.length > 0) {
+      const first = error.errors[0]
+      return `${first.message || 'Dữ liệu không hợp lệ'} (${first.field})`
+    }
+    // 2. Nếu server có thông điệp giải thích cụ thể
+    if (
+      error.message &&
+      error.message !== 'Bad Request' &&
+      error.message !== 'Conflict' &&
+      error.message !== error.code
+    ) {
+      return error.message
+    }
     return ERROR_MESSAGES[error.code] ?? error.message ?? 'Đã có lỗi xảy ra.'
   }
   if (error instanceof TypeError) return 'Không kết nối được máy chủ.'
