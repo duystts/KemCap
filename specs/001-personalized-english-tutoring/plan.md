@@ -37,8 +37,9 @@ TanStack Query, react-hook-form + zod, FullCalendar, Recharts, `@livekit/compone
 Testing Library · Playwright (smoke) · **k6** (tải, tuần 4) · **gitleaks** (quét secret trên PR) ·
 GitHub Actions CI; Maven Enforcer cấm `h2` (test DB luôn là PostgreSQL thật)
 
-**Target Platform**: Backend Linux container (Oracle Cloud Always Free VM, ARM); frontend tĩnh trên
-Cloudflare Pages; trình duyệt Chrome/Edge/Safari/Firefox bản mới, desktop và mobile web
+**Target Platform**: Demo 12/11 chạy trên laptop, chi phí 0 đ (quyết định R1-b, 2026-10-21): backend,
+PostgreSQL và frontend chạy local, xem [quickstart.md](./quickstart.md); bộ `deploy/` dành cho lúc thuê VPS,
+khi đó phải sửa constitution trước. Trình duyệt Chrome/Edge/Safari/Firefox bản mới, desktop và mobile web
 
 **Project Type**: Web application (backend REST API + frontend SPA)
 
@@ -97,14 +98,14 @@ backend/
     │   ├── shared/              # open module: security config, JWT, ProblemDetail handler,
     │   │                        #   clock, paging ([GĐ2 — K2]: FileStorage port + adapters s3, fake)
     │   ├── identity/            # UserDirectory, UserDeactivationGuard (SPI), events | internal/: entity, repo, service, web,
-    │   │                        #   privacy/ (policy consent, guardian consent, data subject request, anonymize), ratelimit/
+    │   │                        #   privacy/ (policy consent, guardian consent, data subject request, anonymize); rate limit hoãn theo K3
     │   ├── catalog/             # EnrollmentApi, events  | internal/: profiles, course, package, enrollment
     │   ├── scheduling/          # VideoRoomProvider, events | internal/: availability, slots, session, jobs, livekit adapter
     │   ├── learning/            # events | internal/: assessment, goal, path, report, assignment, feedback, progress
     │   ├── billing/             # events | internal/: receivable, payment, revenue report
     │   └── notification/        # EmailSender | internal/: listeners, templates, dispatch, in-app notifications
     ├── main/resources/
-    │   ├── application.yml, application-local.yml, application-demo-seed.yml
+    │   ├── application.yml, application-local.yml (dữ liệu demo: bean `@Profile("demo-seed")` trong từng module)
     │   ├── db/migration/        # V1__shared_infra.sql, V2__identity_….sql, …
     │   └── templates/email/     # Thymeleaf email templates (tiếng Việt)
     └── test/java/com/englishplatform/
@@ -130,8 +131,8 @@ frontend/
     tests/ (vitest) · e2e/ (playwright)
 
 docker-compose.yml           # postgres, mailpit, livekit (dev); minio từ GĐ2 (K2)
-deploy/                      # docker-compose.prod.yml (+ backup sidecar pg_dump → R2), Caddyfile, .env.example, runbook.md
-perf/                        # kịch bản k6 (tuần 4)
+deploy/                      # docker-compose.prod.yml (+ backup sidecar pg_dump → R2), Caddyfile, .env.example, README.md (runbook), script backup/restore/drill
+perf/                        # kịch bản k6, dữ liệu tải, stack 1 GB (T141)
 .github/workflows/ci.yml     # backend verify + frontend lint/test/build trên mỗi PR
 ```
 
@@ -145,8 +146,8 @@ cấp cao; class trong `internal/` không được module khác truy cập) và 
 |---|---|---|
 | **#1 Leader** | **Toàn bộ backend**: `shared`, `identity` (gồm privacy), `catalog`, `scheduling` (gồm LiveKit adapter), `learning`, `billing`, `notification`; hạ tầng (repo, CI, docker-compose, deploy, sao lưu, k6); OpenAPI là hợp đồng cho frontend | quyết định 2026-10-18; backend là đường găng duy nhất — thứ tự và phần cắt giảm xem [aidlc/unit-of-work.md](./aidlc/unit-of-work.md) |
 | **#2** | Frontend `features/scheduling`, `features/classroom` (LiveKit UI) | làm trên mock sinh từ OpenAPI / adapter `fake` cho tới khi API thật xong |
-| **#3** | Frontend `features/learning`; ngoại lệ D1: backend U4 (năng lực, mục tiêu, lộ trình), #1 review | nhiều màn hình nhất (lộ trình, phiếu đánh giá, tiến bộ) |
-| **#4** | Frontend `features/catalog`, `features/billing`, `features/admin` (dashboard, báo cáo, quản lý người dùng, `admin/privacy`); ngoại lệ D1: backend billing core (U2) + U8, #1 review | |
+| **#3** | Frontend `features/learning` | nhiều màn hình nhất (lộ trình, phiếu đánh giá, tiến bộ) |
+| **#4** | Frontend `features/catalog`, `features/billing`, `features/admin` (dashboard, báo cáo, quản lý người dùng, `admin/privacy`) | |
 | **#2** (thêm) | Frontend app shell (router, layout, API client, auth, consent gate), `features/auth` | chốt tại cổng units 2026-10-18 |
 | **#3** (thêm) | Chuông thông báo `features/notifications` | |
 
@@ -163,10 +164,9 @@ rỗng trả dữ liệu mẫu) của mỗi module trước khi cài thật, fro
 | 4 tuần không đủ | Thứ tự ưu tiên theo spec (P1 → P3); các mục "rút gọn" có thể cắt thêm; tuần 4 dành cho ổn định, không thêm tính năng |
 | Lệch API giữa FE/BE | Sinh type từ OpenAPI; contracts là thỏa thuận ban đầu, thay đổi phải báo owner |
 | Hạn mức free thay đổi | Mọi provider có adapter `fake`; demo vẫn chạy được local nếu dịch vụ free có vấn đề |
-| Hosting free ngủ → mất nhắc lịch | Dùng VM luôn chạy (R13), không dùng Render/Koyeb free cho backend |
+| Laptop tắt → mất nhắc lịch | Job hết hạn gói chạy bù khi khởi động; không dùng Render/Koyeb free cho backend (R13) |
 | Quota LiveKit free không đủ (~54.000 participant-phút/tháng ước tính ở quy mô demo) | Theo dõi mức dùng; > 80% quota → tự host LiveKit hoặc nâng gói (cần ghi Complexity Tracking) |
-| Một VM chứa cả backend và DB | Sao lưu hằng ngày ra R2 + diễn tập khôi phục (R17); fallback Neon/Supabase |
-| Oracle thu hồi VM Always Free nhàn rỗi | ⚠ verify chính sách; healthcheck ping định kỳ; sao lưu R17 |
+| Laptop chứa cả backend và DB | Dữ liệu demo seed lại được; khi lên VPS: sao lưu hằng ngày ra R2 + diễn tập khôi phục (R17) |
 | Tuân thủ dữ liệu cá nhân (đồng ý, trẻ em, dữ liệu ở nhà cung cấp nước ngoài) | FR-030/FR-031 trong MVP (R16); pháp lý trung tâm xác nhận mốc tuổi + nội dung chính sách trước khi dùng dữ liệu thật |
 | Phạm vi tăng sau clarify (privacy, hủy hệ thống, chốt thay) | Privacy giao #1 tuần 2–3; nếu trễ, cắt thêm mục "Rút gọn" theo spec chứ không cắt FR-030/FR-031 (constitution V là MUST) |
 

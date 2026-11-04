@@ -87,12 +87,14 @@ class LearningPathController {
     }
   }
 
-  record CreatePathRequest(@NotNull String title, List<PathSpec.MilestoneSpec> milestones) {}
+  record CreatePathRequest(
+      @NotNull @Size(max = 200) String title,
+      @Size(max = 100) List<PathSpec.@Valid MilestoneSpec> milestones) {}
 
   /** {@code version} = giá trị {@code version} của lần đọc gần nhất (chống ghi đè). */
   record UpdatePathRequest(
-      @NotNull String title,
-      List<PathSpec.MilestoneSpec> milestones,
+      @NotNull @Size(max = 200) String title,
+      @Size(max = 100) List<PathSpec.@Valid MilestoneSpec> milestones,
       @Size(max = 2000) String reason,
       @NotNull Long version) {}
 

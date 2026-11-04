@@ -1,0 +1,47 @@
+# Stack thử tải T141: backend giới hạn 1 GB như bản triển khai (NFR-SCAL-03), không mở cổng ra ngoài.
+name: perf
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: english
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d english"]
+      interval: 5s
+      retries: 20
+
+  mailpit:
+    image: axllent/mailpit
+
+  backend:
+    build: ../backend
+    mem_limit: 1g
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/english
+      DB_USER: app
+      DB_PASSWORD: app
+      JWT_SECRET: perf-only-secret-perf-only-secret-perf-only
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      VIDEO_PROVIDER: fake
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      interval: 5s
+      retries: 40
+
+  k6:
+    image: grafana/k6:0.57.0
+    profiles: [run]
+    environment:
+      BASE_URL: http://backend:8080
+    volumes:
+      - .:/perf
+    command: run --summary-export=/perf/results/summary.json /perf/booking-and-join.js
+    depends_on:
+      backend:
+        condition: service_healthy

@@ -259,7 +259,8 @@ class AuthFlowIT {
             .encode(JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), noExpiry))
             .getTokenValue();
     mvc.perform(get("/api/v1/me").header("Authorization", "Bearer " + token))
-        .andExpect(status().isUnauthorized());
+        .andExpect(status().isUnauthorized())
+        .andExpect(jsonPath("$.code").value("UNAUTHENTICATED"));
   }
 
   @Test

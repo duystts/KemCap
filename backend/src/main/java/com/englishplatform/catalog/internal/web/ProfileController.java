@@ -40,7 +40,7 @@ class ProfileController {
 
   record TeacherProfileRequest(
       @Size(max = 5000) String bio,
-      List<@Size(max = 100) String> specialties,
+      @Size(max = 20) List<@Size(max = 100) String> specialties,
       @Size(max = 5000) String certificates) {}
 
   record StudentProfileDto(

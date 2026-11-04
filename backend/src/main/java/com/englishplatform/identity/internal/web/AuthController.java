@@ -8,6 +8,7 @@ import com.englishplatform.identity.internal.PasswordResetService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.time.Duration;
 import java.util.UUID;
 import org.springframework.http.HttpHeaders;
@@ -53,18 +54,22 @@ class AuthController {
     return new PolicyResponse(consentService.currentPolicyVersion());
   }
 
-  record LoginRequest(@NotBlank String email, @NotBlank String password) {}
+  record LoginRequest(
+      @NotBlank @Size(max = 254) String email, @NotBlank @Size(max = 200) String password) {}
 
   record UserSummary(UUID id, String email, String fullName, Role role, String timezone) {}
 
   record TokenResponse(String accessToken, UserSummary user) {}
 
   record AcceptInviteRequest(
-      @NotBlank String token, @NotBlank String password, String acceptedPolicyVersion) {}
+      @NotBlank @Size(max = 200) String token,
+      @NotBlank @Size(max = 200) String password,
+      @Size(max = 50) String acceptedPolicyVersion) {}
 
-  record ForgotPasswordRequest(String email) {}
+  record ForgotPasswordRequest(@Size(max = 254) String email) {}
 
-  record ResetPasswordRequest(@NotBlank String token, @NotBlank String newPassword) {}
+  record ResetPasswordRequest(
+      @NotBlank @Size(max = 200) String token, @NotBlank @Size(max = 200) String newPassword) {}
 
   @PostMapping("/login")
   TokenResponse login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
@@ -97,7 +102,7 @@ class AuthController {
   /** Luôn 202 để không lộ email có tồn tại hay không (NFR-SEC-10). */
   @PostMapping("/forgot-password")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  void forgotPassword(@RequestBody ForgotPasswordRequest request) {
+  void forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
     passwordResetService.requestReset(request.email());
   }
 

@@ -41,11 +41,12 @@ class CourseController {
     }
   }
 
-  record CreateCourseRequest(@NotBlank @Size(max = 150) String name, String description) {}
+  record CreateCourseRequest(
+      @NotBlank @Size(max = 150) String name, @Size(max = 5000) String description) {}
 
   record UpdateCourseRequest(
       @NotBlank @Size(max = 150) String name,
-      String description,
+      @Size(max = 5000) String description,
       @NotNull CatalogItemStatus status) {}
 
   @GetMapping

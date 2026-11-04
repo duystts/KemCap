@@ -168,11 +168,12 @@ xuyên — kiểm tra lại trang giá nhà cung cấp trước khi đăng ký (
 
 ## R13. Triển khai miễn phí
 
-- **Decision**:
-  - Frontend: **Cloudflare Pages** (hoặc Vercel) — build tĩnh.
-  - Backend + PostgreSQL: **Oracle Cloud Always Free VM** (ARM) chạy Docker Compose
-    (backend, postgres, caddy reverse proxy + HTTPS tự động). ⚠ verify chính sách Always Free.
-  - Video: LiveKit Cloud free; email: Brevo/Gmail SMTP; file: Cloudflare R2.
+- **Decision (cập nhật 2026-10-21, R1-b)**: demo 12/11 chạy **trên laptop**, chi phí 0 đ theo constitution III.
+  - Backend, PostgreSQL, frontend: chạy local theo [quickstart.md](./quickstart.md).
+  - Video: LiveKit Cloud free hoặc LiveKit dev; email: Brevo free hoặc Mailpit.
+  - Thuê VPS là hosting trả phí nên phải sửa constitution trước; khi đó dùng bộ `deploy/`: một VPS chạy Docker
+    Compose (backend, postgres, Caddy phục vụ cả frontend, API và HTTPS), sao lưu lên Cloudflare R2.
+- **Phương án ban đầu, không dùng nữa**: frontend trên Cloudflare Pages, backend trên Oracle Cloud Always Free VM.
 - **Lý do không chọn Render/Koyeb free cho backend**: các gói này **tự ngủ khi không có truy cập**
   → job nhắc lịch `@Scheduled` không chạy đúng giờ. Nếu buộc phải dùng, cần ping định kỳ từ dịch vụ
   cron bên ngoài và chấp nhận rủi ro.
@@ -222,7 +223,7 @@ xuyên — kiểm tra lại trang giá nhà cung cấp trước khi đăng ký (
   thanh toán (gợi ý ở T114); các ô tự do khác (`session.cancel_reason`, `session_outcome_change.note`,
   `teacher_assignment_history.reason`) bị xóa khi ẩn danh hóa; `data_subject_request.requester_name`
   có thể chính là tên học viên, cần pháp lý xác nhận (OQ-7); mốc 16 tuổi và nội dung chính sách chờ pháp lý trung tâm; việc dữ liệu
-  nằm ở nhà cung cấp nước ngoài (Oracle, R2, LiveKit, Brevo) cần được nêu trong chính sách (aidlc/nfr.md Q3).
+  nằm ở nhà cung cấp nước ngoài (LiveKit, Brevo; thêm VPS và R2 khi lên server) cần được nêu trong chính sách (aidlc/nfr.md Q3).
 
 ## R17. Sao lưu & khôi phục
 
