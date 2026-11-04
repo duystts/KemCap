@@ -290,6 +290,117 @@ class EnrollmentLifecycleJobIT extends ApiTestSupport {
             () -> assertThat(emailSender.sent()).extracting(EmailMessage::to).contains(childEmail));
   }
 
+  private record Child(UUID id, String email, UUID enrollmentId) {}
+
+  private Child childEnrolled(Setup s, UserStatus status) throws Exception {
+    String email = uniqueEmail();
+    UserAccount child =
+        users.save(
+            new UserAccount(
+                email, "Bé Bo", Role.STUDENT, LocalDate.now(VN).minusYears(12), status));
+    UUID courseId =
+        courseService
+            .createCourse("Khóa " + UUID.randomUUID().toString().substring(0, 8), null)
+            .getId();
+    CoursePackage pkg =
+        courseService.createPackage(
+            courseId, new CourseService.PackageSpec("Gói", 6, 45, VALIDITY_DAYS, 1_000_000));
+    UUID enrollmentId =
+        enrollmentService
+            .create(child.getId(), pkg.getId(), s.teacher().id(), null, s.admin().id())
+            .getId();
+    call(
+            post("/api/v1/enrollments/" + enrollmentId + "/payments"),
+            s.admin(),
+            "{\"amountVnd\":100000,\"paidAt\":\"" + LocalDate.now(VN) + "\",\"method\":\"CASH\"}")
+        .andExpect(status().isCreated());
+    call(post("/api/v1/sessions"), s.admin(), bookBody(enrollmentId, daysFromClock(3, 10)))
+        .andExpect(status().isCreated());
+    return new Child(child.getId(), email, enrollmentId);
+  }
+
+  private void assertChildNotContacted(Child child) {
+    await()
+        .atMost(Duration.ofSeconds(10))
+        .untilAsserted(
+            () ->
+                assertThat(
+                        jdbc.queryForObject(
+                            "select count(*) from event_publication where serialized_event like ?",
+                            Long.class,
+                            "%" + child.id() + "%"))
+                    .isZero());
+    assertThat(emailSender.sent()).extracting(EmailMessage::to).doesNotContain(child.email());
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from notification where user_id = ?", Long.class, child.id()))
+        .isZero();
+  }
+
+  /** R1 (T140): ngừng kích hoạt trẻ chưa có đồng ý: buổi bị hủy hệ thống nhưng không báo trẻ. */
+  @Test
+  void deactivatingChildWithoutConsentSendsNoCancellationEmail() throws Exception {
+    Setup s = setup(2);
+    Child child = childEnrolled(s, UserStatus.AWAITING_GUARDIAN_CONSENT);
+
+    call(patch("/api/v1/users/" + child.id() + "/status"), s.admin(), "{\"status\":\"INACTIVE\"}")
+        .andExpect(status().isOk());
+
+    await()
+        .atMost(Duration.ofSeconds(10))
+        .untilAsserted(
+            () ->
+                assertThat(emailSender.sent())
+                    .extracting(EmailMessage::subject)
+                    .anyMatch(subject -> subject.contains("đã bị hủy")));
+    assertChildNotContacted(child);
+  }
+
+  /** R1 (T140): hồ sơ cũ đang {@code INVITED} nhưng thiếu đồng ý cũng không nhận liên lạc. */
+  @Test
+  void invitedChildWithoutConsentGetsNoNotification() throws Exception {
+    Setup s = setup(2);
+    Child child = childEnrolled(s, UserStatus.INVITED);
+
+    await()
+        .atMost(Duration.ofSeconds(10))
+        .untilAsserted(
+            () ->
+                assertThat(emailSender.sent())
+                    .extracting(EmailMessage::to)
+                    .contains(s.teacher().email()));
+    assertChildNotContacted(child);
+
+    job.run();
+    assertThat(reminders(child.enrollmentId())).isEmpty();
+  }
+
+  /** Trẻ đã có đồng ý thì nhận liên lạc bình thường. */
+  @Test
+  void childWithConsentIsNotified() throws Exception {
+    Setup s = setup(2);
+    Child child = childEnrolled(s, UserStatus.AWAITING_GUARDIAN_CONSENT);
+    jdbc.update("update user_account set status = 'INVITED' where id = ?", child.id());
+    jdbc.update(
+        "insert into guardian_consent (id, student_id, guardian_name, relationship,"
+            + " guardian_contact, consented_on, recorded_by, created_at, updated_at)"
+            + " values (?, ?, 'Mẹ', 'Mẹ', '09', '2026-01-15', ?, now(), now())",
+        UUID.randomUUID(),
+        child.id(),
+        s.admin().id());
+
+    call(post("/api/v1/sessions"), s.admin(), bookBody(child.enrollmentId(), daysFromClock(4, 10)))
+        .andExpect(status().isCreated());
+
+    await()
+        .atMost(Duration.ofSeconds(10))
+        .untilAsserted(
+            () ->
+                assertThat(emailSender.sent())
+                    .extracting(EmailMessage::to)
+                    .contains(child.email()));
+  }
+
   /** R2: học viên đang ngừng không bị nhắc và không mất lượt nhắc khi được kích hoạt lại. */
   @Test
   void inactiveStudentIsRemindedOnlyAfterReactivation() throws Exception {

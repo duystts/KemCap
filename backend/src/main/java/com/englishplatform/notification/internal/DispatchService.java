@@ -1,7 +1,6 @@
 package com.englishplatform.notification.internal;
 
 import com.englishplatform.identity.UserDirectory;
-import com.englishplatform.identity.UserStatus;
 import com.englishplatform.notification.EmailSender;
 import java.time.Clock;
 import java.util.Map;
@@ -68,9 +67,9 @@ public class DispatchService {
       String templateName,
       Map<String, Object> model,
       InApp inApp) {
-    // event tới sau lúc ẩn danh hóa: địa chỉ đã bị ghi đè, không có ai để gửi (FR-031)
+    // ẩn danh hóa: địa chỉ đã bị ghi đè (FR-031); trẻ chưa có đồng ý: chưa được liên lạc (FR-030)
     if (email.endsWith(ANONYMIZED_EMAIL_SUFFIX)
-        || awaitingGuardianConsent(userId)
+        || (userId != null && userDirectory.isAwaitingGuardianConsent(userId))
         || dispatches.existsByDedupeKey(dedupeKey)) {
       return;
     }
@@ -98,15 +97,6 @@ public class DispatchService {
               inApp.aboutStudentId()));
     }
     attempt(dispatch);
-  }
-
-  /** Trẻ chưa có đồng ý của người giám hộ chưa nhận bất kỳ liên lạc nào (FR-030). */
-  private boolean awaitingGuardianConsent(UUID userId) {
-    return userId != null
-        && userDirectory
-            .find(userId)
-            .filter(u -> u.status() == UserStatus.AWAITING_GUARDIAN_CONSENT)
-            .isPresent();
   }
 
   /**

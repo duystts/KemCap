@@ -15,6 +15,12 @@ public interface UserDirectory {
 
   boolean isAnonymized(UUID userId);
 
+  /**
+   * Học viên dưới mốc tuổi chưa có đồng ý của người giám hộ, ở bất kỳ trạng thái nào: chưa được
+   * liên lạc (FR-030).
+   */
+  boolean isAwaitingGuardianConsent(UUID userId);
+
   /** Ném 409 {@code ANONYMIZED} nếu hồ sơ đã ẩn danh hóa: không ghi thêm dữ liệu mới (FR-031). */
   void requireNotAnonymized(UUID userId);
 

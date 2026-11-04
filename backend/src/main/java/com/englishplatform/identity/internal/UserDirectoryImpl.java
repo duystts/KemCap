@@ -18,9 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 class UserDirectoryImpl implements UserDirectory {
 
   private final UserAccountRepository users;
+  private final InvitationService invitations;
 
-  UserDirectoryImpl(UserAccountRepository users) {
+  UserDirectoryImpl(UserAccountRepository users, InvitationService invitations) {
     this.users = users;
+    this.invitations = invitations;
   }
 
   @Override
@@ -44,6 +46,17 @@ class UserDirectoryImpl implements UserDirectory {
   @Override
   public boolean isAnonymized(UUID userId) {
     return users.findById(userId).filter(UserAccount::isAnonymized).isPresent();
+  }
+
+  @Override
+  public boolean isAwaitingGuardianConsent(UUID userId) {
+    return users
+        .findById(userId)
+        .filter(
+            u ->
+                u.getStatus() == UserStatus.AWAITING_GUARDIAN_CONSENT
+                    || invitations.missingGuardianConsent(u))
+        .isPresent();
   }
 
   @Override

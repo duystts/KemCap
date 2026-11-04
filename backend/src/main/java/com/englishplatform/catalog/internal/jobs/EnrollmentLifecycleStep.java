@@ -70,12 +70,10 @@ class EnrollmentLifecycleStep {
    */
   private boolean canBeReminded(UUID studentId) {
     return userDirectory
-        .find(studentId)
-        .filter(
-            student ->
-                student.status() != UserStatus.INACTIVE
-                    && student.status() != UserStatus.AWAITING_GUARDIAN_CONSENT)
-        .isPresent();
+            .find(studentId)
+            .filter(student -> student.status() != UserStatus.INACTIVE)
+            .isPresent()
+        && !userDirectory.isAwaitingGuardianConsent(studentId);
   }
 
   private void publish(Enrollment e, RenewalReason reason) {
