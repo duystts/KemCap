@@ -81,17 +81,11 @@ export default function ProficiencyPanel({ studentId, canEdit = true }: Proficie
               <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-indigo-50/50 rounded-xl border border-indigo-100 text-xs text-indigo-900">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold uppercase tracking-wider text-[11px] bg-indigo-100 text-indigo-800 px-2.5 py-0.5 rounded-full">
-                    {current.type === 'INPUT' ? 'Đầu vào' : 'Định kỳ'}
+                    {current.type === 'PLACEMENT' ? 'Đầu vào' : 'Định kỳ'}
                   </span>
                   <span>
                     Đánh giá ngày:{' '}
                     <strong>{new Date(current.assessedAt).toLocaleDateString('vi-VN')}</strong>
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 font-bold text-sm">
-                  <span>Trình độ chung:</span>
-                  <span className="text-base font-black text-indigo-600">
-                    CEFR {current.overall}
                   </span>
                 </div>
               </div>
@@ -136,7 +130,7 @@ export default function ProficiencyPanel({ studentId, canEdit = true }: Proficie
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-semibold text-slate-800">
-                      {h.type === 'INPUT' ? 'Đánh giá đầu vào' : 'Đánh giá định kỳ'}
+                      {h.type === 'PLACEMENT' ? 'Đánh giá đầu vào' : 'Đánh giá định kỳ'}
                     </span>
                     <span className="text-slate-400">•</span>
                     <span className="text-slate-500">
@@ -163,11 +157,6 @@ export default function ProficiencyPanel({ studentId, canEdit = true }: Proficie
                   {h.notes && (
                     <div className="text-slate-500 mt-1 italic">&quot;{h.notes}&quot;</div>
                   )}
-                </div>
-                <div className="shrink-0">
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-lg font-black text-sm bg-indigo-100 text-indigo-800">
-                    {h.overall}
-                  </span>
                 </div>
               </div>
             ))}

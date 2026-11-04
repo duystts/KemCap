@@ -7,12 +7,23 @@ import {
   updateGoal,
   type GoalItem,
   type GoalStatus,
+  type GoalType,
 } from '@/lib/api/learning'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
 import { Target, Plus, CheckCircle, AlertCircle, X, Calendar } from 'lucide-react'
+
+const GOAL_TYPE_LABELS: Record<GoalType, string> = {
+  IELTS: 'IELTS',
+  TOEIC: 'TOEIC',
+  COMMUNICATION: 'Tiếng Anh giao tiếp',
+  BUSINESS: 'Tiếng Anh công sở / Phỏng vấn',
+  KIDS: 'Tiếng Anh trẻ em',
+  OTHER: 'Khác',
+}
+const GOAL_TYPES = Object.keys(GOAL_TYPE_LABELS) as GoalType[]
 
 interface GoalsPanelProps {
   studentId: string
@@ -24,7 +35,7 @@ export default function GoalsPanel({ studentId, canEdit = true }: GoalsPanelProp
   const showError = useApiErrorToast()
 
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [goalType, setGoalType] = useState('IELTS Academic')
+  const [goalType, setGoalType] = useState<GoalType>('IELTS')
   const [target, setTarget] = useState('')
   const [deadline, setDeadline] = useState('')
 
@@ -39,7 +50,7 @@ export default function GoalsPanel({ studentId, canEdit = true }: GoalsPanelProp
   const createMutation = useMutation({
     mutationFn: () =>
       createGoal(studentId, {
-        type: goalType.trim(),
+        type: goalType,
         target: target.trim(),
         deadline: deadline || undefined,
       }),
@@ -129,7 +140,7 @@ export default function GoalsPanel({ studentId, canEdit = true }: GoalsPanelProp
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">
-                        {g.type}
+                        {GOAL_TYPE_LABELS[g.type]}
                       </span>
                       <span
                         className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
@@ -222,17 +233,14 @@ export default function GoalsPanel({ studentId, canEdit = true }: GoalsPanelProp
                 </label>
                 <select
                   value={goalType}
-                  onChange={(e) => setGoalType(e.target.value)}
+                  onChange={(e) => setGoalType(e.target.value as GoalType)}
                   className="w-full px-3 py-2 text-sm border rounded-lg focus:outline-hidden focus:ring-2 focus:ring-indigo-500 bg-white"
                 >
-                  <option value="IELTS Academic">IELTS Academic</option>
-                  <option value="IELTS General">IELTS General</option>
-                  <option value="Tiếng Anh giao tiếp">Tiếng Anh giao tiếp</option>
-                  <option value="Tiếng Anh công sở / Phỏng vấn">
-                    Tiếng Anh công sở / Phỏng vấn
-                  </option>
-                  <option value="TOEIC">TOEIC</option>
-                  <option value="Khác">Khác</option>
+                  {GOAL_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {GOAL_TYPE_LABELS[t]}
+                    </option>
+                  ))}
                 </select>
               </div>
 

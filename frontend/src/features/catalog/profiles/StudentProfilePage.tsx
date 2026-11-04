@@ -7,6 +7,7 @@ import {
   fetchStudentProfile,
   updateStudentProfile,
   fetchEnrollments,
+  fetchStudents,
   type EnrollmentDetail,
   type CefrLevel,
 } from '@/lib/api/catalog'
@@ -62,8 +63,19 @@ export default function StudentProfilePage() {
   const { data: user } = useQuery({
     queryKey: ['user', id],
     queryFn: () => fetchUser(id!),
-    enabled: !!id,
+    enabled: !!id && isAdmin,
   })
+
+  // Giáo viên không đọc được /users/{id}: lấy tên, email từ danh sách học viên được phân công
+  const { data: assignedStudents } = useQuery({
+    queryKey: ['students', 'assigned'],
+    queryFn: () => fetchStudents(),
+    enabled: isTeacher,
+  })
+  const summary = assignedStudents?.find((s) => s.id === id)
+  const fullName = user?.fullName ?? summary?.fullName
+  const email = user?.email ?? summary?.email
+  const status = user?.status ?? summary?.status
 
   const { data: profile, isLoading: loadingProfile } = useQuery({
     queryKey: ['student-profile', id],
@@ -116,14 +128,14 @@ export default function StudentProfilePage() {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-slate-900">
-                  {user?.fullName || 'Hồ sơ học viên'}
+                  {fullName || 'Hồ sơ học viên'}
                 </h1>
-                {user && <StatusBadge status={user.status} />}
+                {status && <StatusBadge status={status} />}
               </div>
               <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
                 <span className="flex items-center gap-1">
                   <Mail className="w-3.5 h-3.5" />
-                  {user?.email}
+                  {email}
                 </span>
                 {user?.phone && <span>• {user.phone}</span>}
                 {user?.dateOfBirth && (
@@ -137,7 +149,7 @@ export default function StudentProfilePage() {
           </div>
 
           <div className="flex items-center gap-2">
-            {canEdit && (
+            {isAdmin && (
               <Button variant="outline" size="sm" onClick={openEditModal}>
                 <Edit className="w-4 h-4 mr-1.5" />
                 Cập nhật thông tin

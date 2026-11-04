@@ -33,11 +33,13 @@ export default function TeacherProfilePage() {
   const [specialtiesText, setSpecialtiesText] = useState('')
   const [certificates, setCertificates] = useState('')
 
-  const { data: user } = useQuery({
+  // Giáo viên không đọc được /users/{id}: hồ sơ của chính mình lấy từ /me
+  const { data: fetchedUser } = useQuery({
     queryKey: ['user', teacherId],
     queryFn: () => fetchUser(teacherId),
-    enabled: !!teacherId,
+    enabled: !!teacherId && !isSelf,
   })
+  const user = isSelf ? me : fetchedUser
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['teacher-profile', teacherId],

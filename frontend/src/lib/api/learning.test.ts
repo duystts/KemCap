@@ -36,7 +36,7 @@ describe('learning API client', () => {
 
   it('createAssessment sends POST with 5 skill CEFR levels', async () => {
     const assessment = {
-      type: 'INPUT' as const,
+      type: 'PLACEMENT' as const,
       listening: 'B1' as const,
       speaking: 'B1' as const,
       reading: 'B2' as const,
@@ -46,9 +46,9 @@ describe('learning API client', () => {
     }
     const fetchMock = vi
       .spyOn(globalThis, 'fetch')
-      .mockResolvedValueOnce(json(201, { id: 'a-1', overall: 'B1', ...assessment }))
+      .mockResolvedValueOnce(json(201, { id: 'a-1', ...assessment }))
     const res = await createAssessment('s-1', assessment)
-    expect(res.overall).toBe('B1')
+    expect(res.id).toBe('a-1')
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining('/students/s-1/assessments'),
       expect.objectContaining({
@@ -68,7 +68,7 @@ describe('learning API client', () => {
   })
 
   it('createGoal sends POST to /students/:id/goals', async () => {
-    const goal = { type: 'IELTS', target: '6.5', deadline: '2026-12-31' }
+    const goal = { type: 'IELTS' as const, target: '6.5', deadline: '2026-12-31' }
     const fetchMock = vi
       .spyOn(globalThis, 'fetch')
       .mockResolvedValueOnce(json(201, { id: 'g-1', status: 'ACTIVE', ...goal }))

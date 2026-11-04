@@ -7,7 +7,6 @@ import {
   type LearningPathDto,
   type MilestoneItem,
   type TopicItem,
-  type TopicStatus,
 } from '@/lib/api/learning'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -47,7 +46,7 @@ export default function LearningPathEditor({
             position: 1,
             title: 'Chủ đề 1',
             objective: 'Mục tiêu bài học',
-            status: 'NOT_STARTED',
+            status: 'PLANNED',
           },
         ],
       },
@@ -71,7 +70,6 @@ export default function LearningPathEditor({
               id: t.id.startsWith('top-new') ? undefined : t.id,
               title: t.title.trim(),
               objective: t.objective?.trim() || undefined,
-              status: t.status,
             })),
           })),
           reason: revisionReason.trim(),
@@ -143,7 +141,7 @@ export default function LearningPathEditor({
         position: nextTIdx,
         title: `Chủ đề ${nextTIdx}`,
         objective: '',
-        status: 'NOT_STARTED',
+        status: 'PLANNED',
       },
     ]
     setMilestones(updated)
@@ -310,20 +308,6 @@ export default function LearningPathEditor({
                           placeholder="Mục tiêu cụ thể…"
                           className="text-xs flex-1 text-slate-600"
                         />
-
-                        {existingPath && (
-                          <select
-                            value={t.status}
-                            onChange={(e) =>
-                              updateTopic(mIdx, tIdx, 'status', e.target.value as TopicStatus)
-                            }
-                            className="text-xs border rounded-lg px-2 py-1.5 bg-white"
-                          >
-                            <option value="NOT_STARTED">Chưa học</option>
-                            <option value="IN_PROGRESS">Đang học</option>
-                            <option value="DONE">Hoàn thành</option>
-                          </select>
-                        )}
 
                         <button
                           type="button"
