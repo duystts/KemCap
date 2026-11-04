@@ -1,9 +1,10 @@
 import { api } from './client'
 import type { CefrLevel } from './catalog'
 
-export type AssessmentType = 'INPUT' | 'PERIODIC'
+export type AssessmentType = 'PLACEMENT' | 'PERIODIC'
+export type GoalType = 'IELTS' | 'TOEIC' | 'COMMUNICATION' | 'BUSINESS' | 'KIDS' | 'OTHER'
 export type GoalStatus = 'ACTIVE' | 'ACHIEVED' | 'DROPPED'
-export type TopicStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'DONE'
+export type TopicStatus = 'PLANNED' | 'DONE'
 
 export interface AssessmentItem {
   id: string
@@ -16,7 +17,6 @@ export interface AssessmentItem {
   reading: CefrLevel
   writing: CefrLevel
   grammarVocab: CefrLevel
-  overall: CefrLevel
   notes?: string | null
 }
 
@@ -29,7 +29,7 @@ export interface ProficiencyDto {
 export interface GoalItem {
   id: string
   studentId: string
-  type: string
+  type: GoalType
   target: string
   deadline?: string | null
   status: GoalStatus
@@ -99,7 +99,7 @@ export function fetchGoals(studentId: string): Promise<GoalItem[]> {
 export function createGoal(
   studentId: string,
   data: {
-    type: string
+    type: GoalType
     target: string
     deadline?: string
   },

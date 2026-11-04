@@ -389,12 +389,14 @@ export default function EnrollmentDetailPage() {
 
       {/* Dialogs */}
       {/* 1. Thu học phí */}
-      <ManualPaymentDialog
-        enrollmentId={enrollment.id}
-        debtVnd={statement?.debtVnd}
-        open={paymentDialogOpen}
-        onClose={() => setPaymentDialogOpen(false)}
-      />
+      {paymentDialogOpen && (
+        <ManualPaymentDialog
+          enrollmentId={enrollment.id}
+          debtVnd={statement?.debtVnd}
+          open
+          onClose={() => setPaymentDialogOpen(false)}
+        />
+      )}
 
       {/* 2. Đổi giáo viên */}
       {changeTeacherDialogOpen && (

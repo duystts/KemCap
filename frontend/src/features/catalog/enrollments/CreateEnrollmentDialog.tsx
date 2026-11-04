@@ -177,7 +177,7 @@ export default function CreateEnrollmentDialog({
             <Input
               type="number"
               min={0}
-              step={50000}
+              step={1000}
               value={priceVnd}
               onChange={(e) => setPriceVnd(e.target.value ? Number(e.target.value) : '')}
               placeholder="Học phí thực thu"

@@ -93,7 +93,7 @@ export default function ManualPaymentDialog({
             <Input
               type="number"
               min={1000}
-              step={50000}
+              step={1000}
               value={amountVnd}
               onChange={(e) => setAmountVnd(Number(e.target.value))}
               required

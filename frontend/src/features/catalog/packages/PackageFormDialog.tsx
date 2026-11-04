@@ -197,7 +197,7 @@ export default function PackageFormDialog({
               <Input
                 type="number"
                 min={0}
-                step={50000}
+                step={1000}
                 value={priceVnd}
                 onChange={(e) => setPriceVnd(Number(e.target.value))}
                 required

@@ -23,7 +23,7 @@ export default function AssessmentFormDialog({
   const queryClient = useQueryClient()
   const showError = useApiErrorToast()
 
-  const [type, setType] = useState<AssessmentType>('INPUT')
+  const [type, setType] = useState<AssessmentType>('PLACEMENT')
   const [listening, setListening] = useState<CefrLevel>('B1')
   const [speaking, setSpeaking] = useState<CefrLevel>('B1')
   const [reading, setReading] = useState<CefrLevel>('B1')
@@ -86,7 +86,7 @@ export default function AssessmentFormDialog({
               onChange={(e) => setType(e.target.value as AssessmentType)}
               className="w-full px-3 py-2 text-sm border rounded-lg focus:outline-hidden focus:ring-2 focus:ring-indigo-500 bg-white"
             >
-              <option value="INPUT">Đánh giá đầu vào (Input Test)</option>
+              <option value="PLACEMENT">Đánh giá đầu vào (Input Test)</option>
               <option value="PERIODIC">Đánh giá định kỳ (Periodic Test)</option>
             </select>
           </div>

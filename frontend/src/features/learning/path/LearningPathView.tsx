@@ -5,7 +5,7 @@ import LearningPathEditor from './LearningPathEditor'
 import RevisionHistory from './RevisionHistory'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { BookOpen, Edit, History, CheckCircle2, Clock, Circle, Calendar, Plus } from 'lucide-react'
+import { BookOpen, Edit, History, CheckCircle2, Circle, Calendar, Plus } from 'lucide-react'
 
 interface LearningPathViewProps {
   studentId: string
@@ -59,12 +59,6 @@ export default function LearningPathView({ studentId, canEdit = true }: Learning
         return (
           <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
             <CheckCircle2 className="w-3.5 h-3.5" /> Hoàn thành
-          </span>
-        )
-      case 'IN_PROGRESS':
-        return (
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
-            <Clock className="w-3.5 h-3.5" /> Đang học
           </span>
         )
       default:
