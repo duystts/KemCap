@@ -2,8 +2,10 @@ package com.englishplatform.catalog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.awaitility.Awaitility.await;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -16,6 +18,8 @@ import com.englishplatform.catalog.internal.jobs.EnrollmentLifecycleJob;
 import com.englishplatform.identity.Role;
 import com.englishplatform.identity.UserStatus;
 import com.englishplatform.identity.internal.UserAccount;
+import com.englishplatform.notification.EmailSender.EmailMessage;
+import com.englishplatform.notification.internal.FakeEmailSender;
 import com.englishplatform.scheduling.internal.availability.AvailabilityRule;
 import com.englishplatform.scheduling.internal.availability.AvailabilityRuleRepository;
 import com.englishplatform.shared.web.BusinessException;
@@ -51,6 +55,7 @@ class EnrollmentLifecycleJobIT extends ApiTestSupport {
   @Autowired PlatformTransactionManager txManager;
   @Autowired ApplicationEvents events;
   @Autowired JdbcTemplate jdbc;
+  @Autowired FakeEmailSender emailSender;
 
   private record Setup(TestUser admin, TestUser teacher, TestUser student, UUID enrollmentId) {}
 
@@ -206,6 +211,83 @@ class EnrollmentLifecycleJobIT extends ApiTestSupport {
     job.run();
 
     assertThat(reminders(id)).isEmpty();
+  }
+
+  /**
+   * FR-030: trẻ chưa có đồng ý của người giám hộ không nhận email hay thông báo nào, kể cả khi giáo
+   * vụ đã thu tiền và đặt buổi hộ; giáo viên vẫn được báo; có đồng ý thì lời mời tới bình thường.
+   */
+  @Test
+  void studentAwaitingGuardianConsentGetsNoNotificationUntilConsent() throws Exception {
+    Setup s = setup(2);
+    String childEmail = uniqueEmail();
+    UserAccount child =
+        users.save(
+            new UserAccount(
+                childEmail,
+                "Bé Na",
+                Role.STUDENT,
+                LocalDate.now(VN).minusYears(12),
+                UserStatus.AWAITING_GUARDIAN_CONSENT));
+    UUID courseId =
+        courseService
+            .createCourse("Khóa " + UUID.randomUUID().toString().substring(0, 8), null)
+            .getId();
+    CoursePackage pkg =
+        courseService.createPackage(
+            courseId, new CourseService.PackageSpec("Gói", 6, 45, VALIDITY_DAYS, 1_000_000));
+    UUID id =
+        enrollmentService
+            .create(child.getId(), pkg.getId(), s.teacher().id(), null, s.admin().id())
+            .getId();
+
+    call(
+            post("/api/v1/enrollments/" + id + "/payments"),
+            s.admin(),
+            "{\"amountVnd\":100000,\"paidAt\":\"" + LocalDate.now(VN) + "\",\"method\":\"CASH\"}")
+        .andExpect(status().isCreated());
+    call(post("/api/v1/sessions"), s.admin(), bookBody(id, daysFromClock(3, 10)))
+        .andExpect(status().isCreated());
+
+    await()
+        .atMost(Duration.ofSeconds(10))
+        .untilAsserted(
+            () ->
+                assertThat(emailSender.sent())
+                    .extracting(EmailMessage::to)
+                    .contains(s.teacher().email()));
+    await()
+        .atMost(Duration.ofSeconds(10))
+        .untilAsserted(
+            () ->
+                assertThat(
+                        jdbc.queryForObject(
+                            "select count(*) from event_publication where serialized_event like ?",
+                            Long.class,
+                            "%" + child.getId() + "%"))
+                    .isZero());
+    assertThat(emailSender.sent()).extracting(EmailMessage::to).doesNotContain(childEmail);
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from notification where user_id = ?", Long.class, child.getId()))
+        .isZero();
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from notification_dispatch where recipient = ?",
+                Long.class,
+                childEmail))
+        .isZero();
+
+    call(
+            put("/api/v1/students/" + child.getId() + "/guardian-consent"),
+            s.admin(),
+            "{\"guardianName\":\"Mẹ\",\"relationship\":\"Mẹ\",\"guardianContact\":\"09\","
+                + "\"consentedOn\":\"2026-01-15\"}")
+        .andExpect(status().isOk());
+    await()
+        .atMost(Duration.ofSeconds(10))
+        .untilAsserted(
+            () -> assertThat(emailSender.sent()).extracting(EmailMessage::to).contains(childEmail));
   }
 
   /** R2: học viên đang ngừng không bị nhắc và không mất lượt nhắc khi được kích hoạt lại. */

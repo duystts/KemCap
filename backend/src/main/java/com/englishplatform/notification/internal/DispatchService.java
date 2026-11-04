@@ -1,5 +1,7 @@
 package com.englishplatform.notification.internal;
 
+import com.englishplatform.identity.UserDirectory;
+import com.englishplatform.identity.UserStatus;
 import com.englishplatform.notification.EmailSender;
 import java.time.Clock;
 import java.util.Map;
@@ -27,6 +29,7 @@ public class DispatchService {
   private final NotificationDispatchRepository dispatches;
   private final NotificationRepository notifications;
   private final EmailSender emailSender;
+  private final UserDirectory userDirectory;
   private final TemplateEngine templateEngine;
   private final Clock clock;
 
@@ -34,11 +37,13 @@ public class DispatchService {
       NotificationDispatchRepository dispatches,
       NotificationRepository notifications,
       EmailSender emailSender,
+      UserDirectory userDirectory,
       TemplateEngine templateEngine,
       Clock clock) {
     this.dispatches = dispatches;
     this.notifications = notifications;
     this.emailSender = emailSender;
+    this.userDirectory = userDirectory;
     this.templateEngine = templateEngine;
     this.clock = clock;
   }
@@ -64,7 +69,9 @@ public class DispatchService {
       Map<String, Object> model,
       InApp inApp) {
     // event tới sau lúc ẩn danh hóa: địa chỉ đã bị ghi đè, không có ai để gửi (FR-031)
-    if (email.endsWith(ANONYMIZED_EMAIL_SUFFIX) || dispatches.existsByDedupeKey(dedupeKey)) {
+    if (email.endsWith(ANONYMIZED_EMAIL_SUFFIX)
+        || awaitingGuardianConsent(userId)
+        || dispatches.existsByDedupeKey(dedupeKey)) {
       return;
     }
     Context context = new Context();
@@ -91,6 +98,15 @@ public class DispatchService {
               inApp.aboutStudentId()));
     }
     attempt(dispatch);
+  }
+
+  /** Trẻ chưa có đồng ý của người giám hộ chưa nhận bất kỳ liên lạc nào (FR-030). */
+  private boolean awaitingGuardianConsent(UUID userId) {
+    return userId != null
+        && userDirectory
+            .find(userId)
+            .filter(u -> u.status() == UserStatus.AWAITING_GUARDIAN_CONSENT)
+            .isPresent();
   }
 
   /**

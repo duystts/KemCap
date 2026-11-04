@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
+import com.englishplatform.identity.UserDirectory;
 import com.englishplatform.notification.EmailSender;
 import java.time.Clock;
 import java.time.Instant;
@@ -32,6 +33,7 @@ class DispatchServiceLogTest {
             mock(NotificationDispatchRepository.class),
             mock(NotificationRepository.class),
             sender,
+            mock(UserDirectory.class),
             mock(TemplateEngine.class),
             Clock.fixed(T0, ZoneOffset.UTC));
 
