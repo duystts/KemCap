@@ -31,6 +31,10 @@ const LABELS: Record<string, [string, Tone]> = {
   CANCELLED_LATE: ['Hủy muộn', 'danger'],
   CANCELLED_SYSTEM: ['Hủy hệ thống', 'neutral'],
   INTERRUPTED: ['Gián đoạn', 'warning'],
+  // bài tập
+  PENDING: ['Chưa nộp', 'neutral'],
+  SUBMITTED: ['Đã nộp', 'info'],
+  GRADED: ['Đã chấm', 'success'],
 }
 
 export function statusLabel(status: string) {

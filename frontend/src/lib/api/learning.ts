@@ -169,6 +169,59 @@ export function fetchPathRevisions(pathId: string): Promise<RevisionItem[]> {
   return api<RevisionItem[]>(`/learning-paths/${pathId}/revisions`)
 }
 
+export type AssignmentStatus = 'PENDING' | 'SUBMITTED' | 'GRADED'
+
+export interface AssignmentSubmission {
+  textAnswer: string
+  submittedAt: string
+  late: boolean
+  score?: number | null
+  feedback?: string | null
+  gradedBy?: string | null
+  gradedAt?: string | null
+}
+
+export interface AssignmentItem {
+  id: string
+  sessionId: string
+  studentId: string
+  teacherId: string
+  title: string
+  instructions?: string | null
+  dueAt?: string | null
+  status: AssignmentStatus
+  submission?: AssignmentSubmission | null
+}
+
+export function fetchAssignments(params?: {
+  studentId?: string
+  status?: AssignmentStatus
+}): Promise<AssignmentItem[]> {
+  const query = new URLSearchParams()
+  if (params?.studentId) query.set('studentId', params.studentId)
+  if (params?.status) query.set('status', params.status)
+  const suffix = query.toString() ? `?${query.toString()}` : ''
+  return api<AssignmentItem[]>(`/assignments${suffix}`)
+}
+
+export function submitAssignment(id: string, textAnswer: string): Promise<AssignmentItem> {
+  return api<AssignmentItem>(`/assignments/${id}/submission`, {
+    method: 'PUT',
+    body: { textAnswer },
+  })
+}
+
+export function gradeAssignment(
+  id: string,
+  score: number,
+  feedback?: string,
+): Promise<AssignmentItem> {
+  return api<AssignmentItem>(`/assignments/${id}/grade`, {
+    method: 'POST',
+    body: { score, feedback },
+  })
+}
+
 export type ReportStatus = 'PENDING' | 'SUBMITTED'
 
 export interface ReportScores {
