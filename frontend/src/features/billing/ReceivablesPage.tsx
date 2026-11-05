@@ -3,7 +3,6 @@ import { Link } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
 import { fetchReceivables, type ReceivableItem } from '@/lib/api/billing'
 import { Input } from '@/components/ui/input'
-import { CreditCard, Search, Filter, ExternalLink } from 'lucide-react'
 
 const formatVnd = (amount: number) => amount.toLocaleString('vi-VN') + ' đ'
 
@@ -32,10 +31,7 @@ export default function ReceivablesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-            <CreditCard className="w-6 h-6 text-indigo-600" />
-            Học phí & công nợ
-          </h1>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Học phí & công nợ</h1>
           <p className="text-sm text-slate-500 mt-1">
             Theo dõi học viên còn nợ và mở ghi danh để ghi nhận thanh toán.
           </p>
@@ -50,19 +46,16 @@ export default function ReceivablesPage() {
 
       {/* Filters */}
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="relative w-full sm:max-w-md">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+        <div className="w-full sm:max-w-md">
           <Input
             placeholder="Tìm theo tên học viên…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
           />
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <label className="flex items-center gap-2 text-xs font-medium text-slate-700 bg-slate-50 border p-2 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
-            <Filter className="w-3.5 h-3.5 text-slate-500" />
             <input
               type="checkbox"
               checked={showAll}
@@ -128,10 +121,9 @@ export default function ReceivablesPage() {
                     <td className="py-3.5 px-4 text-right">
                       <Link
                         to={`/admin/enrollments/${r.enrollmentId}`}
-                        className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors"
+                        className="inline-flex text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors"
                       >
                         Mở ghi danh
-                        <ExternalLink className="w-3.5 h-3.5" />
                       </Link>
                     </td>
                   </tr>
