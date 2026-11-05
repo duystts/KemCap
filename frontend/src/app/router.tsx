@@ -37,6 +37,7 @@ const StudentLearningPathPage = lazy(
 )
 const PendingReportsList = lazy(() => import('@/features/learning/report/PendingReportsList'))
 const StudentHomePage = lazy(() => import('@/features/learning/feedback/StudentHomePage'))
+const AssignmentsPage = lazy(() => import('@/features/learning/assignments/AssignmentsPage'))
 
 function page(node: ReactNode) {
   return <Suspense fallback={<div className="p-8 text-sm">Đang tải…</div>}>{node}</Suspense>
@@ -88,6 +89,7 @@ export const router = createBrowserRouter([
           { path: 'students', element: page(<StudentsListPage />) },
           { path: 'students/:id', element: page(<StudentProfilePage />) },
           { path: 'profile', element: page(<TeacherProfilePage />) },
+          { path: 'assignments', element: page(<AssignmentsPage />) },
         ],
       },
     ],
@@ -103,6 +105,7 @@ export const router = createBrowserRouter([
           { path: 'book', element: page(<BookSessionPage />) },
           { path: 'schedule', element: page(<ScheduleCalendar />) },
           { path: 'learning-path', element: page(<StudentLearningPathPage />) },
+          { path: 'assignments', element: page(<AssignmentsPage />) },
           placeholder('progress', 'Tiến bộ'),
           { path: 'packages', element: page(<StudentPackagesPage />) },
         ],
