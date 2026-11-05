@@ -12,6 +12,10 @@ const TONE_CLASS: Record<Tone, string> = {
 
 /** Nhãn trạng thái tiếng Việt cho mọi enum trạng thái của API. */
 const LABELS: Record<string, [string, Tone]> = {
+  // yêu cầu dữ liệu cá nhân
+  RECEIVED: ['Chờ xử lý', 'warning'],
+  DONE: ['Đã xử lý', 'success'],
+  REJECTED: ['Từ chối', 'danger'],
   // tài khoản
   AWAITING_GUARDIAN_CONSENT: ['Chờ đồng ý người giám hộ', 'warning'],
   INVITED: ['Đã mời', 'info'],
