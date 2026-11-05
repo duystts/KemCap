@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import { ChevronLeft, Calendar, Clock, AlertTriangle, CheckCircle2 } from 'lucide-react'
 
 export default function SessionDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -63,7 +62,6 @@ export default function SessionDetailPage() {
   if (error || !session) {
     return (
       <div className="max-w-2xl mx-auto p-8 text-center space-y-4">
-        <AlertTriangle className="w-10 h-10 text-amber-500 mx-auto" />
         <h2 className="text-lg font-bold text-slate-800">Không tìm thấy thông tin buổi học</h2>
         <Button onClick={() => navigate(-1)} variant="outline">
           Quay lại
@@ -101,7 +99,7 @@ export default function SessionDetailPage() {
           onClick={() => navigate(-1)}
           className="flex items-center gap-1 text-slate-600 hover:text-slate-900"
         >
-          <ChevronLeft className="w-4 h-4" /> Quay lại
+          Quay lại
         </Button>
       </div>
 
@@ -120,7 +118,7 @@ export default function SessionDetailPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="p-4 rounded-xl bg-slate-50 border">
               <span className="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
-                <Calendar className="w-4 h-4 text-indigo-600" /> Ngày học
+                Ngày học
               </span>
               <p className="text-base font-semibold text-slate-800 mt-1">
                 {formatDateTime(session.startsAt).date}
@@ -128,7 +126,7 @@ export default function SessionDetailPage() {
             </div>
             <div className="p-4 rounded-xl bg-slate-50 border">
               <span className="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
-                <Clock className="w-4 h-4 text-indigo-600" /> Khung giờ (Múi giờ của bạn)
+                Khung giờ (Múi giờ của bạn)
               </span>
               <p className="text-base font-semibold text-slate-800 mt-1">
                 {formatDateTime(session.startsAt).time} - {formatDateTime(session.endsAt).time}
@@ -139,9 +137,7 @@ export default function SessionDetailPage() {
           {/* Cảnh báo hủy nếu có */}
           {session.cancelReason && (
             <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-800 space-y-1">
-              <div className="font-semibold flex items-center gap-1.5">
-                <AlertTriangle className="w-4 h-4 text-red-600" /> Lý do hủy buổi:
-              </div>
+              <div className="font-semibold flex items-center gap-1.5">Lý do hủy buổi:</div>
               <p>{session.cancelReason}</p>
             </div>
           )}
@@ -191,7 +187,7 @@ export default function SessionDetailPage() {
                   onClick={() => setOutcomeDialogOpen(true)}
                   className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm"
                 >
-                  <CheckCircle2 className="w-4 h-4 mr-1.5" /> Chốt kết quả
+                  Chốt kết quả
                 </Button>
               </div>
             )}
@@ -211,7 +207,6 @@ export default function SessionDetailPage() {
               ) : (
                 <div className="p-4 rounded-xl border border-rose-200 bg-rose-50 space-y-3">
                   <div className="text-sm font-bold text-rose-900 flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-rose-600" />
                     Xác nhận hủy buổi học
                   </div>
                   {loadingPreview ? (

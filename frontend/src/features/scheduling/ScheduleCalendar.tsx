@@ -9,7 +9,6 @@ import { fetchSessions, type SessionStatus } from '@/lib/api/scheduling'
 import SessionDetailDrawer from './SessionDetailDrawer'
 import { statusLabel } from '@/components/StatusBadge'
 import { Card, CardContent } from '@/components/ui/card'
-import { Calendar, Filter } from 'lucide-react'
 
 // Màu sắc cho 8 trạng thái buổi học
 const STATUS_COLORS: Record<SessionStatus, { bg: string; border: string; text: string }> = {
@@ -69,7 +68,6 @@ export default function ScheduleCalendar() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-            <Calendar className="w-6 h-6 text-indigo-600" />
             {isTeacher
               ? 'Lịch giảng dạy 1 kèm 1'
               : isStudent
@@ -85,7 +83,6 @@ export default function ScheduleCalendar() {
         {/* Lọc buổi chưa chốt (cho GV và Admin) */}
         {!isStudent && (
           <div className="flex items-center gap-2 bg-slate-50 border p-2 rounded-xl text-xs">
-            <Filter className="w-4 h-4 text-slate-500" />
             <label className="flex items-center gap-1.5 cursor-pointer font-medium text-slate-700">
               <input
                 type="checkbox"

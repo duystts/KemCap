@@ -19,17 +19,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import {
-  BookOpen,
-  Calendar,
-  CreditCard,
-  History,
-  AlertTriangle,
-  RotateCw,
-  Plus,
-  X,
-  Trash2,
-} from 'lucide-react'
 
 export default function EnrollmentDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -146,7 +135,6 @@ export default function EnrollmentDetailPage() {
             <StatusBadge status={enrollment.status} />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-            <BookOpen className="w-6 h-6 text-indigo-600" />
             Gói học ID: {enrollment.id.slice(0, 8)}
           </h1>
         </div>
@@ -160,11 +148,9 @@ export default function EnrollmentDetailPage() {
                   size="sm"
                   onClick={() => setChangeTeacherDialogOpen(true)}
                 >
-                  <RotateCw className="w-4 h-4 mr-1.5" />
                   Đổi giáo viên
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => setExtendDialogOpen(true)}>
-                  <Calendar className="w-4 h-4 mr-1.5" />
                   Gia hạn gói
                 </Button>
                 <Button
@@ -173,14 +159,12 @@ export default function EnrollmentDetailPage() {
                   onClick={() => setCancelDialogOpen(true)}
                   className="text-red-600 border-red-200 hover:bg-red-50"
                 >
-                  <Trash2 className="w-4 h-4 mr-1.5" />
                   Hủy gói
                 </Button>
               </>
             )}
             {statement && statement.debtVnd > 0 && (
               <Button size="sm" onClick={() => setPaymentDialogOpen(true)}>
-                <CreditCard className="w-4 h-4 mr-1.5" />
                 Thu học phí
               </Button>
             )}
@@ -279,7 +263,6 @@ export default function EnrollmentDetailPage() {
             </CardTitle>
             {isAdmin && statement && statement.debtVnd > 0 && (
               <Button size="sm" variant="outline" onClick={() => setPaymentDialogOpen(true)}>
-                <Plus className="w-3.5 h-3.5 mr-1" />
                 Ghi nhận thu
               </Button>
             )}
@@ -348,7 +331,6 @@ export default function EnrollmentDetailPage() {
         <Card>
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
-              <History className="w-5 h-5 text-slate-500" />
               <CardTitle className="text-base font-bold text-slate-800">
                 Lịch sử phân công giáo viên ({teacherHistory.length})
               </CardTitle>
@@ -408,13 +390,10 @@ export default function EnrollmentDetailPage() {
                 type="button"
                 onClick={() => setChangeTeacherDialogOpen(false)}
                 className="p-1 rounded-lg text-slate-400 hover:text-slate-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              ></button>
             </div>
 
             <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-800 flex items-start gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
                 <strong>Lưu ý:</strong> Khi đổi giáo viên, các buổi học trong tương lai đã đặt với
                 giáo viên cũ sẽ tự động bị hủy và hoàn lại số buổi khả dụng cho học viên.
@@ -498,9 +477,7 @@ export default function EnrollmentDetailPage() {
                 type="button"
                 onClick={() => setExtendDialogOpen(false)}
                 className="p-1 rounded-lg text-slate-400 hover:text-slate-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              ></button>
             </div>
 
             <form
@@ -549,9 +526,7 @@ export default function EnrollmentDetailPage() {
                 type="button"
                 onClick={() => setCancelDialogOpen(false)}
                 className="p-1 rounded-lg text-slate-400 hover:text-slate-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              ></button>
             </div>
 
             <form

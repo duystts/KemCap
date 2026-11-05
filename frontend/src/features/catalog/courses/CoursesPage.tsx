@@ -6,7 +6,6 @@ import { fetchCourses, createCourse, updateCourse, type CourseItem } from '@/lib
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import { BookOpen, Plus, Edit, Package, X, Power } from 'lucide-react'
 
 export default function CoursesPage() {
   const queryClient = useQueryClient()
@@ -85,7 +84,6 @@ export default function CoursesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-            <BookOpen className="w-6 h-6 text-indigo-600" />
             Khóa học & Chương trình đào tạo
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -94,7 +92,6 @@ export default function CoursesPage() {
           </p>
         </div>
         <Button onClick={openCreateDialog} className="shrink-0">
-          <Plus className="w-4 h-4 mr-2" />
           Tạo khóa học mới
         </Button>
       </div>
@@ -146,7 +143,6 @@ export default function CoursesPage() {
                             to={`/admin/packages?courseId=${c.id}`}
                             className="inline-flex items-center text-xs px-2.5 py-1.5 rounded-lg border border-indigo-200 text-indigo-700 hover:bg-indigo-50 font-medium"
                           >
-                            <Package className="w-3.5 h-3.5 mr-1" />
                             Gói học
                           </Link>
                           <Button
@@ -155,7 +151,6 @@ export default function CoursesPage() {
                             onClick={() => openEditDialog(c)}
                             className="h-8 text-xs text-slate-600 hover:text-indigo-600"
                           >
-                            <Edit className="w-3.5 h-3.5 mr-1" />
                             Sửa
                           </Button>
                           <Button
@@ -174,7 +169,6 @@ export default function CoursesPage() {
                                 : 'text-slate-500 hover:text-red-600 hover:bg-red-50'
                             }`}
                           >
-                            <Power className="w-3.5 h-3.5 mr-1" />
                             {isArchived ? 'Mở lại' : 'Lưu trữ'}
                           </Button>
                         </div>
@@ -201,7 +195,7 @@ export default function CoursesPage() {
                 onClick={closeDialog}
                 className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
               >
-                <X className="w-5 h-5" />
+                Đóng
               </button>
             </div>
 

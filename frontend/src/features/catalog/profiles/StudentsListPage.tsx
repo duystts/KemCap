@@ -5,7 +5,6 @@ import { useAuth } from '@/app/AuthProvider'
 import { fetchStudents, type StudentSummary } from '@/lib/api/catalog'
 import { StatusBadge } from '@/components/StatusBadge'
 import { Input } from '@/components/ui/input'
-import { Users, Search, AlertCircle, ExternalLink, Filter } from 'lucide-react'
 
 export default function StudentsListPage() {
   const { me } = useAuth()
@@ -31,7 +30,6 @@ export default function StudentsListPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-            <Users className="w-6 h-6 text-indigo-600" />
             {isAdmin ? 'Danh sách học viên toàn hệ thống' : 'Học viên của tôi'}
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -44,18 +42,15 @@ export default function StudentsListPage() {
       {/* Filters */}
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="relative w-full sm:max-w-md">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
           <Input
             placeholder="Tìm theo tên hoặc email học viên…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
           />
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <label className="flex items-center gap-2 text-xs font-medium text-slate-700 bg-slate-50 border p-2 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
-            <Filter className="w-3.5 h-3.5 text-slate-500" />
             <input
               type="checkbox"
               checked={needsConsultingOnly}
@@ -113,7 +108,6 @@ export default function StudentsListPage() {
                       <td className="py-3.5 px-4">
                         {s.needsConsulting ? (
                           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
-                            <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
                             Cần tư vấn mục tiêu
                           </span>
                         ) : (
@@ -128,7 +122,6 @@ export default function StudentsListPage() {
                           className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors"
                         >
                           Hồ sơ chi tiết
-                          <ExternalLink className="w-3.5 h-3.5" />
                         </Link>
                       </td>
                     </tr>

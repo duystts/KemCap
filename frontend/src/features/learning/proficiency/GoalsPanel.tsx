@@ -13,7 +13,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import { Target, Plus, CheckCircle, AlertCircle, X, Calendar } from 'lucide-react'
 
 const GOAL_TYPE_LABELS: Record<GoalType, string> = {
   IELTS: 'IELTS',
@@ -90,20 +89,17 @@ export default function GoalsPanel({ studentId, canEdit = true }: GoalsPanelProp
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-3">
         <div className="flex items-center gap-2">
-          <Target className="w-5 h-5 text-indigo-600" />
           <CardTitle className="text-base font-bold text-slate-800">
             Mục tiêu học tập cá nhân
           </CardTitle>
           {!hasActiveGoal && (
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200 ml-2">
-              <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
               Cần tư vấn
             </span>
           )}
         </div>
         {canEdit && (
           <Button size="sm" onClick={() => setDialogOpen(true)}>
-            <Plus className="w-4 h-4 mr-1.5" />
             Thiết lập mục tiêu
           </Button>
         )}
@@ -112,7 +108,6 @@ export default function GoalsPanel({ studentId, canEdit = true }: GoalsPanelProp
       <CardContent>
         {goals.length === 0 ? (
           <div className="p-6 text-center bg-amber-50/50 border border-amber-200 rounded-xl">
-            <AlertCircle className="w-6 h-6 text-amber-600 mx-auto mb-2" />
             <p className="text-sm font-semibold text-slate-800">
               Học viên chưa thiết lập mục tiêu học tập
             </p>
@@ -160,7 +155,6 @@ export default function GoalsPanel({ studentId, canEdit = true }: GoalsPanelProp
                     <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
                       {g.deadline && (
                         <span className="flex items-center gap-1 text-slate-600 font-medium">
-                          <Calendar className="w-3.5 h-3.5 text-slate-400" />
                           Hạn chót: {new Date(g.deadline).toLocaleDateString('vi-VN')}
                         </span>
                       )}
@@ -177,7 +171,6 @@ export default function GoalsPanel({ studentId, canEdit = true }: GoalsPanelProp
                         disabled={updateMutation.isPending}
                         className="h-8 text-xs text-emerald-700 border-emerald-300 hover:bg-emerald-50"
                       >
-                        <CheckCircle className="w-3.5 h-3.5 mr-1 text-emerald-600" />
                         Đạt mục tiêu
                       </Button>
                       <Button
@@ -204,16 +197,13 @@ export default function GoalsPanel({ studentId, canEdit = true }: GoalsPanelProp
           <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="p-5 border-b flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Target className="w-5 h-5 text-indigo-600" />
                 <h2 className="text-lg font-bold text-slate-800">Thiết lập mục tiêu học tập</h2>
               </div>
               <button
                 type="button"
                 onClick={() => setDialogOpen(false)}
                 className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              ></button>
             </div>
 
             <form

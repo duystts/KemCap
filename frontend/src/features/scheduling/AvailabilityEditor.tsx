@@ -15,7 +15,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import { Plus, Trash2, Calendar, Clock, AlertCircle } from 'lucide-react'
 
 const DAYS: { key: DayOfWeek; label: string }[] = [
   { key: 'MONDAY', label: 'Thứ Hai' },
@@ -158,7 +157,6 @@ export default function AvailabilityEditor({ teacherIdOverride }: { teacherIdOve
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-4 border-b">
           <CardTitle className="text-lg flex items-center gap-2">
-            <Clock className="w-5 h-5 text-indigo-600" />
             Khung giờ rảnh lặp lại hàng tuần
           </CardTitle>
           <Button
@@ -214,7 +212,6 @@ export default function AvailabilityEditor({ teacherIdOverride }: { teacherIdOve
 
             {currentDayRules.length === 0 ? (
               <div className="p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
                 Chưa có khung giờ rảnh nào được thiết lập cho ngày này. Bạn sẽ nghỉ cả ngày.
               </div>
             ) : (
@@ -224,7 +221,7 @@ export default function AvailabilityEditor({ teacherIdOverride }: { teacherIdOve
                     key={rule.originalIndex}
                     className="flex items-center justify-between p-3 rounded-lg border bg-slate-50 hover:bg-white transition-colors"
                   >
-                    <span className="font-mono text-sm font-medium text-slate-800">
+                    <span className="text-sm font-medium text-slate-800">
                       {rule.startTime.slice(0, 5)} - {rule.endTime.slice(0, 5)}
                     </span>
                     <button
@@ -232,9 +229,7 @@ export default function AvailabilityEditor({ teacherIdOverride }: { teacherIdOve
                       onClick={() => handleRemoveRule(rule.originalIndex)}
                       className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded"
                       title="Xóa khung giờ"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    ></button>
                   </div>
                 ))}
               </div>
@@ -265,7 +260,7 @@ export default function AvailabilityEditor({ teacherIdOverride }: { teacherIdOve
               onClick={handleAddInterval}
               className="flex items-center gap-1.5 text-sm"
             >
-              <Plus className="w-4 h-4" /> Thêm khung giờ
+              Thêm khung giờ
             </Button>
           </div>
         </CardContent>
@@ -275,7 +270,6 @@ export default function AvailabilityEditor({ teacherIdOverride }: { teacherIdOve
       <Card>
         <CardHeader className="border-b pb-4">
           <CardTitle className="text-lg flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-rose-600" />
             Ngày nghỉ ngoại lệ (Nghỉ phép / Nghỉ lễ)
           </CardTitle>
         </CardHeader>
@@ -376,9 +370,7 @@ export default function AvailabilityEditor({ teacherIdOverride }: { teacherIdOve
                         onClick={() => deleteExceptionMutation.mutate(ex.id!)}
                         className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded"
                         title="Xóa ngày nghỉ này"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      ></button>
                     )}
                   </div>
                 ))}

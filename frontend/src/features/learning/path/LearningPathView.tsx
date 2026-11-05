@@ -5,7 +5,6 @@ import LearningPathEditor from './LearningPathEditor'
 import RevisionHistory from './RevisionHistory'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { BookOpen, Edit, History, CheckCircle2, Circle, Calendar, Plus } from 'lucide-react'
 
 interface LearningPathViewProps {
   studentId: string
@@ -29,18 +28,12 @@ export default function LearningPathView({ studentId, canEdit = true }: Learning
     return (
       <Card>
         <CardContent className="p-8 text-center bg-slate-50 border border-dashed rounded-xl">
-          <BookOpen className="w-8 h-8 text-slate-400 mx-auto mb-2" />
           <h3 className="font-semibold text-slate-800">Chưa có lộ trình học tập cá nhân</h3>
           <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto mb-4">
             Lộ trình học tập chi tiết sẽ được giáo viên thiết kế dựa trên kết quả đánh giá năng lực
             đầu vào.
           </p>
-          {canEdit && (
-            <Button onClick={() => setEditorOpen(true)}>
-              <Plus className="w-4 h-4 mr-1.5" />
-              Thiết kế lộ trình ngay
-            </Button>
-          )}
+          {canEdit && <Button onClick={() => setEditorOpen(true)}>Thiết kế lộ trình ngay</Button>}
 
           <LearningPathEditor
             studentId={studentId}
@@ -58,13 +51,13 @@ export default function LearningPathView({ studentId, canEdit = true }: Learning
       case 'DONE':
         return (
           <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-            <CheckCircle2 className="w-3.5 h-3.5" /> Hoàn thành
+            Hoàn thành
           </span>
         )
       default:
         return (
           <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
-            <Circle className="w-3 h-3" /> Chưa học
+            Chưa học
           </span>
         )
     }
@@ -89,12 +82,10 @@ export default function LearningPathView({ studentId, canEdit = true }: Learning
                 onClick={() => setHistoryOpen(true)}
                 className="text-xs"
               >
-                <History className="w-4 h-4 mr-1.5 text-slate-500" />
                 Lịch sử điều chỉnh
               </Button>
               {canEdit && (
                 <Button size="sm" onClick={() => setEditorOpen(true)} className="text-xs">
-                  <Edit className="w-4 h-4 mr-1.5" />
                   Điều chỉnh lộ trình
                 </Button>
               )}
@@ -109,7 +100,7 @@ export default function LearningPathView({ studentId, canEdit = true }: Learning
             </div>
             <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
               <div
-                className="h-full bg-linear-to-r from-indigo-500 to-indigo-600 rounded-full transition-all duration-500"
+                className="h-full bg-indigo-600 rounded-full transition-all duration-500"
                 style={{ width: `${Math.min(100, Math.max(0, path.completionPercent || 0))}%` }}
               />
             </div>
@@ -133,7 +124,6 @@ export default function LearningPathView({ studentId, canEdit = true }: Learning
               </div>
               {m.targetDate && (
                 <span className="text-xs text-slate-500 flex items-center gap-1.5 self-start sm:self-auto bg-slate-50 px-2.5 py-1 rounded-lg border">
-                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
                   Mục tiêu: {new Date(m.targetDate).toLocaleDateString('vi-VN')}
                 </span>
               )}

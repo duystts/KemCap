@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
 import { fetchPathRevisions, type RevisionItem } from '@/lib/api/learning'
-import { X, History, User, Calendar } from 'lucide-react'
 
 interface RevisionHistoryProps {
   pathId: string
@@ -23,7 +22,6 @@ export default function RevisionHistory({ pathId, open, onClose }: RevisionHisto
         <div>
           <div className="p-5 border-b flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <History className="w-5 h-5 text-indigo-600" />
               <h2 className="text-base font-bold text-slate-800">Lịch sử điều chỉnh lộ trình</h2>
             </div>
             <button
@@ -31,7 +29,7 @@ export default function RevisionHistory({ pathId, open, onClose }: RevisionHisto
               onClick={onClose}
               className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
             >
-              <X className="w-5 h-5" />
+              Đóng
             </button>
           </div>
 
@@ -50,11 +48,9 @@ export default function RevisionHistory({ pathId, open, onClose }: RevisionHisto
                     <div className="flex-1 bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs space-y-1.5">
                       <div className="flex items-center justify-between text-slate-500">
                         <span className="flex items-center gap-1 font-semibold text-slate-700">
-                          <User className="w-3.5 h-3.5" />
                           Người đổi: {rev.changedBy}
                         </span>
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-3.5 h-3.5" />
                           {new Date(rev.changedAt).toLocaleDateString('vi-VN')}
                         </span>
                       </div>

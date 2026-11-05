@@ -5,7 +5,6 @@ import { saveGuardianConsent, type GuardianConsentData } from '@/lib/api/users'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import { X, Shield, CheckCircle } from 'lucide-react'
 
 interface GuardianConsentDialogProps {
   studentId: string | null
@@ -65,7 +64,6 @@ export default function GuardianConsentDialog({
       <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="p-5 border-b flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-amber-600" />
             <h2 className="text-lg font-bold text-slate-800">Đồng ý của người giám hộ</h2>
           </div>
           <button
@@ -73,7 +71,7 @@ export default function GuardianConsentDialog({
             onClick={onClose}
             className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
           >
-            <X className="w-5 h-5" />
+            Đóng
           </button>
         </div>
 
@@ -143,7 +141,6 @@ export default function GuardianConsentDialog({
               Đóng
             </Button>
             <Button type="submit" disabled={consentMutation.isPending}>
-              <CheckCircle className="w-4 h-4 mr-1.5" />
               {consentMutation.isPending ? 'Đang lưu…' : 'Xác nhận đồng ý'}
             </Button>
           </div>

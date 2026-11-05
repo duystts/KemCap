@@ -11,7 +11,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import { X, Package as PackageIcon } from 'lucide-react'
 
 interface PackageFormDialogProps {
   packageToEdit?: PackageItem | null
@@ -111,7 +110,6 @@ export default function PackageFormDialog({
       <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="p-5 border-b flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <PackageIcon className="w-5 h-5 text-indigo-600" />
             <h2 className="text-lg font-bold text-slate-800">
               {packageToEdit ? 'Chỉnh sửa gói học' : 'Tạo gói học mới'}
             </h2>
@@ -121,7 +119,7 @@ export default function PackageFormDialog({
             onClick={onClose}
             className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
           >
-            <X className="w-5 h-5" />
+            Đóng
           </button>
         </div>
 

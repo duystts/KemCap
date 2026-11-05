@@ -6,7 +6,6 @@ import type { Role } from '@/lib/api/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import { X, UserPlus, AlertCircle } from 'lucide-react'
 
 interface CreateUserDialogProps {
   open: boolean
@@ -82,7 +81,6 @@ export default function CreateUserDialog({ open, onClose }: CreateUserDialogProp
       <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="p-5 border-b flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <UserPlus className="w-5 h-5 text-indigo-600" />
             <h2 className="text-lg font-bold text-slate-800">Thêm người dùng mới</h2>
           </div>
           <button
@@ -90,7 +88,7 @@ export default function CreateUserDialog({ open, onClose }: CreateUserDialogProp
             onClick={onClose}
             className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
           >
-            <X className="w-5 h-5" />
+            Đóng
           </button>
         </div>
 
@@ -163,7 +161,6 @@ export default function CreateUserDialog({ open, onClose }: CreateUserDialogProp
 
           {isUnder16 && (
             <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
                 <strong>Học viên dưới 16 tuổi:</strong> Tài khoản sẽ ở trạng thái{' '}
                 <em>Chờ đồng ý của người giám hộ</em>. Quản trị viên cần ghi nhận thông tin phụ

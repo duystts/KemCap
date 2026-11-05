@@ -21,20 +21,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import {
-  User,
-  Mail,
-  Calendar,
-  Award,
-  BookOpen,
-  Edit,
-  Plus,
-  ExternalLink,
-  X,
-  CreditCard,
-  Briefcase,
-  FileText,
-} from 'lucide-react'
 
 type TabType = 'info' | 'proficiency' | 'path' | 'enrollments'
 
@@ -122,9 +108,6 @@ export default function StudentProfilePage() {
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
-              <User className="w-8 h-8" />
-            </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-slate-900">
@@ -133,15 +116,11 @@ export default function StudentProfilePage() {
                 {status && <StatusBadge status={status} />}
               </div>
               <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
-                <span className="flex items-center gap-1">
-                  <Mail className="w-3.5 h-3.5" />
-                  {email}
-                </span>
+                <span className="flex items-center gap-1">{email}</span>
                 {user?.phone && <span>• {user.phone}</span>}
                 {user?.dateOfBirth && (
                   <span className="flex items-center gap-1">
-                    • <Calendar className="w-3.5 h-3.5" />
-                    {new Date(user.dateOfBirth).toLocaleDateString('vi-VN')}
+                    • {new Date(user.dateOfBirth).toLocaleDateString('vi-VN')}
                   </span>
                 )}
               </div>
@@ -151,13 +130,11 @@ export default function StudentProfilePage() {
           <div className="flex items-center gap-2">
             {isAdmin && (
               <Button variant="outline" size="sm" onClick={openEditModal}>
-                <Edit className="w-4 h-4 mr-1.5" />
                 Cập nhật thông tin
               </Button>
             )}
             {isAdmin && (
               <Button size="sm" onClick={() => setCreateEnrollmentOpen(true)}>
-                <Plus className="w-4 h-4 mr-1.5" />
                 Tạo ghi danh
               </Button>
             )}
@@ -175,7 +152,6 @@ export default function StudentProfilePage() {
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            <User className="w-4 h-4" />
             Thông tin chung
           </button>
           <button
@@ -187,7 +163,6 @@ export default function StudentProfilePage() {
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            <Award className="w-4 h-4" />
             Năng lực & Mục tiêu
           </button>
           <button
@@ -199,7 +174,6 @@ export default function StudentProfilePage() {
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            <BookOpen className="w-4 h-4" />
             Lộ trình học tập
           </button>
           <button
@@ -211,7 +185,6 @@ export default function StudentProfilePage() {
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            <CreditCard className="w-4 h-4" />
             Gói học & Ghi danh ({enrollments.length})
           </button>
         </div>
@@ -228,10 +201,7 @@ export default function StudentProfilePage() {
             </CardHeader>
             <CardContent className="space-y-4 text-sm">
               <div className="flex justify-between py-2 border-b">
-                <span className="text-slate-500 flex items-center gap-1.5">
-                  <Award className="w-4 h-4 text-indigo-600" />
-                  Trình độ tự khai:
-                </span>
+                <span className="text-slate-500 flex items-center gap-1.5">Trình độ tự khai:</span>
                 <span className="font-bold text-indigo-700">
                   {profile?.selfReportedLevel
                     ? `CEFR ${profile.selfReportedLevel}`
@@ -240,7 +210,6 @@ export default function StudentProfilePage() {
               </div>
               <div className="flex justify-between py-2 border-b">
                 <span className="text-slate-500 flex items-center gap-1.5">
-                  <Briefcase className="w-4 h-4 text-slate-500" />
                   Nghề nghiệp / Lĩnh vực:
                 </span>
                 <span className="font-semibold text-slate-800">
@@ -254,7 +223,6 @@ export default function StudentProfilePage() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-slate-500" />
                   Ghi chú nội bộ giáo vụ
                 </CardTitle>
               </CardHeader>
@@ -294,7 +262,6 @@ export default function StudentProfilePage() {
             </CardTitle>
             {isAdmin && (
               <Button size="sm" onClick={() => setCreateEnrollmentOpen(true)}>
-                <Plus className="w-4 h-4 mr-1.5" />
                 Tạo ghi danh mới
               </Button>
             )}
@@ -342,7 +309,6 @@ export default function StudentProfilePage() {
                         className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 self-start sm:self-auto"
                       >
                         Chi tiết & Học phí
-                        <ExternalLink className="w-3.5 h-3.5" />
                       </Link>
                     )}
                   </div>
@@ -363,9 +329,7 @@ export default function StudentProfilePage() {
                 type="button"
                 onClick={() => setEditProfileOpen(false)}
                 className="p-1 rounded-lg text-slate-400 hover:text-slate-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              ></button>
             </div>
 
             <form

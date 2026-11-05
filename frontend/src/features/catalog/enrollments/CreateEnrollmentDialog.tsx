@@ -6,7 +6,6 @@ import { fetchUsers, type UserItem } from '@/lib/api/users'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import { X, BookOpen, UserCheck, AlertCircle } from 'lucide-react'
 
 interface CreateEnrollmentDialogProps {
   defaultStudentId?: string
@@ -96,7 +95,6 @@ export default function CreateEnrollmentDialog({
       <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="p-5 border-b flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-indigo-600" />
             <h2 className="text-lg font-bold text-slate-800">Tạo ghi danh học tập mới</h2>
           </div>
           <button
@@ -104,7 +102,7 @@ export default function CreateEnrollmentDialog({
             onClick={onClose}
             className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
           >
-            <X className="w-5 h-5" />
+            Đóng
           </button>
         </div>
 
@@ -187,7 +185,6 @@ export default function CreateEnrollmentDialog({
 
           <div className="p-3 bg-slate-50 border rounded-xl text-xs text-slate-600 space-y-1">
             <div className="font-semibold text-slate-800 flex items-center gap-1.5">
-              <AlertCircle className="w-4 h-4 text-indigo-600" />
               Quy trình kích hoạt:
             </div>
             <p>
@@ -202,7 +199,6 @@ export default function CreateEnrollmentDialog({
               Hủy
             </Button>
             <Button type="submit" disabled={createMutation.isPending}>
-              <UserCheck className="w-4 h-4 mr-1.5" />
               {createMutation.isPending ? 'Đang tạo…' : 'Xác nhận ghi danh'}
             </Button>
           </div>

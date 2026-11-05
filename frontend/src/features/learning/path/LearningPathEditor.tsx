@@ -11,7 +11,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import { Plus, Trash2, X, Save, AlertCircle } from 'lucide-react'
 
 interface LearningPathEditorProps {
   studentId: string
@@ -197,7 +196,7 @@ export default function LearningPathEditor({
             onClick={onClose}
             className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200"
           >
-            <X className="w-5 h-5" />
+            Đóng
           </button>
         </div>
 
@@ -222,7 +221,6 @@ export default function LearningPathEditor({
                 Danh sách các chặng học ({milestones.length})
               </span>
               <Button type="button" size="sm" variant="outline" onClick={addMilestone}>
-                <Plus className="w-4 h-4 mr-1.5" />
                 Thêm chặng mới
               </Button>
             </div>
@@ -262,9 +260,7 @@ export default function LearningPathEditor({
                     onClick={() => removeMilestone(mIdx)}
                     className="self-end sm:self-center p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     title="Xóa chặng này"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  ></button>
                 </div>
 
                 {/* Topics in Milestone */}
@@ -276,7 +272,6 @@ export default function LearningPathEditor({
                       onClick={() => addTopic(mIdx)}
                       className="text-indigo-600 hover:text-indigo-800 text-xs flex items-center gap-1 font-bold"
                     >
-                      <Plus className="w-3.5 h-3.5" />
                       Thêm chủ đề
                     </button>
                   </div>
@@ -313,9 +308,7 @@ export default function LearningPathEditor({
                           type="button"
                           onClick={() => removeTopic(mIdx, tIdx)}
                           className="p-1.5 text-slate-400 hover:text-red-600 rounded-lg"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        ></button>
                       </div>
                     ))
                   )}
@@ -331,7 +324,6 @@ export default function LearningPathEditor({
             Hủy
           </Button>
           <Button type="button" onClick={handlePreSave} disabled={saveMutation.isPending}>
-            <Save className="w-4 h-4 mr-1.5" />
             {saveMutation.isPending ? 'Đang lưu…' : 'Lưu lộ trình'}
           </Button>
         </div>
@@ -342,7 +334,6 @@ export default function LearningPathEditor({
         <div className="fixed inset-0 z-60 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center gap-2 text-amber-600 font-bold">
-              <AlertCircle className="w-5 h-5" />
               <span>Ghi nhận lý do điều chỉnh lộ trình</span>
             </div>
             <p className="text-xs text-slate-600">

@@ -4,7 +4,6 @@ import { fetchProficiency, type AssessmentItem } from '@/lib/api/learning'
 import AssessmentFormDialog from './AssessmentFormDialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Award, Plus, History, AlertCircle } from 'lucide-react'
 
 interface ProficiencyPanelProps {
   studentId: string
@@ -52,14 +51,12 @@ export default function ProficiencyPanel({ studentId, canEdit = true }: Proficie
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-3">
           <div className="flex items-center gap-2">
-            <Award className="w-5 h-5 text-indigo-600" />
             <CardTitle className="text-base font-bold text-slate-800">
               Năng lực hiện tại (CEFR 5 kỹ năng)
             </CardTitle>
           </div>
           {canEdit && (
             <Button size="sm" onClick={() => setDialogOpen(true)}>
-              <Plus className="w-4 h-4 mr-1.5" />
               Đánh giá mới
             </Button>
           )}
@@ -67,7 +64,6 @@ export default function ProficiencyPanel({ studentId, canEdit = true }: Proficie
         <CardContent>
           {!current ? (
             <div className="p-8 text-center bg-slate-50 border border-dashed rounded-xl">
-              <AlertCircle className="w-6 h-6 text-amber-600 mx-auto mb-2" />
               <p className="text-sm font-semibold text-slate-700">
                 Chưa có kết quả đánh giá năng lực
               </p>
@@ -115,7 +111,6 @@ export default function ProficiencyPanel({ studentId, canEdit = true }: Proficie
         <Card>
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
-              <History className="w-5 h-5 text-slate-500" />
               <CardTitle className="text-base font-bold text-slate-800">
                 Lịch sử đánh giá năng lực ({history.length})
               </CardTitle>
