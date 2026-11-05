@@ -269,7 +269,7 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 - [X] T113 [US5] (#4·U8) `GET /receivables?hasDebt=true` và `GET /reports/revenue?from=&to=` (tổng đã thu, tổng công nợ) trong `B/billing/internal/web/BillingReportController.java` — *ghi danh đã hủy không tính công nợ, vẫn giữ bản ghi và số đã thu; công nợ là số dư hiện tại*
 - [ ] T114 [P] [US5] (#4·U2) Frontend `F/features/billing/PaymentsPanel.tsx` (trong `EnrollmentDetailPage`): lịch sử, `RecordPaymentDialog.tsx` (VND, ngày, phương thức, ghi chú — gợi ý "không ghi tên học viên"), `AdjustmentDialog.tsx`, nhãn công nợ
 - [X] T115 [P] [US5] (#4·U8) Frontend `F/features/billing/ReceivablesPage.tsx`: học viên còn nợ, lọc, liên kết ghi danh
-- [ ] T116 [US5] (#4·U8) Frontend `F/features/catalog/enrollments/MyPackagesPage.tsx` (`/student/packages`): đã học/đã đặt/còn lại, hạn, trạng thái "Chờ thanh toán", lịch sử thanh toán + công nợ (chỉ đọc), banner gia hạn khi ≤ 2 buổi hoặc ≤ 7 ngày
+- [X] T116 [US5] (#4·U8) Frontend `F/features/catalog/enrollments/MyPackagesPage.tsx` (`/student/packages`): đã học/đã đặt/còn lại, hạn, trạng thái "Chờ thanh toán", lịch sử thanh toán + công nợ (chỉ đọc), banner gia hạn khi ≤ 2 buổi hoặc ≤ 7 ngày
 
 **Checkpoint (cổng B2 cho billing core, B5 cho U8)**: quickstart bước 3 và 13 đúng; số buổi và công nợ khớp lịch sử (SC-007).
 
