@@ -1,6 +1,7 @@
 package com.englishplatform.notification.internal;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,8 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
 
   Page<Notification> findByUserIdAndReadAtIsNullOrderByCreatedAtDesc(
       UUID userId, Pageable pageable);
+
+  List<Notification> findByUserIdOrderByCreatedAtDesc(UUID userId);
 
   long countByUserIdAndReadAtIsNull(UUID userId);
 

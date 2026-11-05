@@ -98,6 +98,15 @@ class UserAdminController {
                 request.dateOfBirth())));
   }
 
+  record PolicyConsentDto(String policyVersion, Instant acceptedAt) {}
+
+  @GetMapping("/{id}/policy-consents")
+  List<PolicyConsentDto> policyConsents(@PathVariable UUID id) {
+    return service.policyConsents(id).stream()
+        .map(c -> new PolicyConsentDto(c.getPolicyVersion(), c.getAcceptedAt()))
+        .toList();
+  }
+
   @PatchMapping("/{id}/status")
   UserDto changeStatus(@PathVariable UUID id, @Valid @RequestBody StatusRequest request) {
     return UserDto.of(service.changeStatus(id, CurrentUser.require().id(), request.status()));

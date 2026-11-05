@@ -178,6 +178,8 @@ describe('PersonalDataSummaryPage', () => {
       const url = String(input)
       const custom = override(url)
       if (custom) return custom
+      if (/policy-consents|\/notifications|teacher-history|outcome-history/.test(url))
+        return json(200, [])
       if (url.includes('/guardian-consent')) return json(404, { code: 'NOT_FOUND', message: 'x' })
       if (url.includes('/learning-path')) return json(404, { code: 'NOT_FOUND', message: 'x' })
       if (url.includes('/profile')) return json(200, { userId: 'stu-1', occupation: 'Kỹ sư' })
@@ -250,6 +252,49 @@ describe('PersonalDataSummaryPage', () => {
     expect(await screen.findByText('Nhận xét rất cũ')).toBeInTheDocument()
     expect(await screen.findByText('Cô dạy hay')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'In / lưu PDF' })).toBeEnabled()
+  })
+
+  it('có các mục FR-031: đồng ý chính sách, thông báo, đổi giáo viên, lý do hủy, ghi chú chốt', async () => {
+    mockApi((url) => {
+      if (url.includes('/policy-consents')) {
+        return json(200, [{ policyVersion: 'v2026', acceptedAt: '2026-01-02T10:00:00Z' }])
+      }
+      if (url.includes('/users/stu-1/notifications')) {
+        return json(200, [{ id: 'n-1', title: 'Nhắc lịch học', createdAt: '2026-01-02T10:00:00Z' }])
+      }
+      if (url.includes('/teacher-history')) {
+        return json(200, [
+          { toTeacherId: 't-1', reason: 'Đổi theo nguyện vọng', changedAt: '2026-01-02T10:00:00Z' },
+        ])
+      }
+      if (url.endsWith('/outcome-history')) {
+        return json(200, [{ toStatus: 'COMPLETED', note: 'Vào muộn 10 phút', createdAt: 'x' }])
+      }
+      if (url.endsWith('/feedback')) return json(404, { code: 'NOT_FOUND', message: 'x' })
+      if (url.includes('/sessions?')) {
+        return json(200, [
+          {
+            id: 'ses-7',
+            teacherId: 't-1',
+            startsAt: '2026-01-02T10:00:00Z',
+            status: 'CANCELLED_LATE',
+            cancelReason: 'Em bị ốm',
+          },
+        ])
+      }
+      return undefined
+    })
+    renderRoute(<PersonalDataSummaryPage />, '/students/stu-1')
+
+    for (const text of [
+      'v2026',
+      'Nhắc lịch học',
+      'Đổi theo nguyện vọng',
+      'Em bị ốm',
+      'Vào muộn 10 phút',
+    ]) {
+      expect(await screen.findByText(text)).toBeInTheDocument()
+    }
   })
 
   it('in gọi window.print', async () => {

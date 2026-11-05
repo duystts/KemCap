@@ -31,6 +31,8 @@ Bảng dưới là thỏa thuận ban đầu để 4 người làm song song.
 | POST | `/users` | A | `{email, fullName, role, phone?, dateOfBirth?}` (`dateOfBirth` bắt buộc khi STUDENT) → tạo + gửi email mời; học viên < 16 tuổi → `AWAITING_GUARDIAN_CONSENT`, chưa gửi mời | FR-002, FR-004, FR-030 |
 | PATCH | `/users/{id}/status` | A | `{status: ACTIVE\|INACTIVE}`; 409 `TEACHER_HAS_STUDENTS` khi ngừng giáo viên còn học viên; 409 `ANONYMIZED` với hồ sơ đã ẩn danh | FR-004 |
 | POST | `/users/{id}/resend-invite` | A | gửi lại lời mời | |
+| GET | `/users/{id}/policy-consents` | A | các lần đồng ý chính sách: `policyVersion`, `acceptedAt` | FR-031 |
+| GET | `/users/{id}/notifications` | A | toàn bộ thông báo của người dùng, không phân trang | FR-031 |
 | GET/PUT | `/students/{id}/guardian-consent` | A | `{guardianName, relationship, guardianContact, consentedOn}`; lưu xong → `INVITED` + gửi mời | FR-030 |
 | GET/POST | `/data-subject-requests?studentId=&status=` | A | ghi nhận yêu cầu `{studentId, requesterName, type: ERASURE\|ACCESS, receivedOn}` | FR-031 |
 | POST | `/data-subject-requests/{id}/reject` | A | `{resolutionNote}` | FR-031 |
@@ -40,7 +42,7 @@ Bảng dưới là thỏa thuận ban đầu để 4 người làm song song.
 Mật khẩu: tối thiểu 8 ký tự, có chữ và số.
 
 **Đồng ý chính sách**: khi `consentRequired = true`, mọi API ngoài `/auth/*`, `GET /me`, `POST /me/consents` trả 403 `CONSENT_REQUIRED`; frontend chỉ hiện màn hình đồng ý.
-**Bản tóm tắt dữ liệu cá nhân** (FR-031, yêu cầu xem): trang in được ở frontend (`features/admin/privacy/PersonalDataSummaryPage`) ghép từ các API đọc sẵn có (`/users/{id}`, `/students/{id}/profile`, `/enrollments`, `/sessions`, `/enrollments/{id}/payments`, `/students/{id}/progress`, `/assignments`); không có endpoint tổng hợp riêng.
+**Bản tóm tắt dữ liệu cá nhân** (FR-031, yêu cầu xem): trang in được ở frontend (`features/admin/privacy/PersonalDataSummaryPage`) ghép từ các API đọc (`/users/{id}`, `/users/{id}/policy-consents`, `/users/{id}/notifications`, `/students/{id}/profile`, `/students/{id}/guardian-consent`, `/students/{id}/proficiency`, `/students/{id}/goals`, `/students/{id}/learning-path`, `/enrollments`, `/enrollments/{id}/payments`, `/enrollments/{id}/teacher-history`, `/sessions`, `/sessions/{id}/outcome-history`, `/sessions/{id}/report`, `/sessions/{id}/feedback`, `/students/{id}/progress`, `/assignments`); không có endpoint tổng hợp riêng.
 
 ## catalog
 
