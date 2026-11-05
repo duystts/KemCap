@@ -115,7 +115,7 @@ export default function SessionDetailDrawer({
                       <Calendar className="w-4 h-4 text-indigo-600" />
                       {formatDateTime(session.startsAt).date}
                     </div>
-                    <div className="flex items-center gap-2 text-slate-900 text-xl font-bold font-mono">
+                    <div className="flex items-center gap-2 text-slate-900 text-xl font-semibold">
                       <Clock className="w-5 h-5 text-indigo-600" />
                       {formatDateTime(session.startsAt).time} -{' '}
                       {formatDateTime(session.endsAt).time}
@@ -142,7 +142,7 @@ export default function SessionDetailDrawer({
                         disabled={!isRoomOpen}
                         className={`w-full py-6 text-base font-semibold shadow-md flex items-center justify-center gap-2 ${
                           isRoomOpen
-                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white animate-pulse'
+                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
                             : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
                         }`}
                       >
@@ -199,8 +199,8 @@ export default function SessionDetailDrawer({
                               {me?.role === 'TEACHER'
                                 ? 'Buổi sẽ được ghi nhận là giáo viên vắng.'
                                 : cancelPreview?.willConsume
-                                  ? '⚠️ Hủy muộn (dưới 12 tiếng): Bạn vẫn sẽ bị tính 1 buổi học.'
-                                  : '✅ Hủy đúng hạn (trên 12 tiếng): Bạn sẽ được hoàn lại 1 buổi vào gói.'}
+                                  ? 'Hủy muộn (dưới 12 tiếng): Bạn vẫn sẽ bị tính 1 buổi học.'
+                                  : 'Hủy đúng hạn (trên 12 tiếng): Bạn sẽ được hoàn lại 1 buổi vào gói.'}
                             </p>
                           )}
 

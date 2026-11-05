@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import { ChevronLeft, Calendar, Clock, Video, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { ChevronLeft, Calendar, Clock, AlertTriangle, CheckCircle2 } from 'lucide-react'
 
 export default function SessionDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -130,7 +130,7 @@ export default function SessionDetailPage() {
               <span className="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
                 <Clock className="w-4 h-4 text-indigo-600" /> Khung giờ (Múi giờ của bạn)
               </span>
-              <p className="text-base font-bold text-indigo-600 font-mono mt-1">
+              <p className="text-base font-semibold text-slate-800 mt-1">
                 {formatDateTime(session.startsAt).time} - {formatDateTime(session.endsAt).time}
               </p>
             </div>
@@ -148,13 +148,10 @@ export default function SessionDetailPage() {
 
           {/* Nút Vào phòng học WebRTC */}
           {session.status === 'BOOKED' && (
-            <div className="p-6 rounded-2xl bg-gradient-to-r from-indigo-900 to-indigo-950 text-white space-y-4 shadow-xl">
+            <div className="p-5 rounded-xl border bg-slate-50 space-y-4">
               <div>
-                <h3 className="font-bold text-lg flex items-center gap-2">
-                  <Video className="w-5 h-5 text-emerald-400" />
-                  Phòng học trực tuyến LiveKit WebRTC
-                </h3>
-                <p className="text-xs text-indigo-200 mt-1 leading-relaxed">
+                <h3 className="text-base font-semibold text-slate-900">Phòng học trực tuyến</h3>
+                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                   Phòng học tích hợp video HD, âm thanh 2 chiều, bảng chat và chia sẻ màn hình.
                   {isRoomOpen
                     ? ' Phòng học đã mở, bạn có thể tham gia ngay!'
@@ -166,13 +163,12 @@ export default function SessionDetailPage() {
                 type="button"
                 onClick={() => navigate(`/sessions/${session.id}/classroom`)}
                 disabled={!isRoomOpen}
-                className={`w-full py-6 text-base font-semibold shadow-md flex items-center justify-center gap-2 ${
+                className={`w-full h-11 text-sm font-semibold ${
                   isRoomOpen
-                    ? 'bg-emerald-500 hover:bg-emerald-600 text-white animate-pulse'
-                    : 'bg-indigo-800/60 text-indigo-300 border border-indigo-700/50 cursor-not-allowed'
+                    ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                    : 'bg-slate-100 text-slate-500 border cursor-not-allowed'
                 }`}
               >
-                <Video className="w-5 h-5" />
                 {isRoomOpen ? 'Tham gia lớp học ngay' : 'Phòng học chưa tới giờ mở'}
               </Button>
             </div>
@@ -225,8 +221,8 @@ export default function SessionDetailPage() {
                       {me?.role === 'TEACHER'
                         ? 'Buổi sẽ được ghi nhận là giáo viên vắng.'
                         : cancelPreview?.willConsume
-                          ? '⚠️ Hủy muộn (dưới 12 tiếng): Bạn vẫn sẽ bị tính trừ 1 buổi học.'
-                          : '✅ Hủy đúng hạn (trên 12 tiếng): Bạn sẽ được hoàn lại 1 buổi vào gói.'}
+                          ? 'Hủy muộn (dưới 12 tiếng): Bạn vẫn sẽ bị tính trừ 1 buổi học.'
+                          : 'Hủy đúng hạn (trên 12 tiếng): Bạn sẽ được hoàn lại 1 buổi vào gói.'}
                     </p>
                   )}
                   <Input

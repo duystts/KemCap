@@ -1,13 +1,124 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/source-serif-4';
 
 @theme {
-  --color-primary: oklch(0.55 0.2 260);
-  --color-primary-foreground: oklch(0.98 0 0);
-  --color-muted: oklch(0.96 0.005 260);
-  --color-muted-foreground: oklch(0.5 0.02 260);
-  --color-border: oklch(0.9 0.01 260);
-  --color-destructive: oklch(0.58 0.22 27);
+  --font-sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Source Serif 4 Variable', Georgia, 'Times New Roman', serif;
+
+  --color-primary: #b4532f;
+  --color-primary-foreground: #ffffff;
+  --color-muted: #f0eee6;
+  --color-muted-foreground: #65635b;
+  --color-border: #e3e0d5;
+  --color-destructive: #b53333;
   --radius: 0.5rem;
+
+  /* Các trang dùng trực tiếp slate, indigo...: đổi bảng màu ở đây để cả app đổi theo */
+  --color-slate-50: #faf9f5;
+  --color-slate-100: #f0eee6;
+  --color-slate-200: #e3e0d5;
+  --color-slate-300: #d1cec2;
+  --color-slate-400: #a3a198;
+  --color-slate-500: #6f6d64;
+  --color-slate-600: #5e5d57;
+  --color-slate-700: #45443f;
+  --color-slate-800: #2f2e2b;
+  --color-slate-900: #1f1e1c;
+  --color-slate-950: #141413;
+
+  --color-indigo-50: #fbf1ec;
+  --color-indigo-100: #f6e1d7;
+  --color-indigo-200: #eec4b1;
+  --color-indigo-300: #e4a287;
+  --color-indigo-400: #d97757;
+  --color-indigo-500: #c8623f;
+  --color-indigo-600: #b4532f;
+  --color-indigo-700: #96431f;
+  --color-indigo-800: #78371f;
+  --color-indigo-900: #5c2c1b;
+  --color-indigo-950: #3a1b10;
+
+  --color-emerald-50: #f2f5ec;
+  --color-emerald-100: #e2e9d5;
+  --color-emerald-200: #c8d4b2;
+  --color-emerald-300: #aabb8c;
+  --color-emerald-400: #8da16b;
+  --color-emerald-500: #788c5d;
+  --color-emerald-600: #5a6b44;
+  --color-emerald-700: #4e5c3c;
+  --color-emerald-800: #3e4931;
+  --color-emerald-900: #333c29;
+  --color-emerald-950: #1b2015;
+
+  --color-blue-50: #edf3f9;
+  --color-blue-100: #dae7f2;
+  --color-blue-200: #b9d1e6;
+  --color-blue-300: #93b7d8;
+  --color-blue-400: #6a9bcc;
+  --color-blue-500: #5183b5;
+  --color-blue-600: #416b96;
+  --color-blue-700: #36587a;
+  --color-blue-800: #2e4963;
+  --color-blue-900: #283e53;
+  --color-blue-950: #1a2836;
+
+  --color-rose-50: #fbeeec;
+  --color-rose-100: #f6dcd8;
+  --color-rose-200: #ecb9b2;
+  --color-rose-300: #df9087;
+  --color-rose-400: #cf6a5f;
+  --color-rose-500: #bf4a40;
+  --color-rose-600: #b53333;
+  --color-rose-700: #962a2a;
+  --color-rose-800: #7a2424;
+  --color-rose-900: #5f1f1f;
+  --color-rose-950: #3a1111;
+
+  --color-red-50: var(--color-rose-50);
+  --color-red-100: var(--color-rose-100);
+  --color-red-200: var(--color-rose-200);
+  --color-red-300: var(--color-rose-300);
+  --color-red-400: var(--color-rose-400);
+  --color-red-500: var(--color-rose-500);
+  --color-red-600: var(--color-rose-600);
+  --color-red-700: var(--color-rose-700);
+  --color-red-800: var(--color-rose-800);
+  --color-red-900: var(--color-rose-900);
+  --color-red-950: var(--color-rose-950);
+
+  --color-purple-50: var(--color-blue-50);
+  --color-purple-100: var(--color-blue-100);
+  --color-purple-200: var(--color-blue-200);
+  --color-purple-300: var(--color-blue-300);
+  --color-purple-400: var(--color-blue-400);
+  --color-purple-500: var(--color-blue-500);
+  --color-purple-600: var(--color-blue-600);
+  --color-purple-700: var(--color-blue-700);
+  --color-purple-800: var(--color-blue-800);
+  --color-purple-900: var(--color-blue-900);
+  --color-purple-950: var(--color-blue-950);
+
+  --color-teal-50: var(--color-emerald-50);
+  --color-teal-100: var(--color-emerald-100);
+  --color-teal-200: var(--color-emerald-200);
+  --color-teal-300: var(--color-emerald-300);
+  --color-teal-400: var(--color-emerald-400);
+  --color-teal-500: var(--color-emerald-500);
+  --color-teal-600: var(--color-emerald-600);
+  --color-teal-700: var(--color-emerald-700);
+  --color-teal-800: var(--color-emerald-800);
+  --color-teal-900: var(--color-emerald-900);
+  --color-teal-950: var(--color-emerald-950);
+}
+
+/* Tailwind 4 mặc định viền theo màu chữ; các trang dùng `border` không kèm màu */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border);
+  }
 }
 
 html,
@@ -17,12 +128,25 @@ body,
 }
 
 body {
-  @apply bg-white text-slate-900 antialiased;
-  font-family:
-    'Inter',
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
+  @apply bg-slate-50 font-sans text-slate-900 antialiased;
+}
+
+/* Ngoài @layer để thắng font-bold, font-semibold đang đặt ở từng trang */
+h1,
+h2 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.fc {
+  --fc-border-color: var(--color-border);
+  --fc-today-bg-color: var(--color-slate-100);
+  --fc-button-text-color: var(--color-slate-800);
+  --fc-button-bg-color: #ffffff;
+  --fc-button-border-color: var(--color-border);
+  --fc-button-hover-bg-color: var(--color-slate-100);
+  --fc-button-hover-border-color: var(--color-slate-300);
+  --fc-button-active-bg-color: var(--color-slate-200);
+  --fc-button-active-border-color: var(--color-slate-300);
 }

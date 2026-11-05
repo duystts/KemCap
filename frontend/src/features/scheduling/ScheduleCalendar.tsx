@@ -13,14 +13,14 @@ import { Calendar, Filter } from 'lucide-react'
 
 // Màu sắc cho 8 trạng thái buổi học
 const STATUS_COLORS: Record<SessionStatus, { bg: string; border: string; text: string }> = {
-  BOOKED: { bg: '#dbeafe', border: '#3b82f6', text: '#1e40af' },
-  COMPLETED: { bg: '#d1fae5', border: '#10b981', text: '#065f46' },
-  STUDENT_NO_SHOW: { bg: '#fee2e2', border: '#ef4444', text: '#991b1b' },
-  TEACHER_ABSENT: { bg: '#fef3c7', border: '#f59e0b', text: '#92400e' },
-  CANCELLED_ON_TIME: { bg: '#f1f5f9', border: '#94a3b8', text: '#475569' },
-  CANCELLED_LATE: { bg: '#ffe4e6', border: '#e11d48', text: '#9f1239' },
-  CANCELLED_SYSTEM: { bg: '#f1f5f9', border: '#64748b', text: '#334155' },
-  INTERRUPTED: { bg: '#fef9c3', border: '#eab308', text: '#854d0e' },
+  BOOKED: { bg: '#dae7f2', border: '#5183b5', text: '#2e4963' },
+  COMPLETED: { bg: '#e2e9d5', border: '#788c5d', text: '#3e4931' },
+  STUDENT_NO_SHOW: { bg: '#f6dcd8', border: '#bf4a40', text: '#7a2424' },
+  TEACHER_ABSENT: { bg: '#f6e1d7', border: '#c8623f', text: '#78371f' },
+  CANCELLED_ON_TIME: { bg: '#f0eee6', border: '#a3a198', text: '#5e5d57' },
+  CANCELLED_LATE: { bg: '#f6dcd8', border: '#b53333', text: '#7a2424' },
+  CANCELLED_SYSTEM: { bg: '#f0eee6', border: '#6f6d64', text: '#45443f' },
+  INTERRUPTED: { bg: '#f9eeda', border: '#c79a3a', text: '#6f5416' },
 }
 
 export default function ScheduleCalendar() {
