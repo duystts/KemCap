@@ -291,7 +291,7 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 - [X] T119 [US6] (#1·U6) Migration `MIG/V9__learning_feedback.sql`: `session_feedback` (`session_id` unique, `stars` `CHECK BETWEEN 1 AND 5`, `comment` nullable)
 - [X] T120 [US6] (#1·U6) `B/learning/internal/feedback/FeedbackService.java` + controller: `POST /sessions/{id}/feedback` (S, qua `SessionQueryApi.find`: đúng học viên, `COMPLETED`, ≤ 7 ngày, một lần), `GET /sessions/{id}/feedback` (chỉ A); listener ẩn danh hóa xóa `comment`, giữ `stars`
 - [X] T121 [US6] (#4·U8) `B/scheduling/internal/report/TeacherSessionsReportService.java` + `GET /reports/teacher-sessions?from=&to=` (A): theo giáo viên — chỉ `sessionsTaught` (K1)
-- [ ] T122 [P] [US6] (#3·U6) Frontend `F/features/learning/feedback/SessionFeedbackPrompt.tsx`: chấm 1–5 sao + nhận xét sau buổi `COMPLETED` (trang chủ học viên, chi tiết buổi; không bắt buộc; ẩn sau khi gửi hoặc quá 7 ngày)
+- [X] T122 [P] [US6] (#3·U6) Frontend `F/features/learning/feedback/SessionFeedbackPrompt.tsx`: chấm 1–5 sao + nhận xét sau buổi `COMPLETED` (trang chủ học viên, chi tiết buổi; không bắt buộc; ẩn sau khi gửi hoặc quá 7 ngày)
 - [ ] T123 [US6] (#4·U8) Frontend `F/features/admin/dashboard/DashboardPage.tsx`: chọn khoảng thời gian; thẻ tổng đã thu và công nợ (`/reports/revenue`); bảng số buổi đã dạy theo giáo viên (`/reports/teacher-sessions`); xem sao từng buổi ở chi tiết buổi (admin)
 
 **Checkpoint (cổng B6, 10/11)**: quickstart bước 12, 24 đúng.

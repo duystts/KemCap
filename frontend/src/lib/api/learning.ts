@@ -169,6 +169,34 @@ export function fetchPathRevisions(pathId: string): Promise<RevisionItem[]> {
   return api<RevisionItem[]>(`/learning-paths/${pathId}/revisions`)
 }
 
+export interface SessionFeedbackItem {
+  sessionId: string
+  studentId: string
+  teacherId: string
+  stars: number
+  comment?: string | null
+  createdAt: string
+}
+
+export function fetchMyFeedback(): Promise<SessionFeedbackItem[]> {
+  return api<SessionFeedbackItem[]>('/session-feedback/mine')
+}
+
+export function fetchSessionFeedback(sessionId: string): Promise<SessionFeedbackItem> {
+  return api<SessionFeedbackItem>(`/sessions/${sessionId}/feedback`)
+}
+
+export function submitSessionFeedback(
+  sessionId: string,
+  stars: number,
+  comment?: string,
+): Promise<SessionFeedbackItem> {
+  return api<SessionFeedbackItem>(`/sessions/${sessionId}/feedback`, {
+    method: 'POST',
+    body: { stars, comment },
+  })
+}
+
 export type ReportStatus = 'PENDING' | 'SUBMITTED'
 
 export interface ReportScores {
