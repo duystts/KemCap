@@ -203,6 +203,15 @@ export async function rescheduleSession(id: string, newStartsAt: string) {
   })
 }
 
+export type InterruptionDecision = 'COUNT' | 'MAKE_UP'
+
+export async function decideInterruption(id: string, decision: InterruptionDecision) {
+  return api<SessionItem>(`/sessions/${id}/interruption-decision`, {
+    method: 'POST',
+    body: { decision },
+  })
+}
+
 export async function recordOutcome(id: string, outcome: SessionStatus, note?: string) {
   return api<SessionItem>(`/sessions/${id}/outcome`, {
     method: 'POST',
