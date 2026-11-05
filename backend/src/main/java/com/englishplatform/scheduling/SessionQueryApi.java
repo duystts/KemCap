@@ -1,6 +1,7 @@
 package com.englishplatform.scheduling;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -8,6 +9,8 @@ import java.util.UUID;
 public interface SessionQueryApi {
 
   Optional<SessionView> find(UUID sessionId);
+
+  List<SessionView> findByEnrollment(UUID enrollmentId);
 
   record SessionView(
       UUID id,
