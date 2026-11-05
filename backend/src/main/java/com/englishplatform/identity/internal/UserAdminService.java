@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserAdminService {
 
   private final UserAccountRepository users;
+  private final PolicyConsentRepository policyConsents;
   private final InvitationService invitations;
   private final AuthService authService;
   private final List<UserDeactivationGuard> deactivationGuards;
@@ -31,17 +32,26 @@ public class UserAdminService {
 
   UserAdminService(
       UserAccountRepository users,
+      PolicyConsentRepository policyConsents,
       InvitationService invitations,
       AuthService authService,
       List<UserDeactivationGuard> deactivationGuards,
       ApplicationEventPublisher events,
       Clock clock) {
     this.users = users;
+    this.policyConsents = policyConsents;
     this.invitations = invitations;
     this.authService = authService;
     this.deactivationGuards = deactivationGuards;
     this.events = events;
     this.clock = clock;
+  }
+
+  /** Các lần đồng ý chính sách, phục vụ bản tóm tắt dữ liệu cá nhân (FR-031). */
+  @Transactional(readOnly = true)
+  public List<PolicyConsent> policyConsents(UUID userId) {
+    users.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
+    return policyConsents.findByUserIdOrderByAcceptedAtDesc(userId);
   }
 
   public record NewUser(

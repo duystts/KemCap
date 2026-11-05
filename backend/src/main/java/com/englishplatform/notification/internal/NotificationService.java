@@ -3,6 +3,7 @@ package com.englishplatform.notification.internal;
 import com.englishplatform.shared.web.BusinessException;
 import com.englishplatform.shared.web.ErrorCode;
 import java.time.Clock;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,11 @@ public class NotificationService {
       return notifications.findByUserIdAndReadAtIsNullOrderByCreatedAtDesc(userId, pageable);
     }
     return notifications.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+  }
+
+  @Transactional(readOnly = true)
+  public List<Notification> listAll(UUID userId) {
+    return notifications.findByUserIdOrderByCreatedAtDesc(userId);
   }
 
   @Transactional(readOnly = true)

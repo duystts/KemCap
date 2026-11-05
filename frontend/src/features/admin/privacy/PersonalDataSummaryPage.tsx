@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router'
 import { useQueries, useQuery } from '@tanstack/react-query'
-import { fetchEnrollments, fetchStudentProfile } from '@/lib/api/catalog'
+import { fetchEnrollments, fetchStudentProfile, fetchTeacherHistory } from '@/lib/api/catalog'
 import { fetchStatement } from '@/lib/api/billing'
 import { ApiError } from '@/lib/api/client'
 import {
@@ -13,7 +13,13 @@ import {
   fetchSessionReport,
   type GoalStatus,
 } from '@/lib/api/learning'
-import { fetchFeedbackRecord, fetchGuardianConsent } from '@/lib/api/privacy'
+import {
+  fetchFeedbackRecord,
+  fetchGuardianConsent,
+  fetchOutcomeHistory,
+  fetchPolicyConsents,
+  fetchUserNotifications,
+} from '@/lib/api/privacy'
 import { fetchSessions } from '@/lib/api/scheduling'
 import { fetchUser, fetchUsers } from '@/lib/api/users'
 import { DateTimeText } from '@/components/DateTimeText'
@@ -170,6 +176,27 @@ export default function PersonalDataSummaryPage() {
     })),
   })
 
+  const policyConsents = useQuery({
+    queryKey: ['policy-consents', studentId],
+    queryFn: () => fetchPolicyConsents(studentId),
+  })
+  const notifications = useQuery({
+    queryKey: ['user-notifications', studentId],
+    queryFn: () => fetchUserNotifications(studentId),
+  })
+  const teacherHistories = useQueries({
+    queries: (enrollments.data ?? []).map((e) => ({
+      queryKey: ['teacher-history', e.id],
+      queryFn: () => fetchTeacherHistory(e.id),
+    })),
+  })
+  const outcomeHistories = useQueries({
+    queries: (sessions.data ?? []).map((s) => ({
+      queryKey: ['outcome-history', s.id],
+      queryFn: () => fetchOutcomeHistory(s.id),
+    })),
+  })
+
   const required = [
     user,
     profile,
@@ -182,6 +209,10 @@ export default function PersonalDataSummaryPage() {
     teachers,
     ...statements,
     ...reports,
+    policyConsents,
+    notifications,
+    ...teacherHistories,
+    ...outcomeHistories,
   ]
   const optional = [guardian, path, ...feedback]
   const loading = required.some((q) => q.isLoading) || optional.some((q) => q.isLoading)
@@ -231,6 +262,17 @@ export default function PersonalDataSummaryPage() {
                 ['Trình độ tự khai', profile.data?.selfReportedLevel],
                 ['Ghi chú của giáo vụ', profile.data?.notes],
               ]}
+            />
+          </Section>
+
+          <Section title="Đồng ý chính sách dữ liệu">
+            <Table
+              headers={['Phiên bản', 'Thời điểm đồng ý']}
+              empty="Chưa đồng ý phiên bản nào."
+              rows={(policyConsents.data ?? []).map((c) => [
+                c.policyVersion,
+                <DateTimeText key="t" value={c.acceptedAt} />,
+              ])}
             />
           </Section>
 
@@ -331,14 +373,40 @@ export default function PersonalDataSummaryPage() {
             />
           </Section>
 
+          <Section title="Lịch sử đổi giáo viên">
+            <Table
+              headers={['Thời gian', 'Từ giáo viên', 'Sang giáo viên', 'Lý do']}
+              empty="Chưa đổi giáo viên."
+              rows={teacherHistories
+                .flatMap((h) => h.data ?? [])
+                .map((h) => [
+                  <DateTimeText key="t" value={h.changedAt} />,
+                  h.fromTeacherId ? teacherName(h.fromTeacherId) : 'Ban đầu',
+                  teacherName(h.toTeacherId),
+                  h.reason,
+                ])}
+            />
+          </Section>
+
           <Section title="Buổi học">
             <Table
-              headers={['Thời gian', 'Giáo viên', 'Trạng thái']}
+              headers={[
+                'Thời gian',
+                'Giáo viên',
+                'Trạng thái',
+                'Lý do hủy',
+                'Ghi chú chốt kết quả',
+              ]}
               empty="Chưa có buổi học."
-              rows={(sessions.data ?? []).map((s) => [
+              rows={(sessions.data ?? []).map((s, i) => [
                 <DateTimeText key="t" value={s.startsAt} />,
                 teacherName(s.teacherId),
                 statusLabel(s.status),
+                s.cancelReason,
+                (outcomeHistories[i]?.data ?? [])
+                  .map((c) => c.note)
+                  .filter(Boolean)
+                  .join('\n') || null,
               ])}
             />
           </Section>
@@ -374,13 +442,26 @@ export default function PersonalDataSummaryPage() {
 
           <Section title="Bài tập và bài nộp">
             <Table
-              headers={['Bài tập', 'Bài nộp', 'Điểm', 'Phản hồi']}
+              headers={['Bài tập', 'Hướng dẫn', 'Bài nộp', 'Điểm', 'Phản hồi']}
               empty="Chưa có bài tập."
               rows={(assignments.data ?? []).map((a) => [
                 a.title,
+                a.instructions,
                 a.submission?.textAnswer,
                 a.submission?.score,
                 a.submission?.feedback,
+              ])}
+            />
+          </Section>
+
+          <Section title="Thông báo trong hệ thống">
+            <Table
+              headers={['Thời gian', 'Tiêu đề', 'Nội dung']}
+              empty="Chưa có thông báo."
+              rows={(notifications.data ?? []).map((n) => [
+                <DateTimeText key="t" value={n.createdAt} />,
+                n.title,
+                n.body,
               ])}
             />
           </Section>

@@ -36,4 +36,8 @@ public class PolicyConsent extends BaseEntity {
   public String getPolicyVersion() {
     return policyVersion;
   }
+
+  public Instant getAcceptedAt() {
+    return acceptedAt;
+  }
 }

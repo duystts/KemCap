@@ -64,6 +64,37 @@ export function fetchFeedbackRecord(sessionId: string): Promise<SessionFeedbackR
   return api<SessionFeedbackRecord>(`/sessions/${sessionId}/feedback`)
 }
 
+export interface PolicyConsentItem {
+  policyVersion: string
+  acceptedAt: string
+}
+
+export function fetchPolicyConsents(userId: string): Promise<PolicyConsentItem[]> {
+  return api<PolicyConsentItem[]>(`/users/${userId}/policy-consents`)
+}
+
+export interface UserNotificationItem {
+  id: string
+  title: string
+  body?: string | null
+  createdAt: string
+}
+
+export function fetchUserNotifications(userId: string): Promise<UserNotificationItem[]> {
+  return api<UserNotificationItem[]>(`/users/${userId}/notifications`)
+}
+
+export interface OutcomeChangeItem {
+  fromStatus?: string | null
+  toStatus: string
+  note?: string | null
+  createdAt: string
+}
+
+export function fetchOutcomeHistory(sessionId: string): Promise<OutcomeChangeItem[]> {
+  return api<OutcomeChangeItem[]>(`/sessions/${sessionId}/outcome-history`)
+}
+
 export function fetchGuardianConsent(studentId: string): Promise<GuardianConsentItem> {
   return api<GuardianConsentItem>(`/students/${studentId}/guardian-consent`)
 }
