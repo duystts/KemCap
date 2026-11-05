@@ -335,13 +335,16 @@ export default function StudentProfilePage() {
                       </div>
                     </div>
 
-                    <Link
-                      to={`/admin/enrollments/${enr.id}`}
-                      className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 self-start sm:self-auto"
-                    >
-                      Chi tiết & Học phí
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </Link>
+                    {/* Trang ghi danh chỉ thuộc route của giáo vụ */}
+                    {isAdmin && (
+                      <Link
+                        to={`/admin/enrollments/${enr.id}`}
+                        className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 self-start sm:self-auto"
+                      >
+                        Chi tiết & Học phí
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </Link>
+                    )}
                   </div>
                 ))}
               </div>
