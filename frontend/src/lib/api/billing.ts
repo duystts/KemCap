@@ -21,6 +21,21 @@ export interface StatementDto {
   payments: PaymentItem[]
 }
 
+export interface ReceivableItem {
+  enrollmentId: string
+  studentId: string
+  studentName?: string | null
+  amountDueVnd: number
+  amountPaidVnd: number
+  debtVnd: number
+  cancelled: boolean
+}
+
+export function fetchReceivables(params?: { hasDebt?: boolean }): Promise<ReceivableItem[]> {
+  const query = params?.hasDebt === undefined ? '' : `?hasDebt=${params.hasDebt}`
+  return api<ReceivableItem[]>(`/receivables${query}`)
+}
+
 export function fetchStatement(enrollmentId: string): Promise<StatementDto> {
   return api<StatementDto>(`/enrollments/${enrollmentId}/payments`)
 }
