@@ -6,6 +6,7 @@ import { useAuth } from '@/app/AuthProvider'
 import { fetchSession, previewCancelSession, cancelSession } from '@/lib/api/scheduling'
 import { StatusBadge } from '@/components/StatusBadge'
 import SessionOutcomeDialog from './SessionOutcomeDialog'
+import SessionReportSection from '@/features/learning/report/SessionReportSection'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -260,6 +261,8 @@ export default function SessionDetailPage() {
           )}
         </CardContent>
       </Card>
+
+      {session.status === 'COMPLETED' && <SessionReportSection sessionId={session.id} />}
 
       <SessionOutcomeDialog
         sessionId={session.id}

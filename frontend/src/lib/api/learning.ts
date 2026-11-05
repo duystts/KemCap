@@ -168,3 +168,69 @@ export function updateLearningPath(
 export function fetchPathRevisions(pathId: string): Promise<RevisionItem[]> {
   return api<RevisionItem[]>(`/learning-paths/${pathId}/revisions`)
 }
+
+export type ReportStatus = 'PENDING' | 'SUBMITTED'
+
+export interface ReportScores {
+  listening?: number | null
+  speaking?: number | null
+  reading?: number | null
+  writing?: number | null
+  grammarVocab?: number | null
+}
+
+export interface ReportListItem {
+  sessionId: string
+  teacherId: string
+  teacherName?: string | null
+  studentId: string
+  studentName?: string | null
+  status: ReportStatus
+  sessionEndsAt: string
+  dueAt: string
+  overdue: boolean
+  onTime?: boolean | null
+}
+
+export interface SessionReportDto {
+  id: string
+  sessionId: string
+  teacherId: string
+  studentId: string
+  status: ReportStatus
+  sessionEndsAt: string
+  dueAt: string
+  overdue: boolean
+  onTime?: boolean | null
+  taughtTopicIds: string[]
+  scores?: ReportScores | null
+  comment?: string | null
+  submittedAt?: string | null
+}
+
+export interface SubmitReportRequest {
+  taughtTopicIds: string[]
+  completedTopicIds: string[]
+  scores: ReportScores
+  comment: string
+  assignments: { title: string; instructions?: string; dueAt?: string }[]
+}
+
+export function fetchSessionReports(status?: ReportStatus): Promise<ReportListItem[]> {
+  const query = status ? `?status=${status}` : ''
+  return api<ReportListItem[]>(`/session-reports${query}`)
+}
+
+export function fetchSessionReport(sessionId: string): Promise<SessionReportDto> {
+  return api<SessionReportDto>(`/sessions/${sessionId}/report`)
+}
+
+export function submitSessionReport(
+  sessionId: string,
+  data: SubmitReportRequest,
+): Promise<SessionReportDto> {
+  return api<SessionReportDto>(`/sessions/${sessionId}/report`, {
+    method: 'PUT',
+    body: data,
+  })
+}
