@@ -16,13 +16,14 @@ import { StatusBadge } from '@/components/StatusBadge'
 import ProficiencyPanel from '@/features/learning/proficiency/ProficiencyPanel'
 import GoalsPanel from '@/features/learning/proficiency/GoalsPanel'
 import LearningPathView from '@/features/learning/path/LearningPathView'
+import ProgressPage from '@/features/learning/progress/ProgressPage'
 import CreateEnrollmentDialog from '@/features/catalog/enrollments/CreateEnrollmentDialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
 
-type TabType = 'info' | 'proficiency' | 'path' | 'enrollments'
+type TabType = 'info' | 'proficiency' | 'path' | 'progress' | 'enrollments'
 
 const CEFR_LEVELS: CefrLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
 
@@ -178,6 +179,17 @@ export default function StudentProfilePage() {
           </button>
           <button
             type="button"
+            onClick={() => setActiveTab('progress')}
+            className={`pb-3 border-b-2 transition-colors flex items-center gap-2 ${
+              activeTab === 'progress'
+                ? 'border-indigo-600 text-indigo-600'
+                : 'border-transparent text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            Tiến bộ
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab('enrollments')}
             className={`pb-3 border-b-2 transition-colors flex items-center gap-2 ${
               activeTab === 'enrollments'
@@ -252,6 +264,8 @@ export default function StudentProfilePage() {
 
       {/* Tab 3: Learning Path */}
       {activeTab === 'path' && <LearningPathView studentId={id!} canEdit={canEdit} />}
+
+      {activeTab === 'progress' && <ProgressPage studentId={id!} />}
 
       {/* Tab 4: Enrollments */}
       {activeTab === 'enrollments' && (

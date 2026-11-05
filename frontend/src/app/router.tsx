@@ -29,6 +29,7 @@ const EnrollmentDetailPage = lazy(
   () => import('@/features/catalog/enrollments/EnrollmentDetailPage'),
 )
 const StudentPackagesPage = lazy(() => import('@/features/catalog/enrollments/StudentPackagesPage'))
+const ProgressPage = lazy(() => import('@/features/learning/progress/ProgressPage'))
 const ReceivablesPage = lazy(() => import('@/features/billing/ReceivablesPage'))
 
 // Learning & Proficiency (U4)
@@ -105,7 +106,7 @@ export const router = createBrowserRouter([
           { path: 'schedule', element: page(<ScheduleCalendar />) },
           { path: 'learning-path', element: page(<StudentLearningPathPage />) },
           { path: 'assignments', element: page(<AssignmentsPage />) },
-          placeholder('progress', 'Tiến bộ'),
+          { path: 'progress', element: page(<ProgressPage />) },
           { path: 'packages', element: page(<StudentPackagesPage />) },
         ],
       },
