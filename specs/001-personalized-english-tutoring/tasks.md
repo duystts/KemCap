@@ -239,7 +239,7 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 - [X] T099 [US4] (#1·U6) `B/learning/internal/progress/ProgressService.java` + `GET /students/{id}/progress`: `skillSeries` (điểm từng kỹ năng theo ngày từ phiếu `SUBMITTED`), `pathCompletion`, `recentReports` (5 phiếu gần nhất); không có `attendanceRate`, `assignmentRate` ([GĐ2])
 - [X] T100 [US4] (#1·U6) Listener `B/learning/internal/ReportAnonymizationListener.java` (`StudentAnonymized`, idempotent): xóa `assignment` + `submission` của học viên; trong `session_report` xóa điểm kỹ năng, `comment`, `taught_topic_ids` (giữ `submitted_at`, `due_at`, `status`)
 - [X] T101 [P] [US4] (#3·U6) Frontend `F/features/learning/report/PendingReportsList.tsx` (trang chủ giáo viên) + `SessionReportForm.tsx`: chủ đề từ lộ trình, điểm 1–5 từng kỹ năng (bỏ trống được), nhận xét, nhiều bài tập (hạn nộp tùy chọn); điền dưới 3 phút (SC-008)
-- [ ] T102 [P] [US4] (#3·U6) Frontend `F/features/learning/assignments/AssignmentsPage.tsx`: học viên nộp văn bản (nhãn "Nộp muộn" khi quá hạn); giáo viên đọc bài, chấm 0–10 kèm phản hồi
+- [X] T102 [P] [US4] (#3·U6) Frontend `F/features/learning/assignments/AssignmentsPage.tsx`: học viên nộp văn bản (nhãn "Nộp muộn" khi quá hạn); giáo viên đọc bài, chấm 0–10 kèm phản hồi
 - [ ] T103 [US4] (#3·U6) Frontend `F/features/learning/progress/ProgressPage.tsx`: thẻ CEFR hiện tại, biểu đồ đường Recharts 5 kỹ năng theo thời gian, % hoàn thành lộ trình, nhận xét gần nhất; dùng cho `/student/progress` và tab "Tiến bộ"
 
 **Checkpoint (cổng B6, 10/11)**: quickstart bước 8, 10, 11 đúng.
