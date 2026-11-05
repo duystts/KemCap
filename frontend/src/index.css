@@ -139,6 +139,16 @@ h2 {
   letter-spacing: -0.01em;
 }
 
+@media print {
+  body {
+    background: #ffffff;
+  }
+
+  [data-sonner-toaster] {
+    display: none;
+  }
+}
+
 .fc {
   --fc-border-color: var(--color-border);
   --fc-today-bg-color: var(--color-slate-100);

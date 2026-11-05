@@ -42,7 +42,7 @@ export function ConfirmDialog({
         e.preventDefault()
         onCancel()
       }}
-      className="w-full max-w-md rounded-xl p-0 backdrop:bg-black/40"
+      className="m-auto w-full max-w-md rounded-xl p-0 backdrop:bg-black/40"
     >
       <div className="space-y-4 p-6">
         <h2 className="text-lg font-semibold">{title}</h2>
