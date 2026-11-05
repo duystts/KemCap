@@ -9,7 +9,6 @@ import SessionOutcomeDialog from './SessionOutcomeDialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import { X, Video, Clock, Calendar, AlertTriangle, ExternalLink, CheckCircle2 } from 'lucide-react'
 
 interface SessionDetailDrawerProps {
   sessionId: string | null
@@ -99,7 +98,7 @@ export default function SessionDetailDrawer({
                 onClick={onClose}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
               >
-                <X className="w-5 h-5" />
+                Đóng
               </button>
             </div>
 
@@ -112,11 +111,9 @@ export default function SessionDetailDrawer({
                   {/* Thời gian */}
                   <div className="p-4 rounded-xl bg-slate-50 border space-y-2">
                     <div className="flex items-center gap-2 text-slate-700 text-sm font-semibold">
-                      <Calendar className="w-4 h-4 text-indigo-600" />
                       {formatDateTime(session.startsAt).date}
                     </div>
-                    <div className="flex items-center gap-2 text-slate-900 text-xl font-bold font-mono">
-                      <Clock className="w-5 h-5 text-indigo-600" />
+                    <div className="flex items-center gap-2 text-slate-900 text-xl font-semibold">
                       {formatDateTime(session.startsAt).time} -{' '}
                       {formatDateTime(session.endsAt).time}
                     </div>
@@ -125,10 +122,7 @@ export default function SessionDetailDrawer({
                   {/* Cảnh báo hủy (nếu có) */}
                   {session.cancelReason && (
                     <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-800 space-y-1">
-                      <div className="font-semibold flex items-center gap-1.5">
-                        <AlertTriangle className="w-4 h-4 text-red-600" />
-                        Lý do hủy buổi:
-                      </div>
+                      <div className="font-semibold flex items-center gap-1.5">Lý do hủy buổi:</div>
                       <p>{session.cancelReason}</p>
                     </div>
                   )}
@@ -142,11 +136,10 @@ export default function SessionDetailDrawer({
                         disabled={!isRoomOpen}
                         className={`w-full py-6 text-base font-semibold shadow-md flex items-center justify-center gap-2 ${
                           isRoomOpen
-                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white animate-pulse'
+                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
                             : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
                         }`}
                       >
-                        <Video className="w-5 h-5" />
                         {isRoomOpen ? 'Vào phòng học ngay' : 'Phòng học chưa mở'}
                       </Button>
                       {!isRoomOpen && (
@@ -167,7 +160,6 @@ export default function SessionDetailDrawer({
                           onClick={() => setOutcomeDialogOpen(true)}
                           className="w-full flex items-center justify-center gap-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
                         >
-                          <CheckCircle2 className="w-4 h-4 text-indigo-600" />
                           Chốt / Cập nhật kết quả buổi học
                         </Button>
                       </div>
@@ -188,7 +180,6 @@ export default function SessionDetailDrawer({
                       ) : (
                         <div className="p-4 rounded-xl border border-rose-200 bg-rose-50/50 space-y-3 animate-in fade-in">
                           <div className="text-xs font-semibold text-rose-900 flex items-center gap-1.5">
-                            <AlertTriangle className="w-4 h-4 text-rose-600" />
                             Xác nhận hủy lịch học
                           </div>
 
@@ -199,8 +190,8 @@ export default function SessionDetailDrawer({
                               {me?.role === 'TEACHER'
                                 ? 'Buổi sẽ được ghi nhận là giáo viên vắng.'
                                 : cancelPreview?.willConsume
-                                  ? '⚠️ Hủy muộn (dưới 12 tiếng): Bạn vẫn sẽ bị tính 1 buổi học.'
-                                  : '✅ Hủy đúng hạn (trên 12 tiếng): Bạn sẽ được hoàn lại 1 buổi vào gói.'}
+                                  ? 'Hủy muộn (dưới 12 tiếng): Bạn vẫn sẽ bị tính 1 buổi học.'
+                                  : 'Hủy đúng hạn (trên 12 tiếng): Bạn sẽ được hoàn lại 1 buổi vào gói.'}
                             </p>
                           )}
 
@@ -252,7 +243,7 @@ export default function SessionDetailDrawer({
               }}
               className="flex items-center gap-1 text-indigo-600 hover:underline font-medium"
             >
-              Mở trang đầy đủ <ExternalLink className="w-3.5 h-3.5" />
+              Mở trang đầy đủ{' '}
             </button>
           </div>
         </div>

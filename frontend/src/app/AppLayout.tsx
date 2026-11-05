@@ -1,5 +1,4 @@
 import { NavLink, Outlet } from 'react-router'
-import { LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { NotificationBell } from '@/features/notifications/NotificationBell'
 import type { Role } from '@/lib/api/types'
@@ -77,7 +76,6 @@ export function AppLayout() {
           <NotificationBell />
           <span className="text-sm font-medium">{me.fullName}</span>
           <Button variant="ghost" size="sm" onClick={() => void logout()} aria-label="Đăng xuất">
-            <LogOut className="h-4 w-4" />
             Đăng xuất
           </Button>
         </header>

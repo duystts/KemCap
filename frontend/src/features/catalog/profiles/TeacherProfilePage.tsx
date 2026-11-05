@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import { User, Mail, Award, Edit, Clock, X } from 'lucide-react'
 
 export default function TeacherProfilePage() {
   const { id: paramId } = useParams<{ id: string }>()
@@ -85,9 +84,6 @@ export default function TeacherProfilePage() {
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
-              <User className="w-8 h-8" />
-            </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-slate-900">
@@ -96,10 +92,7 @@ export default function TeacherProfilePage() {
                 {user && <StatusBadge status={user.status} />}
               </div>
               <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
-                <span className="flex items-center gap-1">
-                  <Mail className="w-3.5 h-3.5" />
-                  {user?.email}
-                </span>
+                <span className="flex items-center gap-1">{user?.email}</span>
                 {user?.phone && <span>• {user.phone}</span>}
               </div>
             </div>
@@ -108,7 +101,6 @@ export default function TeacherProfilePage() {
           <div className="flex items-center gap-2">
             {canEdit && (
               <Button variant="outline" size="sm" onClick={() => setEditDialogOpen(true)}>
-                <Edit className="w-4 h-4 mr-1.5" />
                 Cập nhật thông tin
               </Button>
             )}
@@ -126,7 +118,6 @@ export default function TeacherProfilePage() {
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            <User className="w-4 h-4" />
             Thông tin chuyên môn
           </button>
           <button
@@ -138,7 +129,6 @@ export default function TeacherProfilePage() {
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            <Clock className="w-4 h-4" />
             Lịch rảnh & Ngày nghỉ
           </button>
         </div>
@@ -150,7 +140,6 @@ export default function TeacherProfilePage() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
-                <Award className="w-4 h-4 text-indigo-600" />
                 Chuyên môn & Lĩnh vực giảng dạy
               </CardTitle>
             </CardHeader>
@@ -222,9 +211,7 @@ export default function TeacherProfilePage() {
                 type="button"
                 onClick={() => setEditDialogOpen(false)}
                 className="p-1 rounded-lg text-slate-400 hover:text-slate-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              ></button>
             </div>
 
             <form

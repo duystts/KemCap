@@ -5,7 +5,6 @@ import { recordOutcome, fetchSession, type SessionStatus } from '@/lib/api/sched
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import { CheckCircle, AlertTriangle, XCircle, Clock } from 'lucide-react'
 
 interface SessionOutcomeDialogProps {
   sessionId: string
@@ -18,35 +17,30 @@ const OUTCOMES: {
   status: SessionStatus
   label: string
   description: string
-  icon: typeof CheckCircle
   color: string
 }[] = [
   {
     status: 'COMPLETED',
     label: 'Hoàn thành tốt',
     description: 'Buổi học diễn ra thành công theo đúng kế hoạch.',
-    icon: CheckCircle,
     color: 'text-emerald-600 bg-emerald-50 border-emerald-200',
   },
   {
     status: 'STUDENT_NO_SHOW',
     label: 'Học viên vắng mặt',
     description: 'Học viên không vào lớp sau 15 phút. Buổi học vẫn bị tính trừ vào gói.',
-    icon: AlertTriangle,
     color: 'text-amber-600 bg-amber-50 border-amber-200',
   },
   {
     status: 'TEACHER_ABSENT',
     label: 'Giáo viên vắng / sự cố',
     description: 'Giáo viên có việc đột xuất hoặc vắng. Buổi học sẽ được hoàn lại cho học viên.',
-    icon: XCircle,
     color: 'text-rose-600 bg-rose-50 border-rose-200',
   },
   {
     status: 'INTERRUPTED',
     label: 'Gián đoạn kỹ thuật',
     description: 'Mất mạng, sự cố âm thanh nghiêm trọng. Chuyển giáo vụ xem xét bù buổi.',
-    icon: Clock,
     color: 'text-indigo-600 bg-indigo-50 border-indigo-200',
   },
 ]
@@ -98,7 +92,6 @@ export default function SessionOutcomeDialog({
 
         {isFutureSession && (
           <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs flex items-start gap-2.5">
-            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
             <div className="space-y-0.5">
               <span className="font-semibold text-amber-800">Buổi học chưa diễn ra</span>
               <p className="text-amber-700">
@@ -119,7 +112,6 @@ export default function SessionOutcomeDialog({
 
         <div className="space-y-2.5">
           {OUTCOMES.map((item) => {
-            const Icon = item.icon
             const isSelected = selectedOutcome === item.status
             return (
               <button
@@ -132,7 +124,6 @@ export default function SessionOutcomeDialog({
                     : 'bg-white border-slate-200 hover:bg-slate-50'
                 }`}
               >
-                <Icon className="w-5 h-5 shrink-0 mt-0.5" />
                 <div>
                   <div className="text-sm font-semibold text-slate-900">{item.label}</div>
                   <div className="text-xs text-slate-500 mt-0.5">{item.description}</div>

@@ -16,17 +16,6 @@ import GuardianConsentDialog from './GuardianConsentDialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import {
-  Users,
-  UserPlus,
-  Search,
-  Mail,
-  Shield,
-  RotateCw,
-  ExternalLink,
-  Power,
-  Calendar,
-} from 'lucide-react'
 
 const ROLE_LABELS: Record<Role, { label: string; color: string }> = {
   ADMIN: { label: 'Giáo vụ / Admin', color: 'bg-purple-100 text-purple-800' },
@@ -91,7 +80,6 @@ export default function UsersPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-            <Users className="w-6 h-6 text-indigo-600" />
             Quản lý người dùng
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -99,7 +87,6 @@ export default function UsersPage() {
           </p>
         </div>
         <Button onClick={() => setCreateDialogOpen(true)} className="shrink-0">
-          <UserPlus className="w-4 h-4 mr-2" />
           Thêm người dùng
         </Button>
       </div>
@@ -107,12 +94,10 @@ export default function UsersPage() {
       {/* Filters */}
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-col md:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
           <Input
             placeholder="Tìm theo tên hoặc email…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
           />
         </div>
         <div className="flex flex-wrap sm:flex-nowrap gap-2">
@@ -173,7 +158,6 @@ export default function UsersPage() {
                       <td className="py-3.5 px-4">
                         <div className="font-semibold text-slate-900">{u.fullName}</div>
                         <div className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
-                          <Mail className="w-3.5 h-3.5 text-slate-400" />
                           {u.email}
                           {u.phone && <span className="text-slate-400">• {u.phone}</span>}
                         </div>
@@ -191,7 +175,6 @@ export default function UsersPage() {
                       <td className="py-3.5 px-4 text-xs text-slate-600">
                         {u.dateOfBirth ? (
                           <span className="flex items-center gap-1">
-                            <Calendar className="w-3.5 h-3.5 text-slate-400" />
                             {new Date(u.dateOfBirth).toLocaleDateString('vi-VN')}
                           </span>
                         ) : (
@@ -220,7 +203,7 @@ export default function UsersPage() {
                               className="p-1.5 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                               title="Xem hồ sơ học viên"
                             >
-                              <ExternalLink className="w-4 h-4" />
+                              Xem
                             </Link>
                           )}
                           {u.role === 'TEACHER' && (
@@ -229,7 +212,7 @@ export default function UsersPage() {
                               className="p-1.5 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                               title="Xem hồ sơ giáo viên"
                             >
-                              <ExternalLink className="w-4 h-4" />
+                              Xem
                             </Link>
                           )}
 
@@ -241,7 +224,6 @@ export default function UsersPage() {
                               onClick={() => setConsentStudent({ id: u.id, name: u.fullName })}
                               className="h-8 text-xs border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                             >
-                              <Shield className="w-3.5 h-3.5 mr-1 text-amber-600" />
                               Người giám hộ
                             </Button>
                           )}
@@ -256,7 +238,6 @@ export default function UsersPage() {
                               className="h-8 text-xs text-slate-600 hover:text-indigo-600"
                               title="Gửi lại email mời"
                             >
-                              <RotateCw className="w-3.5 h-3.5 mr-1" />
                               Gửi lại mời
                             </Button>
                           )}
@@ -280,7 +261,6 @@ export default function UsersPage() {
                               }`}
                               title={u.status === 'ACTIVE' ? 'Ngừng kích hoạt' : 'Kích hoạt lại'}
                             >
-                              <Power className="w-3.5 h-3.5 mr-1" />
                               {u.status === 'ACTIVE' ? 'Ngừng' : 'Mở lại'}
                             </Button>
                           )}

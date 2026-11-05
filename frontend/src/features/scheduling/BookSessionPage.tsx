@@ -14,7 +14,6 @@ import SlotPicker from './SlotPicker'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import { Check, AlertCircle, BookOpen } from 'lucide-react'
 
 export default function BookSessionPage() {
   const { me } = useAuth()
@@ -97,7 +96,6 @@ export default function BookSessionPage() {
       ) : activeEnrollments.length === 0 ? (
         <Card className="border-amber-200 bg-amber-50/50">
           <CardContent className="p-6 text-center space-y-3">
-            <AlertCircle className="w-8 h-8 text-amber-600 mx-auto" />
             <h3 className="font-semibold text-slate-800">Bạn chưa có gói học nào khả dụng</h3>
             <p className="text-sm text-slate-600 max-w-md mx-auto">
               Để đặt lịch học, bạn cần có ít nhất một gói học đang trong trạng thái kích hoạt và còn
@@ -110,10 +108,7 @@ export default function BookSessionPage() {
           {/* Bước 1: Chọn gói học */}
           <Card>
             <CardHeader className="pb-3 border-b">
-              <CardTitle className="text-base flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-indigo-600" />
-                Gói học áp dụng
-              </CardTitle>
+              <CardTitle className="text-base flex items-center gap-2">Gói học áp dụng</CardTitle>
             </CardHeader>
             <CardContent className="pt-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -137,7 +132,6 @@ export default function BookSessionPage() {
                         <span className="font-bold text-slate-900 text-sm">
                           Gói {enr.sessionMinutes} phút/buổi
                         </span>
-                        {isSelected && <Check className="w-4 h-4 text-indigo-600 font-bold" />}
                       </div>
                       <div className="mt-2 flex items-center justify-between text-xs text-slate-600">
                         <span>

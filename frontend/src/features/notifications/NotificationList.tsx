@@ -1,5 +1,4 @@
 import type { NotificationItem } from '@/lib/api/notifications'
-import { CheckCheck } from 'lucide-react'
 
 interface NotificationListProps {
   items: NotificationItem[]
@@ -38,7 +37,6 @@ export function NotificationList({
             onClick={onMarkAllRead}
             className="flex items-center gap-1 text-xs text-primary hover:underline"
           >
-            <CheckCheck className="h-3.5 w-3.5" />
             Đọc tất cả
           </button>
         )}

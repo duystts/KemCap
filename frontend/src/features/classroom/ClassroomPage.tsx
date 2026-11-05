@@ -5,7 +5,6 @@ import { useAuth } from '@/app/AuthProvider'
 import { joinClassroom, type JoinInfo } from '@/lib/api/scheduling'
 import SessionOutcomeDialog from '@/features/scheduling/SessionOutcomeDialog'
 import { Button } from '@/components/ui/button'
-import { AlertCircle, ArrowLeft } from 'lucide-react'
 import { LiveKitRoom, VideoConference, RoomAudioRenderer } from '@livekit/components-react'
 import '@livekit/components-styles'
 
@@ -52,9 +51,6 @@ export default function ClassroomPage() {
   if (error || !joinInfo) {
     return (
       <div className="h-screen w-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4 text-center">
-        <div className="p-4 rounded-full bg-red-500/10 text-red-500 mb-4">
-          <AlertCircle className="w-10 h-10" />
-        </div>
         <h2 className="text-xl font-bold">Không thể tham gia phòng học</h2>
         <p className="text-sm text-slate-400 max-w-md mt-2 mb-6">
           Phòng học có thể chưa tới giờ mở (chỉ mở trước 10 phút), hoặc buổi học đã kết thúc/bị hủy.
@@ -63,7 +59,7 @@ export default function ClassroomPage() {
           onClick={() => navigate(-1)}
           className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium flex items-center gap-2"
         >
-          <ArrowLeft className="w-4 h-4" /> Quay lại lịch học
+          Quay lại lịch học
         </Button>
       </div>
     )

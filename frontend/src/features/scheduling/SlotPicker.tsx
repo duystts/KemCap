@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { fetchSlots, slotMinutes, type Slot } from '@/lib/api/scheduling'
-import { Clock, Calendar, AlertCircle } from 'lucide-react'
 
 interface SlotPickerProps {
   enrollmentId: string
@@ -51,7 +50,6 @@ export default function SlotPicker({ enrollmentId, selectedSlot, onSelectSlot }:
       {/* 1. Chọn ngày (Slider/Grid ngang) */}
       <div>
         <label className="block text-sm font-semibold text-slate-800 mb-2 flex items-center gap-1.5">
-          <Calendar className="w-4 h-4 text-indigo-600" />
           Bước 1: Chọn ngày học (14 ngày tới)
         </label>
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
@@ -83,7 +81,6 @@ export default function SlotPicker({ enrollmentId, selectedSlot, onSelectSlot }:
       {/* 2. Danh sách khung giờ trống */}
       <div>
         <label className="block text-sm font-semibold text-slate-800 mb-2 flex items-center gap-1.5">
-          <Clock className="w-4 h-4 text-indigo-600" />
           Bước 2: Chọn khung giờ rảnh phù hợp
         </label>
 
@@ -93,7 +90,6 @@ export default function SlotPicker({ enrollmentId, selectedSlot, onSelectSlot }:
           </div>
         ) : error ? (
           <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 shrink-0 text-red-500" />
             Không thể tải khung giờ. Vui lòng thử lại sau.
           </div>
         ) : slots.length === 0 ? (

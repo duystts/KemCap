@@ -5,7 +5,6 @@ import { createAssessment, type AssessmentType } from '@/lib/api/learning'
 import type { CefrLevel } from '@/lib/api/catalog'
 import { Button } from '@/components/ui/button'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import { X, Award, CheckCircle } from 'lucide-react'
 
 interface AssessmentFormDialogProps {
   studentId: string
@@ -58,7 +57,6 @@ export default function AssessmentFormDialog({
       <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="p-5 border-b flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Award className="w-5 h-5 text-indigo-600" />
             <h2 className="text-lg font-bold text-slate-800">Đánh giá năng lực CEFR 5 kỹ năng</h2>
           </div>
           <button
@@ -66,7 +64,7 @@ export default function AssessmentFormDialog({
             onClick={onClose}
             className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
           >
-            <X className="w-5 h-5" />
+            Đóng
           </button>
         </div>
 
@@ -202,7 +200,6 @@ export default function AssessmentFormDialog({
               Hủy
             </Button>
             <Button type="submit" disabled={createMutation.isPending}>
-              <CheckCircle className="w-4 h-4 mr-1.5" />
               {createMutation.isPending ? 'Đang lưu…' : 'Lưu đánh giá'}
             </Button>
           </div>

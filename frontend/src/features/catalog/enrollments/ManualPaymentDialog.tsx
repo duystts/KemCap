@@ -5,7 +5,6 @@ import { recordPayment, type PaymentMethod } from '@/lib/api/billing'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import { X, CreditCard, CheckCircle } from 'lucide-react'
 
 interface ManualPaymentDialogProps {
   enrollmentId: string
@@ -64,7 +63,6 @@ export default function ManualPaymentDialog({
       <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="p-5 border-b flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-indigo-600" />
             <h2 className="text-lg font-bold text-slate-800">Ghi nhận thanh toán học phí</h2>
           </div>
           <button
@@ -72,7 +70,7 @@ export default function ManualPaymentDialog({
             onClick={onClose}
             className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
           >
-            <X className="w-5 h-5" />
+            Đóng
           </button>
         </div>
 
@@ -146,7 +144,6 @@ export default function ManualPaymentDialog({
               Hủy
             </Button>
             <Button type="submit" disabled={paymentMutation.isPending}>
-              <CheckCircle className="w-4 h-4 mr-1.5" />
               {paymentMutation.isPending ? 'Đang lưu…' : 'Xác nhận thu học phí'}
             </Button>
           </div>

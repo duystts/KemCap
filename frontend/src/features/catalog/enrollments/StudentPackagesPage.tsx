@@ -4,7 +4,6 @@ import { useAuth } from '@/app/AuthProvider'
 import { fetchEnrollments, type EnrollmentDetail } from '@/lib/api/catalog'
 import { StatusBadge } from '@/components/StatusBadge'
 import { Card, CardContent } from '@/components/ui/card'
-import { Package, Calendar, Clock, ArrowRight } from 'lucide-react'
 
 export default function StudentPackagesPage() {
   const { me } = useAuth()
@@ -20,7 +19,6 @@ export default function StudentPackagesPage() {
     <div className="space-y-6 max-w-7xl mx-auto p-4 sm:p-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-          <Package className="w-6 h-6 text-indigo-600" />
           Gói học của tôi
         </h1>
         <p className="text-sm text-slate-500 mt-1">
@@ -33,7 +31,6 @@ export default function StudentPackagesPage() {
       ) : enrollments.length === 0 ? (
         <Card className="border-dashed bg-slate-50">
           <CardContent className="p-12 text-center space-y-3">
-            <Package className="w-8 h-8 text-slate-400 mx-auto" />
             <h3 className="font-semibold text-slate-800">Bạn chưa có gói học nào</h3>
             <p className="text-sm text-slate-500 max-w-sm mx-auto">
               Vui lòng liên hệ với bộ phận tư vấn / giáo vụ để đăng ký gói học phù hợp.
@@ -83,12 +80,10 @@ export default function StudentPackagesPage() {
                 <div className="space-y-1.5 text-xs text-slate-500">
                   {enr.expiresAt && (
                     <div className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
                       Hết hạn: {new Date(enr.expiresAt).toLocaleDateString('vi-VN')}
                     </div>
                   )}
                   <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-slate-400" />
                     Thời lượng mỗi buổi: {enr.sessionMinutes} phút
                   </div>
                 </div>
@@ -101,7 +96,6 @@ export default function StudentPackagesPage() {
                     className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-700 transition-colors shadow-xs"
                   >
                     Đặt lịch ngay
-                    <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               )}

@@ -11,7 +11,6 @@ import {
 import PackageFormDialog from './PackageFormDialog'
 import { Button } from '@/components/ui/button'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
-import { Package, Plus, Edit, Clock, Calendar, Power } from 'lucide-react'
 
 export default function PackagesPage() {
   const queryClient = useQueryClient()
@@ -66,7 +65,6 @@ export default function PackagesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-            <Package className="w-6 h-6 text-indigo-600" />
             Quản lý gói học
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -80,7 +78,6 @@ export default function PackagesPage() {
           }}
           className="shrink-0"
         >
-          <Plus className="w-4 h-4 mr-2" />
           Tạo gói học mới
         </Button>
       </div>
@@ -145,21 +142,17 @@ export default function PackagesPage() {
 
                   <div className="mt-4 space-y-2 text-xs text-slate-600 pt-3 border-t">
                     <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-1.5 text-slate-500">
-                        <Clock className="w-3.5 h-3.5" /> Thời lượng:
-                      </span>
+                      <span className="flex items-center gap-1.5 text-slate-500">Thời lượng:</span>
                       <strong className="text-slate-800">{pkg.sessionMinutes} phút / buổi</strong>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="flex items-center gap-1.5 text-slate-500">
-                        <Package className="w-3.5 h-3.5" /> Tổng số buổi:
+                        Tổng số buổi:
                       </span>
                       <strong className="text-slate-800">{pkg.sessionCount} buổi</strong>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-1.5 text-slate-500">
-                        <Calendar className="w-3.5 h-3.5" /> Hạn sử dụng:
-                      </span>
+                      <span className="flex items-center gap-1.5 text-slate-500">Hạn sử dụng:</span>
                       <strong className="text-slate-800">{pkg.validityDays} ngày</strong>
                     </div>
                   </div>
@@ -175,7 +168,6 @@ export default function PackagesPage() {
                     }}
                     className="h-8 text-xs text-slate-600 hover:text-indigo-600"
                   >
-                    <Edit className="w-3.5 h-3.5 mr-1" />
                     Sửa
                   </Button>
                   <Button
@@ -194,7 +186,6 @@ export default function PackagesPage() {
                         : 'text-slate-500 hover:text-red-600 hover:bg-red-50'
                     }`}
                   >
-                    <Power className="w-3.5 h-3.5 mr-1" />
                     {isArchived ? 'Mở bán lại' : 'Ngừng bán'}
                   </Button>
                 </div>
