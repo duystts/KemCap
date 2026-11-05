@@ -1,6 +1,6 @@
 import { api } from './client'
 
-export type CatalogStatus = 'ACTIVE' | 'ARCHIVED'
+export type CatalogStatus = 'ACTIVE' | 'INACTIVE'
 export type CefrLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2'
 export type EnrollmentStatus = 'PENDING_PAYMENT' | 'ACTIVE' | 'COMPLETED' | 'EXPIRED' | 'CANCELLED'
 

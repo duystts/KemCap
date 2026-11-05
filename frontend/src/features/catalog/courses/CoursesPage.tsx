@@ -46,7 +46,7 @@ export default function CoursesPage() {
   })
 
   const statusMutation = useMutation({
-    mutationFn: ({ course, status }: { course: CourseItem; status: 'ACTIVE' | 'ARCHIVED' }) =>
+    mutationFn: ({ course, status }: { course: CourseItem; status: 'ACTIVE' | 'INACTIVE' }) =>
       updateCourse(course.id, {
         name: course.name,
         description: course.description || undefined,
@@ -117,7 +117,7 @@ export default function CoursesPage() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {courses.map((c: CourseItem) => {
-                  const isArchived = c.status === 'ARCHIVED'
+                  const isArchived = c.status === 'INACTIVE'
                   return (
                     <tr key={c.id} className="hover:bg-slate-50/70 transition-colors">
                       <td className="py-3.5 px-4 font-semibold text-slate-900">{c.name}</td>
@@ -159,7 +159,7 @@ export default function CoursesPage() {
                             onClick={() =>
                               statusMutation.mutate({
                                 course: c,
-                                status: isArchived ? 'ACTIVE' : 'ARCHIVED',
+                                status: isArchived ? 'ACTIVE' : 'INACTIVE',
                               })
                             }
                             disabled={statusMutation.isPending}
