@@ -43,6 +43,15 @@ k6 run perf/booking-and-join.js     # tuần 4: kiểm tra p95/p99 và SC-010 �
 gitleaks detect                      # quét secret (chạy trong CI trên mỗi PR)
 ```
 
+**Smoke test Playwright** (bước 1–5, 8, 11, 15–17; không chạy trên CI vì cần cả hệ thống):
+
+```bash
+# Database mới, vì bước 8 và 17 dùng hết dữ liệu seed: docker compose down -v rồi chạy lại mục 2
+cd frontend && npm run e2e
+```
+
+Cần Chrome đã cài trên máy; bước 8, 17 dời giờ buổi học qua `docker compose exec postgres`. Bước 16 không tự động phần đổi `app.privacy.policy-version` vì phải khởi động lại backend; video chỉ kiểm tay ở bước 7.
+
 ## 4. Kịch bản kiểm chứng end-to-end (= kịch bản demo)
 
 Mỗi bước nêu kết quả mong đợi; tất cả phải đúng trước khi coi bản demo hoàn thành.
