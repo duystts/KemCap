@@ -70,6 +70,33 @@ export interface RevisionItem {
   changedAt: string
 }
 
+export interface SkillPoint {
+  sessionId: string
+  date: string // YYYY-MM-DD
+  listening?: number | null
+  speaking?: number | null
+  reading?: number | null
+  writing?: number | null
+  grammarVocab?: number | null
+}
+
+export interface RecentReport {
+  sessionId: string
+  sessionEndsAt: string
+  submittedAt: string
+  comment?: string | null
+}
+
+export interface ProgressDto {
+  skillSeries: SkillPoint[]
+  pathCompletion?: number | null
+  recentReports: RecentReport[]
+}
+
+export function fetchProgress(studentId: string): Promise<ProgressDto> {
+  return api<ProgressDto>(`/students/${studentId}/progress`)
+}
+
 export function fetchProficiency(studentId: string): Promise<ProficiencyDto> {
   return api<ProficiencyDto>(`/students/${studentId}/proficiency`)
 }

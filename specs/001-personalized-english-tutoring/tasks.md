@@ -240,7 +240,7 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 - [X] T100 [US4] (#1·U6) Listener `B/learning/internal/ReportAnonymizationListener.java` (`StudentAnonymized`, idempotent): xóa `assignment` + `submission` của học viên; trong `session_report` xóa điểm kỹ năng, `comment`, `taught_topic_ids` (giữ `submitted_at`, `due_at`, `status`)
 - [X] T101 [P] [US4] (#3·U6) Frontend `F/features/learning/report/PendingReportsList.tsx` (trang chủ giáo viên) + `SessionReportForm.tsx`: chủ đề từ lộ trình, điểm 1–5 từng kỹ năng (bỏ trống được), nhận xét, nhiều bài tập (hạn nộp tùy chọn); điền dưới 3 phút (SC-008)
 - [X] T102 [P] [US4] (#3·U6) Frontend `F/features/learning/assignments/AssignmentsPage.tsx`: học viên nộp văn bản (nhãn "Nộp muộn" khi quá hạn); giáo viên đọc bài, chấm 0–10 kèm phản hồi
-- [ ] T103 [US4] (#3·U6) Frontend `F/features/learning/progress/ProgressPage.tsx`: thẻ CEFR hiện tại, biểu đồ đường Recharts 5 kỹ năng theo thời gian, % hoàn thành lộ trình, nhận xét gần nhất; dùng cho `/student/progress` và tab "Tiến bộ"
+- [X] T103 [US4] (#3·U6) Frontend `F/features/learning/progress/ProgressPage.tsx`: thẻ CEFR hiện tại, biểu đồ đường Recharts 5 kỹ năng theo thời gian, % hoàn thành lộ trình, nhận xét gần nhất; dùng cho `/student/progress` và tab "Tiến bộ"
 
 **Checkpoint (cổng B6, 10/11)**: quickstart bước 8, 10, 11 đúng.
 
@@ -292,7 +292,7 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 - [X] T120 [US6] (#1·U6) `B/learning/internal/feedback/FeedbackService.java` + controller: `POST /sessions/{id}/feedback` (S, qua `SessionQueryApi.find`: đúng học viên, `COMPLETED`, ≤ 7 ngày, một lần), `GET /sessions/{id}/feedback` (chỉ A); listener ẩn danh hóa xóa `comment`, giữ `stars`
 - [X] T121 [US6] (#4·U8) `B/scheduling/internal/report/TeacherSessionsReportService.java` + `GET /reports/teacher-sessions?from=&to=` (A): theo giáo viên — chỉ `sessionsTaught` (K1)
 - [X] T122 [P] [US6] (#3·U6) Frontend `F/features/learning/feedback/SessionFeedbackPrompt.tsx`: chấm 1–5 sao + nhận xét sau buổi `COMPLETED` (trang chủ học viên, chi tiết buổi; không bắt buộc; ẩn sau khi gửi hoặc quá 7 ngày)
-- [ ] T123 [US6] (#4·U8) Frontend `F/features/admin/dashboard/DashboardPage.tsx`: chọn khoảng thời gian; thẻ tổng đã thu và công nợ (`/reports/revenue`); bảng số buổi đã dạy theo giáo viên (`/reports/teacher-sessions`); xem sao từng buổi ở chi tiết buổi (admin)
+- [X] T123 [US6] (#4·U8) Frontend `F/features/admin/dashboard/DashboardPage.tsx`: chọn khoảng thời gian; thẻ tổng đã thu và công nợ (`/reports/revenue`); bảng số buổi đã dạy theo giáo viên (`/reports/teacher-sessions`); xem sao từng buổi ở chi tiết buổi (admin)
 
 **Checkpoint (cổng B6, 10/11)**: quickstart bước 12, 24 đúng.
 

@@ -181,6 +181,16 @@ export async function fetchSessions(params?: {
   return api<SessionItem[]>(`/sessions${qs ? `?${qs}` : ''}`)
 }
 
+export interface TeacherSessionsRow {
+  teacherId: string
+  teacherName?: string | null
+  sessionsTaught: number
+}
+
+export async function fetchTeacherSessions(range: { from: string; to: string }) {
+  return api<TeacherSessionsRow[]>(`/reports/teacher-sessions?from=${range.from}&to=${range.to}`)
+}
+
 export async function fetchSession(id: string) {
   return api<SessionItem>(`/sessions/${id}`)
 }

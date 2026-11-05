@@ -36,6 +36,17 @@ export function fetchReceivables(params?: { hasDebt?: boolean }): Promise<Receiv
   return api<ReceivableItem[]>(`/receivables${query}`)
 }
 
+export interface RevenueReport {
+  from?: string | null
+  to?: string | null
+  collectedVnd: number
+  debtVnd: number
+}
+
+export function fetchRevenue(range: { from: string; to: string }): Promise<RevenueReport> {
+  return api<RevenueReport>(`/reports/revenue?from=${range.from}&to=${range.to}`)
+}
+
 export function fetchStatement(enrollmentId: string): Promise<StatementDto> {
   return api<StatementDto>(`/enrollments/${enrollmentId}/payments`)
 }
