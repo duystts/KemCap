@@ -27,7 +27,11 @@ export interface ExceptionRequest {
 export interface Slot {
   startsAt: string // ISO Instant string
   endsAt: string // ISO Instant string
-  durationMinutes: number
+}
+
+/** Backend chỉ trả giờ bắt đầu và kết thúc của khung giờ. */
+export function slotMinutes(slot: Slot): number {
+  return Math.round((new Date(slot.endsAt).getTime() - new Date(slot.startsAt).getTime()) / 60_000)
 }
 
 export type SessionStatus =
@@ -67,10 +71,8 @@ export interface BookSessionRequest {
 }
 
 export interface CancelPreview {
-  willConsumeSession: boolean
-  hoursUntilStart: number
-  cutoffHours: number
-  policyMessage?: string
+  willConsume: boolean
+  cutoffAt: string // ISO Instant string
 }
 
 export interface JoinInfo {

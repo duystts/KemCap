@@ -125,7 +125,6 @@ export const schedulingHandlers = [
       return {
         startsAt: start.toISOString(),
         endsAt: end.toISOString(),
-        durationMinutes: 45,
       }
     })
     return HttpResponse.json(sampleSlots)
@@ -171,12 +170,10 @@ export const schedulingHandlers = [
     const hours = session ? (new Date(session.startsAt).getTime() - Date.now()) / (3600 * 1000) : 24
     const willConsume = hours < 12
     const preview: CancelPreview = {
-      willConsumeSession: willConsume,
-      hoursUntilStart: Math.round(hours),
-      cutoffHours: 12,
-      policyMessage: willConsume
-        ? 'Hủy muộn (dưới 12 tiếng): Buổi học này vẫn sẽ bị tính trừ vào gói của bạn.'
-        : 'Hủy đúng hạn (trên 12 tiếng): Bạn sẽ được hoàn lại 1 buổi vào gói học.',
+      willConsume,
+      cutoffAt: new Date(
+        new Date(session?.startsAt ?? Date.now()).getTime() - 12 * 3600 * 1000,
+      ).toISOString(),
     }
     return HttpResponse.json(preview)
   }),

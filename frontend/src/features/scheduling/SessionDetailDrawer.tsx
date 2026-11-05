@@ -43,7 +43,8 @@ export default function SessionDetailDrawer({
   const { data: cancelPreview, isLoading: loadingPreview } = useQuery({
     queryKey: ['cancel-preview', sessionId],
     queryFn: () => previewCancelSession(sessionId!),
-    enabled: !!sessionId && confirmCancel,
+    // Giáo viên không có quyền xem trước: hủy của giáo viên không tính vào gói học viên
+    enabled: !!sessionId && confirmCancel && me?.role !== 'TEACHER',
   })
 
   const cancelMutation = useMutation({
@@ -195,10 +196,11 @@ export default function SessionDetailDrawer({
                             <p className="text-xs text-slate-400">Đang kiểm tra chính sách phạt…</p>
                           ) : (
                             <p className="text-xs text-rose-800 leading-relaxed font-medium">
-                              {cancelPreview?.policyMessage ||
-                                (cancelPreview?.willConsumeSession
+                              {me?.role === 'TEACHER'
+                                ? 'Buổi sẽ được ghi nhận là giáo viên vắng.'
+                                : cancelPreview?.willConsume
                                   ? '⚠️ Hủy muộn (dưới 12 tiếng): Bạn vẫn sẽ bị tính 1 buổi học.'
-                                  : '✅ Hủy đúng hạn (trên 12 tiếng): Bạn sẽ được hoàn lại 1 buổi vào gói.')}
+                                  : '✅ Hủy đúng hạn (trên 12 tiếng): Bạn sẽ được hoàn lại 1 buổi vào gói.'}
                             </p>
                           )}
 

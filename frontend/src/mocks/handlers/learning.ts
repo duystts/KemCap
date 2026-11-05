@@ -47,7 +47,7 @@ let mockPaths: Record<string, LearningPathDto> = {
     studentId: 'user-student-1',
     title: 'Lộ trình IELTS 6.5 Cá nhân hóa',
     status: 'ACTIVE',
-    progressPercent: 35,
+    completionPercent: 35,
     milestones: [
       {
         id: 'ms-1',
@@ -201,7 +201,7 @@ export const learningHandlers = [
       studentId: params.id as string,
       title: body.title,
       status: 'ACTIVE',
-      progressPercent: 0,
+      completionPercent: 0,
       milestones: (body.milestones || []).map((m: any, mIdx: number) => ({
         id: `ms-${Date.now()}-${mIdx}`,
         position: mIdx + 1,

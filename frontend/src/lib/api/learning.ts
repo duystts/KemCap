@@ -58,7 +58,7 @@ export interface LearningPathDto {
   title: string
   status: 'ACTIVE' | 'ARCHIVED'
   milestones: MilestoneItem[]
-  progressPercent: number
+  completionPercent: number
   version?: number
 }
 

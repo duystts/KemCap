@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { fetchSlots, type Slot } from '@/lib/api/scheduling'
+import { fetchSlots, slotMinutes, type Slot } from '@/lib/api/scheduling'
 import { Clock, Calendar, AlertCircle } from 'lucide-react'
 
 interface SlotPickerProps {
@@ -125,7 +125,7 @@ export default function SlotPicker({ enrollmentId, selectedSlot, onSelectSlot }:
                     {formatSlotTime(slot.startsAt)} - {formatSlotTime(slot.endsAt)}
                   </div>
                   <div className="text-[11px] text-slate-500 mt-0.5 flex items-center justify-between">
-                    <span>{slot.durationMinutes} phút</span>
+                    <span>{slotMinutes(slot)} phút</span>
                     {isSelected && (
                       <span className="text-[10px] font-bold text-indigo-600 bg-indigo-100 px-1.5 py-0.2 rounded">
                         Đã chọn

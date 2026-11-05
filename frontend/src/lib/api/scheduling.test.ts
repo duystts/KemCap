@@ -7,6 +7,7 @@ import {
   previewCancelSession,
   cancelSession,
   joinClassroom,
+  slotMinutes,
 } from './scheduling'
 import { setAccessToken } from './client'
 
@@ -60,7 +61,6 @@ describe('scheduling api client', () => {
         {
           startsAt: '2026-11-01T10:00:00Z',
           endsAt: '2026-11-01T10:45:00Z',
-          durationMinutes: 45,
         },
       ]),
     )
@@ -106,16 +106,14 @@ describe('scheduling api client', () => {
 
   it('previewCancelSession returns penalty preview data', async () => {
     const previewData = {
-      willConsumeSession: false,
-      hoursUntilStart: 24,
-      cutoffHours: 12,
-      policyMessage: 'Hủy đúng hạn',
+      willConsume: false,
+      cutoffAt: '2026-11-01T02:00:00Z',
     }
     vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(json(200, previewData))
 
     const preview = await previewCancelSession('sess-1')
-    expect(preview.willConsumeSession).toBe(false)
-    expect(preview.hoursUntilStart).toBe(24)
+    expect(preview.willConsume).toBe(false)
+    expect(preview.cutoffAt).toBe('2026-11-01T02:00:00Z')
   })
 
   it('cancelSession calls cancel endpoint with reason', async () => {
@@ -130,6 +128,12 @@ describe('scheduling api client', () => {
         method: 'POST',
         body: expect.stringContaining('Bận việc đột xuất'),
       }),
+    )
+  })
+
+  it('slotMinutes computes duration from slot start and end', () => {
+    expect(slotMinutes({ startsAt: '2026-11-01T09:00:00Z', endsAt: '2026-11-01T09:45:00Z' })).toBe(
+      45,
     )
   })
 
