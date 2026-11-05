@@ -31,8 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Lịch demo (chạy sau seed catalog): teacher1, teacher2 rảnh T2–T6 18:00–21:00 và T7 08:00–11:00;
  * mỗi học viên 1–4 có 2 buổi đã học (COMPLETED) và 1 buổi sắp tới (BOOKED); student1 có 4 buổi đã
- * học để trang Tiến bộ có đường xu hướng, thêm 1 buổi hôm qua chưa chốt kết quả. Bộ đếm ghi danh được đổi qua {@link EnrollmentApi} nên luôn khớp với
- * số buổi. Chạy lại không tạo trùng.
+ * học để trang Tiến bộ có đường xu hướng, thêm 1 buổi hôm qua chưa chốt kết quả. Bộ đếm ghi danh
+ * được đổi qua {@link EnrollmentApi} nên luôn khớp với số buổi. Chạy lại không tạo trùng.
  */
 @Component
 @Profile("demo-seed")
