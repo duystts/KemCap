@@ -18,6 +18,7 @@ import GoalsPanel from '@/features/learning/proficiency/GoalsPanel'
 import LearningPathView from '@/features/learning/path/LearningPathView'
 import ProgressPage from '@/features/learning/progress/ProgressPage'
 import CreateEnrollmentDialog from '@/features/catalog/enrollments/CreateEnrollmentDialog'
+import GuardianConsentDialog from '@/features/admin/users/GuardianConsentDialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
@@ -40,6 +41,7 @@ export default function StudentProfilePage() {
   const [activeTab, setActiveTab] = useState<TabType>('info')
   const [editProfileOpen, setEditProfileOpen] = useState(false)
   const [createEnrollmentOpen, setCreateEnrollmentOpen] = useState(false)
+  const [guardianOpen, setGuardianOpen] = useState(false)
 
   // Form edit states
   const [selfReportedLevel, setSelfReportedLevel] = useState<CefrLevel | ''>('')
@@ -129,6 +131,11 @@ export default function StudentProfilePage() {
           </div>
 
           <div className="flex items-center gap-2">
+            {isAdmin && status === 'AWAITING_GUARDIAN_CONSENT' && (
+              <Button size="sm" onClick={() => setGuardianOpen(true)}>
+                Ghi nhận đồng ý người giám hộ
+              </Button>
+            )}
             {isAdmin && (
               <Button variant="outline" size="sm" onClick={openEditModal}>
                 Cập nhật thông tin
@@ -408,6 +415,18 @@ export default function StudentProfilePage() {
             </form>
           </div>
         </div>
+      )}
+
+      {guardianOpen && (
+        <GuardianConsentDialog
+          studentId={id!}
+          studentName={fullName}
+          open={guardianOpen}
+          onClose={() => {
+            setGuardianOpen(false)
+            queryClient.invalidateQueries({ queryKey: ['user', id] })
+          }}
+        />
       )}
 
       {/* Dialog Tạo ghi danh mới */}

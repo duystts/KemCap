@@ -291,7 +291,7 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 - [X] T119 [US6] (#1·U6) Migration `MIG/V9__learning_feedback.sql`: `session_feedback` (`session_id` unique, `stars` `CHECK BETWEEN 1 AND 5`, `comment` nullable)
 - [X] T120 [US6] (#1·U6) `B/learning/internal/feedback/FeedbackService.java` + controller: `POST /sessions/{id}/feedback` (S, qua `SessionQueryApi.find`: đúng học viên, `COMPLETED`, ≤ 7 ngày, một lần), `GET /sessions/{id}/feedback` (chỉ A); listener ẩn danh hóa xóa `comment`, giữ `stars`
 - [X] T121 [US6] (#4·U8) `B/scheduling/internal/report/TeacherSessionsReportService.java` + `GET /reports/teacher-sessions?from=&to=` (A): theo giáo viên — chỉ `sessionsTaught` (K1)
-- [ ] T122 [P] [US6] (#3·U6) Frontend `F/features/learning/feedback/SessionFeedbackPrompt.tsx`: chấm 1–5 sao + nhận xét sau buổi `COMPLETED` (trang chủ học viên, chi tiết buổi; không bắt buộc; ẩn sau khi gửi hoặc quá 7 ngày)
+- [X] T122 [P] [US6] (#3·U6) Frontend `F/features/learning/feedback/SessionFeedbackPrompt.tsx`: chấm 1–5 sao + nhận xét sau buổi `COMPLETED` (trang chủ học viên, chi tiết buổi; không bắt buộc; ẩn sau khi gửi hoặc quá 7 ngày)
 - [X] T123 [US6] (#4·U8) Frontend `F/features/admin/dashboard/DashboardPage.tsx`: chọn khoảng thời gian; thẻ tổng đã thu và công nợ (`/reports/revenue`); bảng số buổi đã dạy theo giáo viên (`/reports/teacher-sessions`); xem sao từng buổi ở chi tiết buổi (admin)
 
 **Checkpoint (cổng B6, 10/11)**: quickstart bước 12, 24 đúng.
@@ -317,8 +317,8 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 - [X] T127 [US1] (#1·U7) `B/identity/internal/privacy/GuardianConsentService.java` + `B/identity/internal/web/GuardianConsentController.java`: `GET/PUT /students/{id}/guardian-consent` (A; `guardianName`, `relationship`, `guardianContact`, `consentedOn ≤ hôm nay` bắt buộc); lưu khi `AWAITING_GUARDIAN_CONSENT` → `INVITED` + phát `UserInvited`
 - [X] T128 [US1] (#1·U7) `B/identity/internal/privacy/DataSubjectRequestService.java` + `B/identity/internal/web/DataSubjectRequestController.java`: `GET/POST /data-subject-requests?studentId=&status=`, `POST /{id}/reject` (`resolutionNote` bắt buộc), `POST /{id}/complete-access`, `POST /{id}/anonymize` (`confirm: true`)
 - [X] T129 [US1] (#1·U7) `B/identity/internal/privacy/AnonymizationService.java`: trong một transaction — `user_account` → `email = anonymized+{id}@invalid`, `full_name = "Học viên đã ẩn danh"`, `phone`/`date_of_birth` = null, `status = INACTIVE`, `anonymized_at = now`; xóa `guardian_consent`; thu hồi refresh token; yêu cầu → `COMPLETED`; phát `StudentAnonymized`; bản ghi đã ẩn danh → 409 `ANONYMIZED` — *thu hồi cả REFRESH, INVITE, PASSWORD_RESET; xóa `password_hash`; chỉ nhận `ERASURE` đang `RECEIVED`*
-- [ ] T130 [P] [US1] (#4·U7) Frontend `F/features/admin/privacy/GuardianConsentDialog.tsx` (mở từ hồ sơ học viên `AWAITING_GUARDIAN_CONSENT`), `DataSubjectRequestsPage.tsx` (ghi yêu cầu, từ chối, hoàn tất xem, ẩn danh hóa với xác nhận "không khôi phục được")
-- [ ] T131 [P] [US1] (#4·U7) Frontend `F/features/admin/privacy/PersonalDataSummaryPage.tsx`: trang in được (`@media print`) ghép từ `/users/{id}`, `/students/{id}/profile`, `/enrollments`, `/sessions`, `/enrollments/{id}/payments`, `/students/{id}/progress`, `/assignments`; nút "In / lưu PDF"
+- [X] T130 [P] [US1] (#4·U7) Frontend `F/features/admin/privacy/GuardianConsentDialog.tsx` (mở từ hồ sơ học viên `AWAITING_GUARDIAN_CONSENT`), `DataSubjectRequestsPage.tsx` (ghi yêu cầu, từ chối, hoàn tất xem, ẩn danh hóa với xác nhận "không khôi phục được")
+- [X] T131 [P] [US1] (#4·U7) Frontend `F/features/admin/privacy/PersonalDataSummaryPage.tsx`: trang in được (`@media print`) ghép từ `/users/{id}`, `/students/{id}/profile`, `/enrollments`, `/sessions`, `/enrollments/{id}/payments`, `/students/{id}/progress`, `/assignments`; nút "In / lưu PDF"
 
 **Checkpoint (cổng B5, 7/11)**: quickstart bước 15, 16, 23 đúng; T125 xanh.
 

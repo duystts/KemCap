@@ -9,6 +9,8 @@ import InterruptionDecisionPanel from './InterruptionDecisionPanel'
 import RescheduleSessionPanel from './RescheduleSessionPanel'
 import SessionOutcomeDialog from './SessionOutcomeDialog'
 import SessionReportSection from '@/features/learning/report/SessionReportSection'
+import SessionFeedbackPrompt from '@/features/learning/feedback/SessionFeedbackPrompt'
+import SessionFeedbackView from '@/features/learning/feedback/SessionFeedbackView'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -272,6 +274,8 @@ export default function SessionDetailPage() {
       </Card>
 
       {session.status === 'COMPLETED' && <SessionReportSection sessionId={session.id} />}
+      {me?.role === 'STUDENT' && <SessionFeedbackPrompt session={session} />}
+      {isAdmin && session.status === 'COMPLETED' && <SessionFeedbackView sessionId={session.id} />}
 
       <SessionOutcomeDialog
         sessionId={session.id}

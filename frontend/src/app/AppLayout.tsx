@@ -50,7 +50,7 @@ export function AppLayout() {
   if (!me) return null
   return (
     <div className="flex min-h-full flex-col md:flex-row">
-      <aside className="border-b border-border bg-muted md:w-60 md:border-b-0 md:border-r">
+      <aside className="border-b border-border bg-muted md:w-60 md:border-b-0 md:border-r print:hidden">
         <div className="px-4 py-4">
           <p className="text-base font-semibold">English 1-1</p>
           <p className="text-xs text-muted-foreground">{ROLE_LABEL[me.role]}</p>
@@ -74,14 +74,14 @@ export function AppLayout() {
         </nav>
       </aside>
       <div className="flex flex-1 flex-col">
-        <header className="flex items-center justify-end gap-3 border-b border-border px-4 py-3">
+        <header className="flex items-center justify-end gap-3 border-b border-border px-4 py-3 print:hidden">
           <NotificationBell />
           <span className="text-sm font-medium">{me.fullName}</span>
           <Button variant="ghost" size="sm" onClick={() => void logout()} aria-label="Đăng xuất">
             Đăng xuất
           </Button>
         </header>
-        <main className="flex-1 p-4 md:p-6">
+        <main className="flex-1 p-4 md:p-6 print:p-0">
           <Outlet />
         </main>
       </div>

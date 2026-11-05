@@ -9,7 +9,8 @@ const LoginPage = lazy(() => import('@/features/auth/LoginPage'))
 const AcceptInvitePage = lazy(() => import('@/features/auth/AcceptInvitePage'))
 const ForgotPasswordPage = lazy(() => import('@/features/auth/ForgotPasswordPage'))
 const ResetPasswordPage = lazy(() => import('@/features/auth/ResetPasswordPage'))
-const PlaceholderPage = lazy(() => import('./PlaceholderPage'))
+// export để nhánh khác bỏ trang giữ chỗ cuối cùng không làm lỗi noUnusedLocals; xóa khi hết dùng
+export const PlaceholderPage = lazy(() => import('./PlaceholderPage'))
 
 // Scheduling & Video features (U3)
 const AvailabilityEditor = lazy(() => import('@/features/scheduling/AvailabilityEditor'))
@@ -29,6 +30,12 @@ const EnrollmentDetailPage = lazy(
   () => import('@/features/catalog/enrollments/EnrollmentDetailPage'),
 )
 const StudentPackagesPage = lazy(() => import('@/features/catalog/enrollments/StudentPackagesPage'))
+const DataSubjectRequestsPage = lazy(
+  () => import('@/features/admin/privacy/DataSubjectRequestsPage'),
+)
+const PersonalDataSummaryPage = lazy(
+  () => import('@/features/admin/privacy/PersonalDataSummaryPage'),
+)
 const ProgressPage = lazy(() => import('@/features/learning/progress/ProgressPage'))
 const ReceivablesPage = lazy(() => import('@/features/billing/ReceivablesPage'))
 const DashboardPage = lazy(() => import('@/features/admin/dashboard/DashboardPage'))
@@ -38,16 +45,12 @@ const StudentLearningPathPage = lazy(
   () => import('@/features/learning/path/StudentLearningPathPage'),
 )
 const PendingReportsList = lazy(() => import('@/features/learning/report/PendingReportsList'))
+const StudentHomePage = lazy(() => import('@/features/learning/feedback/StudentHomePage'))
 const AssignmentsPage = lazy(() => import('@/features/learning/assignments/AssignmentsPage'))
 
 function page(node: ReactNode) {
   return <Suspense fallback={<div className="p-8 text-sm">Đang tải…</div>}>{node}</Suspense>
 }
-
-const placeholder = (path: string, title: string) => ({
-  path,
-  element: page(<PlaceholderPage title={title} />),
-})
 
 export const router = createBrowserRouter([
   { path: '/', element: <HomeRedirect /> },
@@ -72,7 +75,8 @@ export const router = createBrowserRouter([
           { path: 'enrollments/:id', element: page(<EnrollmentDetailPage />) },
           { path: 'schedule', element: page(<ScheduleCalendar />) },
           { path: 'billing', element: page(<ReceivablesPage />) },
-          placeholder('privacy', 'Dữ liệu cá nhân'),
+          { path: 'privacy', element: page(<DataSubjectRequestsPage />) },
+          { path: 'privacy/students/:id', element: page(<PersonalDataSummaryPage />) },
         ],
       },
     ],
@@ -102,7 +106,7 @@ export const router = createBrowserRouter([
         path: '/student',
         element: <AppLayout />,
         children: [
-          { index: true, element: page(<PlaceholderPage title="Trang chủ học viên" />) },
+          { index: true, element: page(<StudentHomePage />) },
           { path: 'book', element: page(<BookSessionPage />) },
           { path: 'schedule', element: page(<ScheduleCalendar />) },
           { path: 'learning-path', element: page(<StudentLearningPathPage />) },
