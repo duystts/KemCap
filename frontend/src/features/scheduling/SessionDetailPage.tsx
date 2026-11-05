@@ -5,6 +5,8 @@ import { toast } from 'sonner'
 import { useAuth } from '@/app/AuthProvider'
 import { fetchSession, previewCancelSession, cancelSession } from '@/lib/api/scheduling'
 import { StatusBadge } from '@/components/StatusBadge'
+import InterruptionDecisionPanel from './InterruptionDecisionPanel'
+import RescheduleSessionPanel from './RescheduleSessionPanel'
 import SessionOutcomeDialog from './SessionOutcomeDialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
@@ -39,7 +41,7 @@ export default function SessionDetailPage() {
     queryKey: ['cancel-preview', id],
     queryFn: () => previewCancelSession(id!),
     // Giáo viên không có quyền xem trước: hủy của giáo viên không tính vào gói học viên
-    enabled: !!id && confirmCancel && me?.role !== 'TEACHER',
+    enabled: !!id && session?.status === 'BOOKED' && me?.role !== 'TEACHER',
   })
 
   const cancelMutation = useMutation({
@@ -191,6 +193,22 @@ export default function SessionDetailPage() {
                 </Button>
               </div>
             )}
+
+          {/* Gián đoạn: giáo vụ quyết định */}
+          {isAdmin && session.status === 'INTERRUPTED' && (
+            <InterruptionDecisionPanel sessionId={session.id} />
+          )}
+
+          {/* Đổi lịch: ẩn sau hạn chót */}
+          {session.status === 'BOOKED' &&
+            cancelPreview &&
+            (cancelPreview.willConsume ? (
+              <p className="text-xs text-slate-500">
+                Đã quá hạn đổi lịch. Bạn vẫn có thể hủy muộn và bị tính 1 buổi.
+              </p>
+            ) : (
+              <RescheduleSessionPanel session={session} />
+            ))}
 
           {/* Hủy buổi học */}
           {session.status === 'BOOKED' && (
