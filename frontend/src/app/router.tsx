@@ -30,6 +30,7 @@ const EnrollmentDetailPage = lazy(
 )
 const StudentPackagesPage = lazy(() => import('@/features/catalog/enrollments/StudentPackagesPage'))
 const ReceivablesPage = lazy(() => import('@/features/billing/ReceivablesPage'))
+const DashboardPage = lazy(() => import('@/features/admin/dashboard/DashboardPage'))
 
 // Learning & Proficiency (U4)
 const StudentLearningPathPage = lazy(
@@ -60,7 +61,7 @@ export const router = createBrowserRouter([
         path: '/admin',
         element: <AppLayout />,
         children: [
-          { index: true, element: page(<PlaceholderPage title="Tổng quan" />) },
+          { index: true, element: page(<DashboardPage />) },
           { path: 'users', element: page(<UsersPage />) },
           { path: 'students', element: page(<StudentsListPage />) },
           { path: 'students/:id', element: page(<StudentProfilePage />) },
