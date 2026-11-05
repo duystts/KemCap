@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { MemoryRouter } from 'react-router'
 import type { SessionItem } from '@/lib/api/scheduling'
 import SessionFeedbackPrompt from './SessionFeedbackPrompt'
 import StudentHomePage from './StudentHomePage'
@@ -36,19 +37,27 @@ function json(status: number, body: unknown) {
 function mockApi(options: {
   mine?: { sessionId: string; stars: number }[]
   sessions?: SessionItem[]
+  booked?: SessionItem[]
+  enrollments?: unknown[]
   post?: () => Response
 }) {
   return vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
     const url = String(input)
     if (url.includes('/session-feedback/mine')) return json(200, options.mine ?? [])
     if (init?.method === 'POST') return options.post?.() ?? json(201, {})
+    if (url.includes('status=BOOKED')) return json(200, options.booked ?? [])
+    if (url.includes('/enrollments')) return json(200, options.enrollments ?? [])
     return json(200, options.sessions ?? [])
   })
 }
 
 function wrap(node: React.ReactNode) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  return render(<QueryClientProvider client={client}>{node}</QueryClientProvider>)
+  return render(
+    <QueryClientProvider client={client}>
+      <MemoryRouter>{node}</MemoryRouter>
+    </QueryClientProvider>,
+  )
 }
 
 describe('SessionFeedbackPrompt', () => {
@@ -128,6 +137,46 @@ describe('StudentHomePage', () => {
     wrap(<StudentHomePage />)
 
     expect(await screen.findAllByRole('button', { name: 'Gửi đánh giá' })).toHaveLength(1)
+  })
+
+  it('hiện buổi sắp tới gần nhất trước, bỏ buổi đã qua; cộng số buổi còn lại của gói đang dùng', async () => {
+    const hoursAhead = (h: number) => new Date(Date.now() + h * 3600_000).toISOString()
+    mockApi({
+      booked: [
+        session({
+          id: 'later',
+          startsAt: hoursAhead(48),
+          endsAt: hoursAhead(49),
+          status: 'BOOKED',
+        }),
+        session({ id: 'sooner', startsAt: hoursAhead(2), endsAt: hoursAhead(3), status: 'BOOKED' }),
+        session({ id: 'past', startsAt: hoursAgo(5), endsAt: hoursAgo(4), status: 'BOOKED' }),
+      ],
+      enrollments: [
+        { id: 'e-1', status: 'ACTIVE', sessionsRemaining: 5 },
+        { id: 'e-2', status: 'ACTIVE', sessionsRemaining: 2 },
+        { id: 'e-3', status: 'EXPIRED', sessionsRemaining: 9 },
+      ],
+    })
+    wrap(<StudentHomePage />)
+
+    const links = await screen.findAllByRole('link', { name: /Xem chi tiết/ })
+    expect(links.map((l) => l.getAttribute('href'))).toEqual([
+      '/sessions/sooner',
+      '/sessions/later',
+    ])
+    expect(await screen.findByText('7')).toBeInTheDocument()
+  })
+
+  it('chưa có buổi và chưa có gói: có hướng dẫn', async () => {
+    mockApi({})
+    wrap(<StudentHomePage />)
+
+    expect(await screen.findByRole('link', { name: 'Đặt lịch' })).toHaveAttribute(
+      'href',
+      '/student/book',
+    )
+    expect(await screen.findByText('Chưa có gói đang dùng.')).toBeInTheDocument()
   })
 
   it('không có buổi cần đánh giá', async () => {

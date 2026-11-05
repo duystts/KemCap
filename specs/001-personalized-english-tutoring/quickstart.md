@@ -30,6 +30,7 @@ npm run dev         # http://localhost:5173
 
 Tài khoản demo (profile `demo-seed`, mật khẩu `Demo@1234`):
 `admin@demo.local`, `teacher1@demo.local`, `teacher2@demo.local`, `student1@demo.local` … `student5@demo.local`.
+`student1` có sẵn 4 phiếu đánh giá và vài chủ đề đã hoàn thành, nên trang Tiến bộ có dữ liệu ngay.
 
 Chạy không cần Docker cho LiveKit: đặt `app.providers.video=fake`.
 
