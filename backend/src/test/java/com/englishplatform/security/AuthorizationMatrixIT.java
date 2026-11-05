@@ -247,6 +247,8 @@ class AuthorizationMatrixIT extends ApiTestSupport {
     post("/api/v1/me/consents", "{\"policyVersion\":\"x\"}").ok(A, T, S, OT, OS);
     get("/api/v1/users").ok(A).forbidden(T, S, OT, OS);
     get("/api/v1/users/{id}", s).ok(A).forbidden(T, S, OT, OS);
+    get("/api/v1/users/{id}/policy-consents", s).ok(A).forbidden(T, S, OT, OS);
+    get("/api/v1/users/{userId}/notifications", s).ok(A).forbidden(T, S, OT, OS);
     post("/api/v1/users", "{\"email\":\"m@test.local\",\"fullName\":\"M\",\"role\":\"TEACHER\"}")
         .ok(A)
         .forbidden(T, S, OT, OS);
