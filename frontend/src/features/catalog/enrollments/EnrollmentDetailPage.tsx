@@ -12,13 +12,23 @@ import {
   type TeacherAssignmentHistory,
 } from '@/lib/api/catalog'
 import { fetchUsers, type UserItem } from '@/lib/api/users'
-import { fetchStatement, type PaymentItem } from '@/lib/api/billing'
+import { fetchStatement, PAYMENT_METHOD_LABEL, type PaymentItem } from '@/lib/api/billing'
 import { StatusBadge } from '@/components/StatusBadge'
 import ManualPaymentDialog from './ManualPaymentDialog'
+import AdjustmentDialog from './AdjustmentDialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
+
+/** Nhãn công nợ theo số dư: dương là còn nợ, âm là thu vượt. */
+function debtLabel(debtVnd: number): { text: string; className: string } {
+  if (debtVnd > 0)
+    return { text: 'Còn nợ', className: 'bg-amber-50 text-amber-800 border-amber-200' }
+  if (debtVnd < 0)
+    return { text: 'Thu vượt', className: 'bg-blue-50 text-blue-800 border-blue-200' }
+  return { text: 'Đã thu đủ', className: 'bg-emerald-50 text-emerald-800 border-emerald-200' }
+}
 
 export default function EnrollmentDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -29,6 +39,7 @@ export default function EnrollmentDetailPage() {
 
   // State dialogs
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
+  const [adjustmentDialogOpen, setAdjustmentDialogOpen] = useState(false)
   const [changeTeacherDialogOpen, setChangeTeacherDialogOpen] = useState(false)
   const [extendDialogOpen, setExtendDialogOpen] = useState(false)
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
@@ -122,6 +133,11 @@ export default function EnrollmentDetailPage() {
     if (amount === undefined || amount === null) return '—'
     return amount.toLocaleString('vi-VN') + ' đ'
   }
+  // Backend từ chối thu thêm khi gói đã hủy; điều chỉnh vẫn được để sửa khoản nhập nhầm.
+  const canCollect =
+    isAdmin && enrollment.status !== 'CANCELLED' && !!statement && statement.debtVnd > 0
+  const canAdjust = isAdmin && !!statement && statement.amountPaidVnd > 0
+  const debt = statement ? debtLabel(statement.debtVnd) : null
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto p-4 sm:p-6">
@@ -163,7 +179,7 @@ export default function EnrollmentDetailPage() {
                 </Button>
               </>
             )}
-            {statement && statement.debtVnd > 0 && (
+            {canCollect && (
               <Button size="sm" onClick={() => setPaymentDialogOpen(true)}>
                 Thu học phí
               </Button>
@@ -258,12 +274,21 @@ export default function EnrollmentDetailPage() {
         {/* Right: Statement & Payments */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-3">
-            <CardTitle className="text-base font-bold text-slate-800">
-              Tình trạng công nợ & Thanh toán
-            </CardTitle>
-            {isAdmin && statement && statement.debtVnd > 0 && (
-              <Button size="sm" variant="outline" onClick={() => setPaymentDialogOpen(true)}>
-                Ghi nhận thu
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base font-bold text-slate-800">
+                Công nợ và thanh toán
+              </CardTitle>
+              {debt && (
+                <span
+                  className={`text-[11px] font-semibold px-2 py-0.5 rounded border ${debt.className}`}
+                >
+                  {debt.text}
+                </span>
+              )}
+            </div>
+            {canAdjust && (
+              <Button size="sm" variant="outline" onClick={() => setAdjustmentDialogOpen(true)}>
+                Điều chỉnh
               </Button>
             )}
           </CardHeader>
@@ -283,9 +308,11 @@ export default function EnrollmentDetailPage() {
                   </div>
                 </div>
                 <div>
-                  <div className="text-[11px] text-slate-500">Còn nợ</div>
+                  <div className="text-[11px] text-slate-500">
+                    {statement.debtVnd < 0 ? 'Thu vượt' : 'Còn nợ'}
+                  </div>
                   <div className="font-bold text-sm text-amber-700 mt-0.5">
-                    {formatVnd(statement.debtVnd)}
+                    {formatVnd(Math.abs(statement.debtVnd))}
                   </div>
                 </div>
               </div>
@@ -308,15 +335,26 @@ export default function EnrollmentDetailPage() {
                       className="p-3 bg-white border rounded-xl text-xs flex justify-between items-center"
                     >
                       <div>
-                        <div className="font-bold text-slate-800">{formatVnd(p.amountVnd)}</div>
+                        <div
+                          className={`font-bold tabular-nums ${p.adjustment ? 'text-red-700' : 'text-slate-800'}`}
+                        >
+                          {formatVnd(p.amountVnd)}
+                        </div>
                         <div className="text-[11px] text-slate-500 mt-0.5">
-                          {p.paidAt} • {p.method === 'BANK_TRANSFER' ? 'Chuyển khoản' : p.method}
-                          {p.note && ` • "${p.note}"`}
+                          {new Date(`${p.paidAt}T00:00:00`).toLocaleDateString('vi-VN')}
+                          {!p.adjustment && ` · ${PAYMENT_METHOD_LABEL[p.method]}`}
+                          {p.note && ` · ${p.note}`}
                         </div>
                       </div>
-                      <span className="text-[11px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded font-medium">
-                        Đã thu
-                      </span>
+                      {p.adjustment ? (
+                        <span className="text-[11px] text-red-700 bg-red-50 px-2 py-0.5 rounded font-medium">
+                          Điều chỉnh
+                        </span>
+                      ) : (
+                        <span className="text-[11px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded font-medium">
+                          Đã thu
+                        </span>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -377,6 +415,14 @@ export default function EnrollmentDetailPage() {
           debtVnd={statement?.debtVnd}
           open
           onClose={() => setPaymentDialogOpen(false)}
+        />
+      )}
+
+      {adjustmentDialogOpen && statement && (
+        <AdjustmentDialog
+          enrollmentId={enrollment.id}
+          amountPaidVnd={statement.amountPaidVnd}
+          onClose={() => setAdjustmentDialogOpen(false)}
         />
       )}
 

@@ -455,4 +455,31 @@ export const catalogHandlers = [
 
     return HttpResponse.json(payment, { status: 201 })
   }),
+
+  http.post('*/api/v1/enrollments/:id/payments/adjustments', async ({ params, request }) => {
+    const body = (await request.json()) as { amountVnd: number; note: string }
+    const statement = mockStatements[params.id as string]
+    if (body.amountVnd >= 0 || (statement && statement.amountPaidVnd + body.amountVnd < 0)) {
+      return HttpResponse.json(
+        { status: 400, title: 'Bad Request', code: 'VALIDATION_FAILED' },
+        { status: 400 },
+      )
+    }
+    const payment: PaymentItem = {
+      id: `adj-${Date.now()}`,
+      amountVnd: body.amountVnd,
+      paidAt: new Date().toLocaleDateString('sv-SE'),
+      method: 'OTHER',
+      adjustment: true,
+      note: body.note,
+      recordedBy: 'user-admin-1',
+      recordedAt: new Date().toISOString(),
+    }
+    if (statement) {
+      statement.payments.push(payment)
+      statement.amountPaidVnd += body.amountVnd
+      statement.debtVnd = statement.amountDueVnd - statement.amountPaidVnd
+    }
+    return HttpResponse.json(payment, { status: 201 })
+  }),
 ]

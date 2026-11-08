@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router'
 import { useAuth } from '@/app/AuthProvider'
 import { fetchEnrollments, type EnrollmentDetail } from '@/lib/api/catalog'
-import { fetchStatement, type PaymentMethod } from '@/lib/api/billing'
+import { fetchStatement, PAYMENT_METHOD_LABEL } from '@/lib/api/billing'
 import { StatusBadge } from '@/components/StatusBadge'
 import { Card, CardContent } from '@/components/ui/card'
 
@@ -11,12 +11,6 @@ import { Card, CardContent } from '@/components/ui/card'
 const RENEWAL_LOW_SESSIONS = 2
 const RENEWAL_EXPIRING_DAYS = 7
 const DAY_MS = 24 * 3600 * 1000
-
-const METHOD_LABEL: Record<PaymentMethod, string> = {
-  BANK_TRANSFER: 'Chuyển khoản',
-  CASH: 'Tiền mặt',
-  OTHER: 'Khác',
-}
 
 const formatVnd = (amount: number) => amount.toLocaleString('vi-VN') + ' đ'
 
@@ -92,7 +86,9 @@ function PaymentSummary({ enrollmentId }: { enrollmentId: string }) {
             {statement.payments.map((p) => (
               <tr key={p.id}>
                 <td className="py-1">{formatDay(p.paidAt)}</td>
-                <td className="py-1">{p.adjustment ? 'Điều chỉnh' : METHOD_LABEL[p.method]}</td>
+                <td className="py-1">
+                  {p.adjustment ? 'Điều chỉnh' : PAYMENT_METHOD_LABEL[p.method]}
+                </td>
                 <td className="py-1 text-right tabular-nums">{formatVnd(p.amountVnd)}</td>
               </tr>
             ))}

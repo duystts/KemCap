@@ -2,6 +2,16 @@ import { api } from './client'
 
 export type PaymentMethod = 'BANK_TRANSFER' | 'CASH' | 'OTHER'
 
+export const PAYMENT_METHOD_LABEL: Record<PaymentMethod, string> = {
+  BANK_TRANSFER: 'Chuyển khoản',
+  CASH: 'Tiền mặt',
+  OTHER: 'Khác',
+}
+
+/** Ghi chú thanh toán là văn bản tự do; gợi ý này là biện pháp duy nhất tránh ghi dữ liệu cá nhân vào đó (research.md). */
+export const PAYMENT_NOTE_HINT =
+  'Không ghi tên, số điện thoại hay thông tin cá nhân của học viên. Chỉ ghi mã giao dịch hoặc nơi thu.'
+
 export interface PaymentItem {
   id: string
   amountVnd: number
