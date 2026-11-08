@@ -3,17 +3,33 @@ import type { ProblemDetail, TokenResponse } from './types'
 const BASE_URL =
   (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8080/api/v1'
 
+const STANDARD_FIELDS = new Set(['type', 'title', 'status', 'detail', 'instance', 'code', 'errors'])
+
+function extraFields(body: ProblemDetail | undefined): Record<string, unknown> {
+  if (!body) return {}
+  return Object.fromEntries(Object.entries(body).filter(([key]) => !STANDARD_FIELDS.has(key)))
+}
+
 /** Lỗi API đã chuẩn hóa từ RFC 9457 Problem Details. */
 export class ApiError extends Error {
   readonly status: number
   readonly code: string
   readonly errors: { field: string; message: string }[]
+  /** Trường bổ sung ngoài chuẩn RFC 9457 mà backend gửi kèm, vd. `sessions` của EXCEPTION_OVERLAPS_SESSIONS. */
+  readonly details: Record<string, unknown>
 
-  constructor(status: number, code: string, message: string, errors: ApiError['errors'] = []) {
+  constructor(
+    status: number,
+    code: string,
+    message: string,
+    errors: ApiError['errors'] = [],
+    details: Record<string, unknown> = {},
+  ) {
     super(message)
     this.status = status
     this.code = code
     this.errors = errors
+    this.details = details
   }
 
   static async from(response: Response): Promise<ApiError> {
@@ -28,6 +44,7 @@ export class ApiError extends Error {
       body?.code ?? (response.status >= 500 ? 'INTERNAL_ERROR' : 'UNKNOWN'),
       body?.detail ?? response.statusText,
       body?.errors ?? [],
+      extraFields(body),
     )
   }
 }

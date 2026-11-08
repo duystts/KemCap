@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useAuth } from '@/app/AuthProvider'
@@ -14,10 +14,21 @@ import SlotPicker from './SlotPicker'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
+import { fetchStudents } from '@/lib/api/catalog'
 
 export default function BookSessionPage() {
   const { me } = useAuth()
   const navigate = useNavigate()
+  // Giáo vụ đặt thay học viên qua /admin/students/:id/book
+  const { id: studentIdParam } = useParams<{ id: string }>()
+  const isAdmin = me?.role === 'ADMIN'
+  const studentId = isAdmin ? studentIdParam : me?.id
+  const { data: students = [] } = useQuery({
+    queryKey: ['students'],
+    queryFn: () => fetchStudents(),
+    enabled: isAdmin,
+  })
+  const studentName = students.find((s) => s.id === studentId)?.fullName
   const queryClient = useQueryClient()
   const showError = useApiErrorToast()
 
@@ -26,9 +37,9 @@ export default function BookSessionPage() {
 
   // 1. Lấy danh sách gói học active của học viên
   const { data: enrollments = [], isLoading: loadingEnrollments } = useQuery({
-    queryKey: ['my-enrollments', me?.id],
-    queryFn: () => fetchEnrollments({ studentId: me?.id, status: 'ACTIVE' }),
-    enabled: !!me?.id,
+    queryKey: ['my-enrollments', studentId],
+    queryFn: () => fetchEnrollments({ studentId, status: 'ACTIVE' }),
+    enabled: !!studentId,
   })
 
   // Chọn gói đầu tiên nếu chưa chọn
@@ -48,9 +59,14 @@ export default function BookSessionPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-enrollments'] })
       queryClient.invalidateQueries({ queryKey: ['my-sessions'] })
-      toast.success('Đặt lịch học thành công! Buổi học đã được lưu vào lịch của bạn.')
       setSelectedSlot(null)
-      navigate('/student/schedule')
+      if (isAdmin) {
+        toast.success('Đã đặt buổi học cho học viên.')
+        navigate(`/admin/students/${studentId}`)
+      } else {
+        toast.success('Đặt lịch học thành công! Buổi học đã được lưu vào lịch của bạn.')
+        navigate('/student/schedule')
+      }
     },
     onError: (err: any) => {
       const code = err?.code
@@ -85,7 +101,9 @@ export default function BookSessionPage() {
   return (
     <div className="space-y-8 max-w-4xl mx-auto p-4 sm:p-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Đặt lịch học 1 kèm 1</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          {isAdmin ? `Đặt lịch cho ${studentName ?? 'học viên'}` : 'Đặt lịch học 1 kèm 1'}
+        </h1>
         <p className="text-sm text-slate-500 mt-1">
           Chọn gói học của bạn, tìm khung giờ rảnh phù hợp với giáo viên và xác nhận đặt buổi.
         </p>
@@ -141,7 +159,9 @@ export default function BookSessionPage() {
                           </strong>{' '}
                           / {enr.sessionsTotal} buổi
                         </span>
-                        <span>Đã học: {enr.sessionsConsumed}</span>
+                        <span>
+                          Đã học: {enr.sessionsConsumed} · Đã đặt: {enr.sessionsReserved}
+                        </span>
                       </div>
                       {enr.expiresAt && (
                         <div className="text-[11px] text-slate-400 mt-1">

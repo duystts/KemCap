@@ -6,6 +6,8 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import { useAuth } from '@/app/AuthProvider'
 import { fetchSessions, type SessionStatus } from '@/lib/api/scheduling'
+import { fetchStudents } from '@/lib/api/catalog'
+import { fetchUsers } from '@/lib/api/users'
 import SessionDetailDrawer from './SessionDetailDrawer'
 import { statusLabel } from '@/components/StatusBadge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -27,17 +29,31 @@ export default function ScheduleCalendar() {
   const isStudent = me?.role === 'STUDENT'
   const isTeacher = me?.role === 'TEACHER'
 
+  const isAdmin = me?.role === 'ADMIN'
   const [outcomePendingOnly, setOutcomePendingOnly] = useState(false)
+  const [teacherFilter, setTeacherFilter] = useState('')
+  const [studentFilter, setStudentFilter] = useState('')
+
+  const { data: teachers = [] } = useQuery({
+    queryKey: ['users', 'TEACHER'],
+    queryFn: () => fetchUsers({ role: 'TEACHER' }),
+    enabled: isAdmin,
+  })
+  const { data: students = [] } = useQuery({
+    queryKey: ['students'],
+    queryFn: () => fetchStudents(),
+    enabled: isAdmin,
+  })
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   // Fetch danh sách buổi học
   const { data: sessions = [], isLoading } = useQuery({
-    queryKey: ['my-sessions', me?.id, outcomePendingOnly],
+    queryKey: ['my-sessions', me?.id, outcomePendingOnly, teacherFilter, studentFilter],
     queryFn: () =>
       fetchSessions({
-        teacherId: isTeacher ? me?.id : undefined,
-        studentId: isStudent ? me?.id : undefined,
+        teacherId: isTeacher ? me?.id : teacherFilter || undefined,
+        studentId: isStudent ? me?.id : studentFilter || undefined,
         outcomePending: outcomePendingOnly ? true : undefined,
       }),
     enabled: !!me?.id,
@@ -82,7 +98,37 @@ export default function ScheduleCalendar() {
 
         {/* Lọc buổi chưa chốt (cho GV và Admin) */}
         {!isStudent && (
-          <div className="flex items-center gap-2 bg-slate-50 border p-2 rounded-xl text-xs">
+          <div className="flex flex-wrap items-center gap-2 bg-slate-50 border p-2 rounded-xl text-xs">
+            {isAdmin && (
+              <>
+                <select
+                  aria-label="Lọc theo giáo viên"
+                  value={teacherFilter}
+                  onChange={(e) => setTeacherFilter(e.target.value)}
+                  className="h-8 px-2 rounded-lg border bg-white"
+                >
+                  <option value="">Tất cả giáo viên</option>
+                  {teachers.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.fullName}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  aria-label="Lọc theo học viên"
+                  value={studentFilter}
+                  onChange={(e) => setStudentFilter(e.target.value)}
+                  className="h-8 px-2 rounded-lg border bg-white"
+                >
+                  <option value="">Tất cả học viên</option>
+                  {students.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.fullName}
+                    </option>
+                  ))}
+                </select>
+              </>
+            )}
             <label className="flex items-center gap-1.5 cursor-pointer font-medium text-slate-700">
               <input
                 type="checkbox"
