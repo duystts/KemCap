@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { recordPayment, type PaymentMethod } from '@/lib/api/billing'
+import { PAYMENT_NOTE_HINT, recordPayment, type PaymentMethod } from '@/lib/api/billing'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
@@ -22,7 +22,8 @@ export default function ManualPaymentDialog({
   const queryClient = useQueryClient()
   const showError = useApiErrorToast()
 
-  const todayStr = new Date().toISOString().slice(0, 10)
+  // Ngày theo giờ máy; toISOString theo UTC nên trước 7 giờ sáng sẽ ra ngày hôm qua
+  const todayStr = new Date().toLocaleDateString('sv-SE')
 
   const [amountVnd, setAmountVnd] = useState<number>(debtVnd > 0 ? debtVnd : 0)
   const [paidAt, setPaidAt] = useState(todayStr)
@@ -41,6 +42,7 @@ export default function ManualPaymentDialog({
       queryClient.invalidateQueries({ queryKey: ['enrollment-statement', enrollmentId] })
       queryClient.invalidateQueries({ queryKey: ['enrollment', enrollmentId] })
       queryClient.invalidateQueries({ queryKey: ['enrollments'] })
+      queryClient.invalidateQueries({ queryKey: ['receivables'] })
       toast.success('Ghi nhận thanh toán thành công! Gói học đã được cập nhật/kích hoạt.')
       onClose()
     },
@@ -129,14 +131,23 @@ export default function ManualPaymentDialog({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label
+              htmlFor="payment-note"
+              className="block text-xs font-semibold text-slate-700 mb-1"
+            >
               Ghi chú giao dịch
             </label>
             <Input
+              id="payment-note"
               placeholder="Ví dụ: Mã GD VCB 88291, thu tiền mặt tại cơ sở…"
+              maxLength={2000}
               value={note}
               onChange={(e) => setNote(e.target.value)}
+              aria-describedby="payment-note-help"
             />
+            <p id="payment-note-help" className="text-xs text-slate-500 mt-1">
+              {PAYMENT_NOTE_HINT}
+            </p>
           </div>
 
           <div className="pt-4 border-t flex justify-end gap-2">
