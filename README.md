@@ -62,6 +62,9 @@ Tài khoản demo, mật khẩu `Demo@1234`: `admin@demo.local`, `teacher1@demo.
 Swagger và `/v3/api-docs` chỉ mở ở profile `local`. Kịch bản kiểm chứng từng bước ở
 [quickstart.md](specs/001-personalized-english-tutoring/quickstart.md).
 
+Hướng dẫn chi tiết từng phần (biến môi trường, làm mới dữ liệu demo, chạy e2e, lỗi thường gặp):
+[backend/README.md](backend/README.md), [frontend/README.md](frontend/README.md).
+
 ## Kiểm thử
 
 ```bash
