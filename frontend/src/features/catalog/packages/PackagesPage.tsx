@@ -31,7 +31,7 @@ export default function PackagesPage() {
   })
 
   const statusMutation = useMutation({
-    mutationFn: ({ pkg, status }: { pkg: PackageItem; status: 'ACTIVE' | 'ARCHIVED' }) =>
+    mutationFn: ({ pkg, status }: { pkg: PackageItem; status: 'ACTIVE' | 'INACTIVE' }) =>
       updatePackage(pkg.id, {
         name: pkg.name,
         sessionMinutes: pkg.sessionMinutes,
@@ -109,7 +109,7 @@ export default function PackagesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {packages.map((pkg: PackageItem) => {
-            const isArchived = pkg.status === 'ARCHIVED'
+            const isArchived = pkg.status === 'INACTIVE'
             return (
               <div
                 key={pkg.id}
@@ -176,7 +176,7 @@ export default function PackagesPage() {
                     onClick={() =>
                       statusMutation.mutate({
                         pkg,
-                        status: isArchived ? 'ACTIVE' : 'ARCHIVED',
+                        status: isArchived ? 'ACTIVE' : 'INACTIVE',
                       })
                     }
                     disabled={statusMutation.isPending}
