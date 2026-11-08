@@ -15,6 +15,17 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
+import { DateTimeText } from '@/components/DateTimeText'
+import { ApiError } from '@/lib/api/client'
+import { fetchStudents } from '@/lib/api/catalog'
+import { Link } from 'react-router'
+
+interface OverlappingSession {
+  id: string
+  studentId: string
+  startsAt: string
+  endsAt: string
+}
 
 const DAYS: { key: DayOfWeek; label: string }[] = [
   { key: 'MONDAY', label: 'Thứ Hai' },
@@ -71,6 +82,15 @@ export default function AvailabilityEditor({ teacherIdOverride }: { teacherIdOve
     onError: (err) => showError(err),
   })
 
+  // Buổi đã đặt trùng ngày nghỉ vừa nhập (409 EXCEPTION_OVERLAPS_SESSIONS), để biết phải hủy buổi nào
+  const [overlaps, setOverlaps] = useState<OverlappingSession[]>([])
+  const { data: students = [] } = useQuery({
+    queryKey: ['students', 'for-overlaps'],
+    queryFn: () => fetchStudents(),
+    enabled: overlaps.length > 0,
+  })
+  const studentName = (id: string) => students.find((s) => s.id === id)?.fullName ?? 'Học viên'
+
   const addExceptionMutation = useMutation({
     mutationFn: () =>
       addTeacherException(teacherId, {
@@ -82,12 +102,23 @@ export default function AvailabilityEditor({ teacherIdOverride }: { teacherIdOve
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['teacher-exceptions', teacherId] })
       toast.success('Đã thêm ngày nghỉ ngoại lệ!')
+      setOverlaps([])
       setExDate('')
       setExStart('')
       setExEnd('')
       setExReason('')
     },
-    onError: (err) => showError(err),
+    onError: (err) => {
+      showError(err)
+      const sessions = err instanceof ApiError ? err.details.sessions : undefined
+      setOverlaps(
+        err instanceof ApiError &&
+          err.code === 'EXCEPTION_OVERLAPS_SESSIONS' &&
+          Array.isArray(sessions)
+          ? (sessions as OverlappingSession[])
+          : [],
+      )
+    },
   })
 
   const deleteExceptionMutation = useMutation({
@@ -333,6 +364,33 @@ export default function AvailabilityEditor({ teacherIdOverride }: { teacherIdOve
               </Button>
             </div>
           </div>
+
+          {overlaps.length > 0 && (
+            <div
+              role="alert"
+              className="p-4 rounded-lg border border-rose-200 bg-rose-50 space-y-2"
+            >
+              <p className="text-sm font-semibold text-rose-900">
+                Ngày nghỉ trùng {overlaps.length} buổi đã đặt. Hủy các buổi này trước rồi thêm lại
+                ngày nghỉ.
+              </p>
+              <ul className="divide-y divide-rose-100 text-sm">
+                {overlaps.map((s) => (
+                  <li key={s.id} className="flex items-center justify-between gap-3 py-1.5">
+                    <span className="text-slate-800">
+                      <DateTimeText value={s.startsAt} /> · {studentName(s.studentId)}
+                    </span>
+                    <Link
+                      to={`/sessions/${s.id}`}
+                      className="text-xs font-medium text-indigo-700 hover:underline"
+                    >
+                      Xem buổi học
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Danh sách ngoại lệ đã thêm */}
           <div className="space-y-2">

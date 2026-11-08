@@ -137,6 +137,14 @@ export default function StudentProfilePage() {
               </Button>
             )}
             {isAdmin && (
+              <Link
+                to={`/admin/students/${id}/book`}
+                className="inline-flex items-center h-8 px-3 text-sm font-medium rounded-[var(--radius)] border border-border bg-white hover:bg-muted"
+              >
+                Đặt lịch thay
+              </Link>
+            )}
+            {isAdmin && (
               <Button variant="outline" size="sm" onClick={openEditModal}>
                 Cập nhật thông tin
               </Button>
