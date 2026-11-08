@@ -160,3 +160,16 @@ h2 {
   --fc-button-active-bg-color: var(--color-slate-200);
   --fc-button-active-border-color: var(--color-slate-300);
 }
+
+/* Điện thoại: tiêu đề lịch nhỏ lại để không đẩy nút xuống nhiều dòng */
+@media (max-width: 639px) {
+  .fc .fc-toolbar-title {
+    font-size: 1.05rem;
+  }
+  .fc .fc-toolbar.fc-footer-toolbar {
+    margin-top: 0.75rem;
+  }
+  .fc .fc-button {
+    white-space: nowrap;
+  }
+}

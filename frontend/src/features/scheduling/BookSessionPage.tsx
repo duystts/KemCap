@@ -164,7 +164,7 @@ export default function BookSessionPage() {
                         </span>
                       </div>
                       {enr.expiresAt && (
-                        <div className="text-[11px] text-slate-400 mt-1">
+                        <div className="text-[11px] text-slate-500 mt-1">
                           Hạn dùng: {new Date(enr.expiresAt).toLocaleDateString('vi-VN')}
                         </div>
                       )}

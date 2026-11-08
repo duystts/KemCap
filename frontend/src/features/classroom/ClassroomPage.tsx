@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -35,6 +35,21 @@ export default function ClassroomPage() {
     staleTime: 0,
   })
 
+  // Tạo RTCPeerConnection lần đầu khởi động cả bộ WebRTC của trình duyệt (hơn 1 giây CPU trên điện thoại
+  // tầm trung). Đợi trang vẽ xong khung phòng học rồi mới kết nối, để học viên không nhìn màn hình trống.
+  const [readyToConnect, setReadyToConnect] = useState(false)
+  useEffect(() => {
+    if (!joinInfo) return
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const frame = requestAnimationFrame(() => {
+      timer = setTimeout(() => setReadyToConnect(true), 0)
+    })
+    return () => {
+      cancelAnimationFrame(frame)
+      clearTimeout(timer)
+    }
+  }, [joinInfo])
+
   const handleDisconnected = useCallback(
     (reason?: DisconnectReason) => {
       // Mất mạng hoặc bị ngắt từ máy chủ không phải là rời phòng: chưa được hỏi kết quả buổi học
@@ -53,7 +68,7 @@ export default function ClassroomPage() {
 
   if (isLoading) {
     return (
-      <div className="h-screen w-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4">
+      <div className="h-dvh w-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4">
         <h2 className="text-lg">Đang chuẩn bị phòng học…</h2>
       </div>
     )
@@ -61,7 +76,7 @@ export default function ClassroomPage() {
 
   if (error || !joinInfo) {
     return (
-      <div className="h-screen w-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4 text-center">
+      <div className="h-dvh w-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4 text-center">
         <h2 className="text-xl">Không vào được phòng học</h2>
         <p className="text-sm text-slate-300 max-w-md mt-2 mb-6">{errorMessage(error)}</p>
         <Button onClick={() => navigate(schedulePath)}>Quay lại lịch học</Button>
@@ -71,7 +86,7 @@ export default function ClassroomPage() {
 
   if (connectionLost) {
     return (
-      <div className="h-screen w-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4 text-center">
+      <div className="h-dvh w-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4 text-center">
         <h2 className="text-xl">Mất kết nối phòng học</h2>
         <p className="text-sm text-slate-300 max-w-md mt-2 mb-6">
           Kiểm tra mạng rồi vào lại. Buổi học chưa được ghi nhận kết quả.
@@ -91,7 +106,7 @@ export default function ClassroomPage() {
   }
 
   return (
-    <div className="h-screen w-screen bg-slate-950 text-white flex flex-col overflow-hidden relative">
+    <div className="h-dvh w-screen bg-slate-950 text-white flex flex-col overflow-hidden relative">
       <div className="h-12 border-b border-slate-800 bg-slate-900 px-4 flex items-center justify-between shrink-0 text-xs">
         <span className="font-semibold text-slate-200">Lớp học trực tuyến 1-1</span>
         <span className="text-slate-300 truncate ml-3">
@@ -105,7 +120,7 @@ export default function ClassroomPage() {
           audio
           token={joinInfo.token}
           serverUrl={joinInfo.serverUrl}
-          connect
+          connect={readyToConnect}
           onDisconnected={handleDisconnected}
           onMediaDeviceFailure={() =>
             toast.error('Không dùng được micro hoặc camera. Hãy kiểm tra quyền của trình duyệt.')
