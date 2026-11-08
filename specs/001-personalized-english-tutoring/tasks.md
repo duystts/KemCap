@@ -210,7 +210,7 @@ và UI không bắt buộc test riêng. Integration test dùng PostgreSQL thật
 - [X] T086 [US3] (#3·U4) `B/learning/internal/path/LearningPathService.java` + `B/learning/internal/web/LearningPathController.java`: `GET/POST /students/{id}/learning-path`, `PUT /learning-paths/{id}` (cả cây, `reason` bắt buộc, tự sinh `summary`, lưu `path_revision`), `GET /learning-paths/{id}/revisions`; trả `completionPercent`
 - [X] T087 [US3] (#3·U4) Listener `B/learning/internal/ProfileAnonymizationListener.java` (`StudentAnonymized`, idempotent): xóa `proficiency_assessment`, `learning_goal`, `learning_path`/`milestone`/`topic`/`path_revision` của học viên
 - [X] T088 [P] [US3] (#3·U4) Frontend `F/features/learning/proficiency/ProficiencyPanel.tsx` + `AssessmentFormDialog.tsx` (5 kỹ năng A1–C2, Đầu vào/Định kỳ) + `GoalsPanel.tsx` (nhãn "Cần tư vấn" khi chưa có mục tiêu); gắn tab "Năng lực" của `StudentProfilePage`
-- [ ] T089 [US3] (#3·U4) Frontend `F/features/learning/path/LearningPathEditor.tsx` (thêm/xóa/sắp xếp chặng, chủ đề, ngày mục tiêu, hộp thoại lý do), `LearningPathView.tsx` (chỉ đọc, thanh %), `RevisionHistory.tsx`; route `/student/learning-path`
+- [X] T089 [US3] (#3·U4) Frontend `F/features/learning/path/LearningPathEditor.tsx` (thêm/xóa/sắp xếp chặng, chủ đề, ngày mục tiêu, hộp thoại lý do), `LearningPathView.tsx` (chỉ đọc, thanh %), `RevisionHistory.tsx`; route `/student/learning-path`
 - [X] T090 [US3] (#3·U4) Seed `B/learning/internal/seed/LearningDemoSeed.java` (`@Profile("demo-seed")`): đánh giá đầu vào, mục tiêu và lộ trình 3 chặng × 3–4 chủ đề cho student1–3; student4 không có mục tiêu (demo "Cần tư vấn")
 
 **Checkpoint (cổng B3, 1/11)**: học viên xem trình độ, mục tiêu, lộ trình; lịch sử điều chỉnh đúng; lọc "Cần tư vấn" chạy.

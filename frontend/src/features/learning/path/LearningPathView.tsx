@@ -33,14 +33,16 @@ export default function LearningPathView({ studentId, canEdit = true }: Learning
             Lộ trình học tập chi tiết sẽ được giáo viên thiết kế dựa trên kết quả đánh giá năng lực
             đầu vào.
           </p>
-          {canEdit && <Button onClick={() => setEditorOpen(true)}>Thiết kế lộ trình ngay</Button>}
+          {canEdit && <Button onClick={() => setEditorOpen(true)}>Tạo lộ trình</Button>}
 
-          <LearningPathEditor
-            studentId={studentId}
-            existingPath={null}
-            open={editorOpen}
-            onClose={() => setEditorOpen(false)}
-          />
+          {editorOpen && (
+            <LearningPathEditor
+              studentId={studentId}
+              existingPath={null}
+              open
+              onClose={() => setEditorOpen(false)}
+            />
+          )}
         </CardContent>
       </Card>
     )
@@ -75,21 +77,22 @@ export default function LearningPathView({ studentId, canEdit = true }: Learning
               </div>
               <h2 className="text-xl font-bold text-slate-900">{path.title}</h2>
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setHistoryOpen(true)}
-                className="text-xs"
-              >
-                Lịch sử điều chỉnh
-              </Button>
-              {canEdit && (
+            {/* Lịch sử điều chỉnh chỉ giáo vụ, giáo viên xem được (API trả 403 với học viên) */}
+            {canEdit && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setHistoryOpen(true)}
+                  className="text-xs"
+                >
+                  Lịch sử điều chỉnh
+                </Button>
                 <Button size="sm" onClick={() => setEditorOpen(true)} className="text-xs">
                   Điều chỉnh lộ trình
                 </Button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Progress Bar */}
@@ -164,13 +167,21 @@ export default function LearningPathView({ studentId, canEdit = true }: Learning
       </div>
 
       {/* Dialogs */}
-      <LearningPathEditor
-        studentId={studentId}
-        existingPath={path}
-        open={editorOpen}
-        onClose={() => setEditorOpen(false)}
-      />
-      <RevisionHistory pathId={path.id} open={historyOpen} onClose={() => setHistoryOpen(false)} />
+      {editorOpen && (
+        <LearningPathEditor
+          studentId={studentId}
+          existingPath={path}
+          open
+          onClose={() => setEditorOpen(false)}
+        />
+      )}
+      {canEdit && (
+        <RevisionHistory
+          pathId={path.id}
+          open={historyOpen}
+          onClose={() => setHistoryOpen(false)}
+        />
+      )}
     </div>
   )
 }

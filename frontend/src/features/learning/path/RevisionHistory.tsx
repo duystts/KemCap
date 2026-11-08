@@ -46,13 +46,8 @@ export default function RevisionHistory({ pathId, open, onClose }: RevisionHisto
                   <div key={rev.id} className="relative flex items-start gap-4 pl-8">
                     <div className="absolute left-2 top-1.5 w-3.5 h-3.5 rounded-full bg-indigo-600 ring-4 ring-white" />
                     <div className="flex-1 bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs space-y-1.5">
-                      <div className="flex items-center justify-between text-slate-500">
-                        <span className="flex items-center gap-1 font-semibold text-slate-700">
-                          Người đổi: {rev.changedBy}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          {new Date(rev.changedAt).toLocaleDateString('vi-VN')}
-                        </span>
+                      <div className="text-slate-500">
+                        {new Date(rev.changedAt).toLocaleString('vi-VN')}
                       </div>
                       <div className="font-semibold text-slate-800 text-sm">
                         Lý do: &quot;{rev.reason}&quot;
