@@ -44,7 +44,7 @@ export default function LearningPathEditor({
             id: `top-new-1`,
             position: 1,
             title: 'Chủ đề 1',
-            objective: 'Mục tiêu bài học',
+            objective: '',
             status: 'PLANNED',
           },
         ],
@@ -103,7 +103,15 @@ export default function LearningPathEditor({
 
   if (!open) return null
 
-  // Thao tác với Chặng (Milestone)
+  // Đổi chỗ phần tử i với i + delta (delta = -1 lên, 1 xuống)
+  const swap = <T,>(items: T[], i: number, delta: number): T[] => {
+    const j = i + delta
+    if (j < 0 || j >= items.length) return items
+    const next = [...items]
+    ;[next[i], next[j]] = [next[j], next[i]]
+    return next
+  }
+
   const addMilestone = () => {
     const nextIdx = milestones.length + 1
     setMilestones([
@@ -122,44 +130,42 @@ export default function LearningPathEditor({
     setMilestones(milestones.filter((_, idx) => idx !== mIdx))
   }
 
-  const updateMilestone = (mIdx: number, field: keyof MilestoneItem, value: any) => {
-    const updated = [...milestones]
-    updated[mIdx] = { ...updated[mIdx], [field]: value }
-    setMilestones(updated)
+  const moveMilestone = (mIdx: number, delta: number) => {
+    setMilestones(swap(milestones, mIdx, delta))
   }
 
-  // Thao tác với Chủ đề (Topic)
-  const addTopic = (mIdx: number) => {
-    const updated = [...milestones]
-    const m = updated[mIdx]
-    const nextTIdx = m.topics.length + 1
-    m.topics = [
-      ...m.topics,
+  const updateMilestone = (mIdx: number, field: 'title' | 'targetDate', value: string) => {
+    setMilestones(milestones.map((m, idx) => (idx === mIdx ? { ...m, [field]: value } : m)))
+  }
+
+  const updateTopics = (mIdx: number, change: (topics: TopicItem[]) => TopicItem[]) => {
+    setMilestones(
+      milestones.map((m, idx) => (idx === mIdx ? { ...m, topics: change(m.topics) } : m)),
+    )
+  }
+
+  const addTopic = (mIdx: number) =>
+    updateTopics(mIdx, (topics) => [
+      ...topics,
       {
-        id: `top-new-${Date.now()}-${nextTIdx}`,
-        position: nextTIdx,
-        title: `Chủ đề ${nextTIdx}`,
+        id: `top-new-${Date.now()}`,
+        position: topics.length + 1,
+        title: `Chủ đề ${topics.length + 1}`,
         objective: '',
         status: 'PLANNED',
       },
-    ]
-    setMilestones(updated)
-  }
+    ])
 
-  const removeTopic = (mIdx: number, tIdx: number) => {
-    const updated = [...milestones]
-    updated[mIdx].topics = updated[mIdx].topics.filter((_, idx) => idx !== tIdx)
-    setMilestones(updated)
-  }
+  const removeTopic = (mIdx: number, tIdx: number) =>
+    updateTopics(mIdx, (topics) => topics.filter((_, idx) => idx !== tIdx))
 
-  const updateTopic = (mIdx: number, tIdx: number, field: keyof TopicItem, value: any) => {
-    const updated = [...milestones]
-    const m = updated[mIdx]
-    const topics = [...m.topics]
-    topics[tIdx] = { ...topics[tIdx], [field]: value }
-    m.topics = topics
-    setMilestones(updated)
-  }
+  const moveTopic = (mIdx: number, tIdx: number, delta: number) =>
+    updateTopics(mIdx, (topics) => swap(topics, tIdx, delta))
+
+  const updateTopic = (mIdx: number, tIdx: number, field: 'title' | 'objective', value: string) =>
+    updateTopics(mIdx, (topics) =>
+      topics.map((t, idx) => (idx === tIdx ? { ...t, [field]: value } : t)),
+    )
 
   const handlePreSave = () => {
     if (!title.trim()) {
@@ -168,6 +174,10 @@ export default function LearningPathEditor({
     }
     if (milestones.length === 0) {
       toast.error('Lộ trình cần có ít nhất một chặng học!')
+      return
+    }
+    if (milestones.some((m) => !m.title.trim() || m.topics.some((t) => !t.title.trim()))) {
+      toast.error('Chặng và chủ đề đều cần có tên.')
       return
     }
     if (existingPath) {
@@ -236,6 +246,7 @@ export default function LearningPathEditor({
                       Tên chặng {mIdx + 1}
                     </label>
                     <Input
+                      aria-label={`Tên chặng ${mIdx + 1}`}
                       value={m.title}
                       onChange={(e) => updateMilestone(mIdx, 'title', e.target.value)}
                       placeholder="Tên chặng học…"
@@ -248,6 +259,7 @@ export default function LearningPathEditor({
                       Ngày mục tiêu hoàn thành
                     </label>
                     <Input
+                      aria-label={`Ngày mục tiêu chặng ${mIdx + 1}`}
                       type="date"
                       value={m.targetDate || ''}
                       onChange={(e) => updateMilestone(mIdx, 'targetDate', e.target.value)}
@@ -255,12 +267,38 @@ export default function LearningPathEditor({
                     />
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => removeMilestone(mIdx)}
-                    className="self-end sm:self-center p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    title="Xóa chặng này"
-                  ></button>
+                  <div className="flex items-center gap-1 self-end">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => moveMilestone(mIdx, -1)}
+                      disabled={mIdx === 0}
+                      aria-label={`Đưa chặng ${mIdx + 1} lên`}
+                    >
+                      Lên
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => moveMilestone(mIdx, 1)}
+                      disabled={mIdx === milestones.length - 1}
+                      aria-label={`Đưa chặng ${mIdx + 1} xuống`}
+                    >
+                      Xuống
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => removeMilestone(mIdx)}
+                      className="text-red-600 border-red-200 hover:bg-red-50"
+                      aria-label={`Xóa chặng ${mIdx + 1}`}
+                    >
+                      Xóa
+                    </Button>
+                  </div>
                 </div>
 
                 {/* Topics in Milestone */}
@@ -291,6 +329,7 @@ export default function LearningPathEditor({
                         </span>
 
                         <Input
+                          aria-label={`Tên chủ đề ${mIdx + 1}.${tIdx + 1}`}
                           value={t.title}
                           onChange={(e) => updateTopic(mIdx, tIdx, 'title', e.target.value)}
                           placeholder="Tiêu đề bài học / chủ đề…"
@@ -298,17 +337,41 @@ export default function LearningPathEditor({
                         />
 
                         <Input
+                          aria-label={`Mục tiêu chủ đề ${mIdx + 1}.${tIdx + 1}`}
                           value={t.objective || ''}
                           onChange={(e) => updateTopic(mIdx, tIdx, 'objective', e.target.value)}
                           placeholder="Mục tiêu cụ thể…"
                           className="text-xs flex-1 text-slate-600"
                         />
 
-                        <button
-                          type="button"
-                          onClick={() => removeTopic(mIdx, tIdx)}
-                          className="p-1.5 text-slate-400 hover:text-red-600 rounded-lg"
-                        ></button>
+                        <div className="flex items-center gap-1 shrink-0 text-xs">
+                          <button
+                            type="button"
+                            onClick={() => moveTopic(mIdx, tIdx, -1)}
+                            disabled={tIdx === 0}
+                            aria-label={`Đưa chủ đề ${mIdx + 1}.${tIdx + 1} lên`}
+                            className="px-2 py-1 rounded text-slate-600 hover:bg-slate-100 disabled:opacity-40"
+                          >
+                            Lên
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => moveTopic(mIdx, tIdx, 1)}
+                            disabled={tIdx === m.topics.length - 1}
+                            aria-label={`Đưa chủ đề ${mIdx + 1}.${tIdx + 1} xuống`}
+                            className="px-2 py-1 rounded text-slate-600 hover:bg-slate-100 disabled:opacity-40"
+                          >
+                            Xuống
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removeTopic(mIdx, tIdx)}
+                            aria-label={`Xóa chủ đề ${mIdx + 1}.${tIdx + 1}`}
+                            className="px-2 py-1 rounded text-red-600 hover:bg-red-50"
+                          >
+                            Xóa
+                          </button>
+                        </div>
                       </div>
                     ))
                   )}
@@ -341,10 +404,15 @@ export default function LearningPathEditor({
               ràng để học viên và giáo vụ theo dõi.
             </p>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label
+                htmlFor="path-revision-reason"
+                className="block text-xs font-semibold text-slate-700 mb-1"
+              >
                 Lý do điều chỉnh <span className="text-red-500">*</span>
               </label>
               <textarea
+                id="path-revision-reason"
+                maxLength={2000}
                 rows={3}
                 placeholder="Ví dụ: Học viên tiếp thu nhanh, đẩy nhanh tiến độ Speaking Part 2…"
                 value={revisionReason}

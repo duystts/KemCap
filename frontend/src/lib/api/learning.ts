@@ -1,4 +1,4 @@
-import { api } from './client'
+import { api, ApiError } from './client'
 import type { CefrLevel } from './catalog'
 
 export type AssessmentType = 'PLACEMENT' | 'PERIODIC'
@@ -151,8 +151,14 @@ export function updateGoal(
   })
 }
 
-export function fetchLearningPath(studentId: string): Promise<LearningPathDto | null> {
-  return api<LearningPathDto>(`/students/${studentId}/learning-path`)
+/** Chưa có lộ trình (hoặc không được xem) thì backend trả 404; trả về null thay vì lỗi. */
+export async function fetchLearningPath(studentId: string): Promise<LearningPathDto | null> {
+  try {
+    return await api<LearningPathDto>(`/students/${studentId}/learning-path`)
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return null
+    throw err
+  }
 }
 
 export function createLearningPath(
