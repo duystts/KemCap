@@ -90,28 +90,43 @@ function ReconnectingNotice() {
   )
 }
 
+// Menu chọn thiết bị bị ẩn trên điện thoại: nút bật/tắt giãn đầy ô và bo đủ bốn góc
+const TOGGLE_MOBILE = 'max-sm:flex-1 max-sm:justify-center max-sm:rounded-lg!'
+
 function ControlBar({ chatOpen, onToggleChat }: { chatOpen: boolean; onToggleChat: () => void }) {
+  // CSS của LiveKit (không thuộc layer nên thắng utility) giới hạn max-height, nên cần `!`. Trên điện
+  // thoại thanh xếp lưới 2 cột: dùng flex-wrap thì hàng thứ hai, có "Rời phòng", bị đẩy ra ngoài màn hình.
   return (
-    <div className="lk-control-bar flex-wrap">
+    <div className="lk-control-bar max-h-none! shrink-0 flex-wrap max-sm:grid! max-sm:grid-cols-2 max-sm:gap-2!">
       <div className="lk-button-group">
-        <TrackToggle source={Track.Source.Microphone}>Micro</TrackToggle>
-        <div className="lk-button-group-menu">
+        <TrackToggle source={Track.Source.Microphone} className={TOGGLE_MOBILE}>
+          Micro
+        </TrackToggle>
+        {/* Điện thoại thường chỉ có một micro, một camera trước: bỏ menu chọn thiết bị cho gọn */}
+        <div className="lk-button-group-menu max-sm:hidden!">
           <MediaDeviceMenu kind="audioinput" aria-label="Chọn micro" />
         </div>
       </div>
       <div className="lk-button-group">
-        <TrackToggle source={Track.Source.Camera}>Camera</TrackToggle>
-        <div className="lk-button-group-menu">
+        <TrackToggle source={Track.Source.Camera} className={TOGGLE_MOBILE}>
+          Camera
+        </TrackToggle>
+        <div className="lk-button-group-menu max-sm:hidden!">
           <MediaDeviceMenu kind="videoinput" aria-label="Chọn camera" />
         </div>
       </div>
-      <TrackToggle source={Track.Source.ScreenShare} captureOptions={{ audio: true }}>
+      {/* Trình duyệt điện thoại không hỗ trợ chia sẻ màn hình */}
+      <TrackToggle
+        source={Track.Source.ScreenShare}
+        captureOptions={{ audio: true }}
+        className="max-sm:hidden!"
+      >
         Chia sẻ màn hình
       </TrackToggle>
       <button type="button" className="lk-button" aria-pressed={chatOpen} onClick={onToggleChat}>
         Trò chuyện
       </button>
-      <DisconnectButton>Rời phòng</DisconnectButton>
+      <DisconnectButton className="text-red-300!">Rời phòng</DisconnectButton>
       <StartAudio label="Bật âm thanh" />
     </div>
   )

@@ -11,6 +11,7 @@ import { fetchUsers } from '@/lib/api/users'
 import SessionDetailDrawer from './SessionDetailDrawer'
 import { statusLabel } from '@/components/StatusBadge'
 import { Card, CardContent } from '@/components/ui/card'
+import { useMediaQuery } from '@/lib/useMediaQuery'
 
 // Màu sắc cho 8 trạng thái buổi học
 const STATUS_COLORS: Record<SessionStatus, { bg: string; border: string; text: string }> = {
@@ -28,6 +29,8 @@ export default function ScheduleCalendar() {
   const { me } = useAuth()
   const isStudent = me?.role === 'STUDENT'
   const isTeacher = me?.role === 'TEACHER'
+  // Điện thoại: 7 cột của chế độ tuần quá hẹp để đọc, nên mặc định xem theo ngày
+  const narrow = useMediaQuery('(max-width: 639px)')
 
   const isAdmin = me?.role === 'ADMIN'
   const [outcomePendingOnly, setOutcomePendingOnly] = useState(false)
@@ -167,13 +170,22 @@ export default function ScheduleCalendar() {
           ) : (
             <div className="calendar-container">
               <FullCalendar
+                // initialView chỉ đọc lúc mount: đổi khóa để dựng lại khi chuyển cỡ màn hình
+                key={narrow ? 'narrow' : 'wide'}
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                initialView="timeGridWeek"
-                headerToolbar={{
-                  left: 'prev,next today',
-                  center: 'title',
-                  right: 'timeGridWeek,dayGridMonth,timeGridDay',
-                }}
+                initialView={narrow ? 'timeGridDay' : 'timeGridWeek'}
+                headerToolbar={
+                  narrow
+                    ? { left: 'title', right: 'prev,next' }
+                    : {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'timeGridWeek,dayGridMonth,timeGridDay',
+                      }
+                }
+                footerToolbar={
+                  narrow ? { left: 'today', right: 'timeGridDay,dayGridMonth' } : false
+                }
                 buttonText={{
                   today: 'Hôm nay',
                   month: 'Tháng',

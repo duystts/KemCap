@@ -68,7 +68,7 @@ export default function SlotPicker({ enrollmentId, selectedSlot, onSelectSlot }:
                     : 'bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50'
                 }`}
               >
-                <span className="uppercase text-[10px] tracking-wider opacity-80">
+                <span className="uppercase text-[10px] tracking-wider">
                   {item.isToday ? 'Hôm nay' : item.dayOfWeek}
                 </span>
                 <span className="text-sm font-bold mt-0.5">{item.dayAndMonth}</span>

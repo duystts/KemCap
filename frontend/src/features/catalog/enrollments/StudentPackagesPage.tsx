@@ -143,15 +143,15 @@ export default function StudentPackagesPage() {
               >
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                       Gói học 1 kèm 1
                     </span>
                     <StatusBadge status={enr.status} />
                   </div>
 
-                  <h3 className="text-lg font-bold text-slate-900">
+                  <h2 className="text-lg font-bold text-slate-900">
                     {enr.sessionsTotal} buổi ({enr.sessionMinutes} phút/buổi)
-                  </h3>
+                  </h2>
 
                   {renewal && (
                     <p

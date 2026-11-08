@@ -154,7 +154,7 @@ export default function ProgressPage({ studentId }: { studentId?: string }) {
                       Buổi <DateTimeText value={r.sessionEndsAt} mode="date" /> ·{' '}
                       <Link
                         to={`/sessions/${r.sessionId}`}
-                        className="text-indigo-700 hover:underline"
+                        className="text-indigo-700 underline underline-offset-2"
                       >
                         Xem buổi học
                       </Link>
