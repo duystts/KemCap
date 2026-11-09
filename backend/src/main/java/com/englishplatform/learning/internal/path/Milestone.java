@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import org.hibernate.annotations.BatchSize;
 
 /** Chặng của lộ trình; {@code position} duy nhất trong lộ trình. */
 @Entity
@@ -49,10 +50,13 @@ public class Milestone extends BaseEntity {
 
   // không orphanRemoval: chủ đề chuyển sang chặng khác phải giữ nguyên id/trạng thái; chủ đề bị xóa
   // được service xóa tường minh
+  // nạp chủ đề của mọi chặng trong một query thay vì mỗi chặng một query (T152); 100 = số chặng tối
+  // đa của một lộ trình
   @OneToMany(
       mappedBy = "milestone",
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @OrderBy("position")
+  @BatchSize(size = 100)
   private List<Topic> topics = new ArrayList<>();
 
   protected Milestone() {}
