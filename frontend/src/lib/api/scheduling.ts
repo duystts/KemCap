@@ -59,6 +59,8 @@ export interface SessionItem {
   outcomeBy?: string
   teacherJoinedAt?: string
   studentJoinedAt?: string
+  /** Quyết định của giáo vụ cho buổi Gián đoạn; chỉ quyết định một lần (T147). */
+  interruptionDecision?: InterruptionDecision | null
   version: number
   // Client enrichment or display
   teacherName?: string

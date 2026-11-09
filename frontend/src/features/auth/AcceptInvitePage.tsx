@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { FieldError, Input, Label } from '@/components/ui/input'
 import { authApi } from '@/lib/api/auth'
 import { AuthCard, passwordSchema } from './AuthCard'
+import { PolicyLink } from './PolicyLink'
 
 const schema = z
   .object({
@@ -94,7 +95,8 @@ export default function AcceptInvitePage() {
           <label className="flex items-start gap-2 text-sm">
             <input type="checkbox" className="mt-1" {...register('accepted')} />
             <span>
-              Tôi đồng ý với <strong>Điều khoản sử dụng và Chính sách xử lý dữ liệu cá nhân</strong>
+              Tôi đồng ý với{' '}
+              <PolicyLink>Điều khoản sử dụng và Chính sách xử lý dữ liệu cá nhân</PolicyLink>
               {policy.data && <> (phiên bản {policy.data.currentPolicyVersion})</>}.
             </span>
           </label>

@@ -102,6 +102,10 @@ public class Session extends BaseEntity {
   @Column(name = "outcome_at")
   private Instant outcomeAt;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "interruption_decision")
+  private InterruptionDecision interruptionDecision;
+
   @Version private long version;
 
   protected Session() {}
@@ -198,8 +202,15 @@ public class Session extends BaseEntity {
       throw new BusinessException(
           ErrorCode.INVALID_STATE_TRANSITION, "Chỉ sửa kết quả trong 7 ngày sau buổi học");
     }
+    if (interruptionDecision == InterruptionDecision.MAKE_UP) {
+      throw new BusinessException(
+          ErrorCode.INVALID_STATE_TRANSITION, "Buổi đã xếp bù, không sửa kết quả được");
+    }
     boolean wasCharged = CHARGED.contains(status);
     boolean charged = CHARGED.contains(outcome);
+    if (outcome != status) {
+      interruptionDecision = null;
+    }
     status = outcome;
     outcomeBy = by;
     outcomeAt = now;
@@ -209,17 +220,23 @@ public class Session extends BaseEntity {
     return Optional.of(charged ? CounterAction.CONSUME_RELEASED : CounterAction.UNCONSUME);
   }
 
-  /** {@code count}: Gián đoạn tính là đã học → {@code COMPLETED}; ngược lại xếp bù, giữ nguyên. */
+  /**
+   * {@code count}: Gián đoạn tính là đã học → {@code COMPLETED}; ngược lại xếp bù, giữ {@code
+   * INTERRUPTED}. Chỉ quyết định một lần (T147): đã xếp bù thì không tính buổi được nữa.
+   */
   public Optional<CounterAction> decideInterruption(boolean count, UUID by, Instant now) {
-    if (status != SessionStatus.INTERRUPTED) {
-      throw new BusinessException(ErrorCode.INVALID_STATE_TRANSITION);
+    if (status != SessionStatus.INTERRUPTED || interruptionDecision != null) {
+      throw new BusinessException(
+          ErrorCode.INVALID_STATE_TRANSITION, "Buổi gián đoạn này đã được quyết định");
     }
-    if (!count) {
-      return Optional.empty();
-    }
-    status = SessionStatus.COMPLETED;
     outcomeBy = by;
     outcomeAt = now;
+    if (!count) {
+      interruptionDecision = InterruptionDecision.MAKE_UP;
+      return Optional.empty();
+    }
+    interruptionDecision = InterruptionDecision.COUNT;
+    status = SessionStatus.COMPLETED;
     return Optional.of(CounterAction.CONSUME_RELEASED);
   }
 
@@ -309,6 +326,10 @@ public class Session extends BaseEntity {
 
   public Instant getOutcomeAt() {
     return outcomeAt;
+  }
+
+  public InterruptionDecision getInterruptionDecision() {
+    return interruptionDecision;
   }
 
   public long getVersion() {

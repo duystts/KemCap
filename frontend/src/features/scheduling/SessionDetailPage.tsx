@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import { useAuth } from '@/app/AuthProvider'
 import { fetchSession, previewCancelSession, cancelSession } from '@/lib/api/scheduling'
 import { StatusBadge } from '@/components/StatusBadge'
-import InterruptionDecisionPanel from './InterruptionDecisionPanel'
+import InterruptionDecisionPanel, { MadeUpNote } from './InterruptionDecisionPanel'
 import RescheduleSessionPanel from './RescheduleSessionPanel'
 import SessionOutcomeDialog from './SessionOutcomeDialog'
 import SessionReportSection from '@/features/learning/report/SessionReportSection'
@@ -199,8 +199,12 @@ export default function SessionDetailPage() {
 
           {/* Gián đoạn: giáo vụ quyết định */}
           {isAdmin && session.status === 'INTERRUPTED' && (
-            <InterruptionDecisionPanel sessionId={session.id} />
+            <InterruptionDecisionPanel
+              sessionId={session.id}
+              decision={session.interruptionDecision}
+            />
           )}
+          {!isAdmin && session.interruptionDecision === 'MAKE_UP' && <MadeUpNote />}
 
           {/* Đổi lịch: ẩn sau hạn chót */}
           {session.status === 'BOOKED' &&

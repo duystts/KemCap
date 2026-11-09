@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.englishplatform.scheduling.internal.session.CounterAction;
+import com.englishplatform.scheduling.internal.session.InterruptionDecision;
 import com.englishplatform.scheduling.internal.session.Session;
 import com.englishplatform.shared.web.BusinessException;
 import com.englishplatform.shared.web.ErrorCode;
@@ -91,15 +92,48 @@ class SessionOutcomeTest {
   }
 
   @Test
-  void interruptionCountBecomesCompletedAndMakeUpKeepsInterrupted() {
+  void interruptionCountBecomesCompleted() {
     Session s = session();
     s.recordOutcome(SessionStatus.INTERRUPTED, s.getTeacherId(), START.plusSeconds(600));
-    assertThat(s.decideInterruption(false, ADMIN, START)).isEmpty();
-    assertThat(s.getStatus()).isEqualTo(SessionStatus.INTERRUPTED);
     assertThat(s.decideInterruption(true, ADMIN, START)).contains(CounterAction.CONSUME_RELEASED);
     assertThat(s.getOutcomeAt()).isEqualTo(START);
     assertThat(s.getStatus()).isEqualTo(SessionStatus.COMPLETED);
+    assertThat(s.getInterruptionDecision()).isEqualTo(InterruptionDecision.COUNT);
     assertCode(() -> s.decideInterruption(true, ADMIN, START), ErrorCode.INVALID_STATE_TRANSITION);
+  }
+
+  /** T147: xếp bù được lưu, sau đó không tính buổi được nữa, kể cả qua sửa kết quả. */
+  @Test
+  void makeUpIsRecordedAndFinal() {
+    Session s = session();
+    s.recordOutcome(SessionStatus.INTERRUPTED, s.getTeacherId(), START.plusSeconds(600));
+    Instant decidedAt = START.plusSeconds(3600);
+    assertThat(s.decideInterruption(false, ADMIN, decidedAt)).isEmpty();
+    assertThat(s.getStatus()).isEqualTo(SessionStatus.INTERRUPTED);
+    assertThat(s.getInterruptionDecision()).isEqualTo(InterruptionDecision.MAKE_UP);
+    assertThat(s.getOutcomeBy()).isEqualTo(ADMIN);
+    assertThat(s.getOutcomeAt()).isEqualTo(decidedAt);
+    assertCode(
+        () -> s.decideInterruption(true, ADMIN, decidedAt), ErrorCode.INVALID_STATE_TRANSITION);
+    assertCode(
+        () -> s.decideInterruption(false, ADMIN, decidedAt), ErrorCode.INVALID_STATE_TRANSITION);
+    assertCode(
+        () -> s.correctOutcome(SessionStatus.COMPLETED, ADMIN, decidedAt),
+        ErrorCode.INVALID_STATE_TRANSITION);
+    assertThat(s.getStatus()).isEqualTo(SessionStatus.INTERRUPTED);
+  }
+
+  /** Sửa kết quả sau khi đã tính là đã học: quyết định cũ không còn đúng nên bị xóa. */
+  @Test
+  void correctingCountedInterruptionClearsDecision() {
+    Session s = session();
+    s.recordOutcome(SessionStatus.INTERRUPTED, s.getTeacherId(), START.plusSeconds(600));
+    s.decideInterruption(true, ADMIN, START.plusSeconds(3600));
+    assertThat(s.correctOutcome(SessionStatus.INTERRUPTED, ADMIN, START.plusSeconds(7200)))
+        .contains(CounterAction.UNCONSUME);
+    assertThat(s.getInterruptionDecision()).isNull();
+    assertThat(s.decideInterruption(false, ADMIN, START.plusSeconds(7300))).isEmpty();
+    assertThat(s.getInterruptionDecision()).isEqualTo(InterruptionDecision.MAKE_UP);
   }
 
   @Test

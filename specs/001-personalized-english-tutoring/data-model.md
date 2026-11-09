@@ -292,7 +292,7 @@ EXCLUDE USING gist (teacher_id WITH =, tstzrange(starts_at, ends_at) WITH &&)
 | `BOOKED` | `CANCELLED_SYSTEM` | hệ thống: đổi giáo viên (`TeacherReassigned`), ngừng kích hoạt học viên (`UserDeactivated`), ẩn danh hóa (`StudentAnonymized`) | reserved −1 |
 | `INTERRUPTED` | `COMPLETED` | admin quyết định "tính là đã học" | consumed +1 (409 `NO_SESSIONS_LEFT` nếu chỗ đã được dùng cho buổi khác) |
 
-`INTERRUPTED` mà admin chọn "xếp bù" thì giữ nguyên trạng thái; học viên/admin đặt buổi mới.
+`INTERRUPTED` mà admin chọn "xếp bù" thì giữ nguyên trạng thái; học viên/admin đặt buổi mới. Quyết định lưu ở cột `session.interruption_decision` (`COUNT` hoặc `MAKE_UP`, null\| `MAKE_UP`, null khi chưa quyết định), chỉ quyết định một lần; buổi đã xếp bù không sửa kết quả được (T147).
 Kết quả buổi (`COMPLETED`, `STUDENT_NO_SHOW`, `INTERRUPTED`) do giáo viên của buổi chốt; sau
 `ends_at + 24h` mà còn `BOOKED` → job mỗi giờ phát `SessionOutcomeOverdue` (một lần) cho giáo viên +
 admin; admin được chốt thay. Buổi `BOOKED` chưa chốt không trừ buổi.

@@ -5,6 +5,7 @@ import com.englishplatform.scheduling.VideoRoomProvider.JoinInfo;
 import com.englishplatform.scheduling.internal.SchedulingAccess;
 import com.englishplatform.scheduling.internal.session.BookingService;
 import com.englishplatform.scheduling.internal.session.CancellationService;
+import com.englishplatform.scheduling.internal.session.InterruptionDecision;
 import com.englishplatform.scheduling.internal.session.JoinService;
 import com.englishplatform.scheduling.internal.session.OutcomeService;
 import com.englishplatform.scheduling.internal.session.Session;
@@ -80,6 +81,7 @@ class SessionController {
       UUID outcomeBy,
       Instant teacherJoinedAt,
       Instant studentJoinedAt,
+      InterruptionDecision interruptionDecision,
       long version) {
 
     static SessionDto of(Session s) {
@@ -98,6 +100,7 @@ class SessionController {
           s.getOutcomeBy(),
           s.getTeacherJoinedAt(),
           s.getStudentJoinedAt(),
+          s.getInterruptionDecision(),
           s.getVersion());
     }
   }
