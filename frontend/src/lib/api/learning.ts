@@ -283,7 +283,7 @@ export function gradeAssignment(
   })
 }
 
-export type ReportStatus = 'PENDING' | 'SUBMITTED'
+export type ReportStatus = 'PENDING' | 'SUBMITTED' | 'CLOSED'
 
 export interface ReportScores {
   listening?: number | null
@@ -320,6 +320,10 @@ export interface SessionReportDto {
   scores?: ReportScores | null
   comment?: string | null
   submittedAt?: string | null
+  /** Giáo viên của buổi còn phụ trách học viên; không thì phiếu không chọn chủ đề (T148). */
+  teacherAssigned: boolean
+  closeReason?: string | null
+  closedAt?: string | null
 }
 
 export interface SubmitReportRequest {
@@ -333,6 +337,14 @@ export interface SubmitReportRequest {
 export function fetchSessionReports(status?: ReportStatus): Promise<ReportListItem[]> {
   const query = status ? `?status=${status}` : ''
   return api<ReportListItem[]>(`/session-reports${query}`)
+}
+
+/** Giáo vụ đóng phiếu treo của giáo viên không còn phụ trách học viên (T148). */
+export function closeSessionReport(sessionId: string, reason: string): Promise<SessionReportDto> {
+  return api<SessionReportDto>(`/sessions/${sessionId}/report/close`, {
+    method: 'POST',
+    body: { reason },
+  })
 }
 
 export function fetchSessionReport(sessionId: string): Promise<SessionReportDto> {

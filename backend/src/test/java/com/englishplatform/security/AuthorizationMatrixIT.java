@@ -449,6 +449,9 @@ class AuthorizationMatrixIT extends ApiTestSupport {
         .ok(T)
         .notFound(OT)
         .forbidden(A, S, OS);
+    post("/api/v1/sessions/{sessionId}/report/close", "{\"reason\":\"x\"}", done)
+        .ok(A)
+        .forbidden(T, S, OT, OS);
     get("/api/v1/assignments").ok(A, T, S, OT, OS);
     putJson("/api/v1/assignments/{id}/submission", "{\"textAnswer\":\"x\"}", assignment)
         .ok(S)

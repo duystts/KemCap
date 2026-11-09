@@ -19,6 +19,7 @@ const report: SessionReportDto = {
   dueAt: '2026-11-06T10:00:00Z',
   overdue: false,
   taughtTopicIds: [],
+  teacherAssigned: true,
 }
 
 const path = {
@@ -58,11 +59,11 @@ function mockApi(pathResponse: () => Response = () => json(200, path)) {
   })
 }
 
-function renderForm() {
+function renderForm(r: SessionReportDto = report) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={client}>
-      <SessionReportForm report={report} />
+      <SessionReportForm report={r} />
     </QueryClientProvider>,
   )
 }
@@ -152,5 +153,24 @@ describe('SessionReportForm', () => {
     renderForm()
 
     expect(await screen.findByText(/Không có chủ đề để chọn/)).toBeInTheDocument()
+  })
+
+  it('giáo viên đã bị đổi: không tải lộ trình, nộp không kèm chủ đề', async () => {
+    const fetchMock = mockApi()
+    renderForm({ ...report, teacherAssigned: false })
+    const user = userEvent.setup()
+
+    expect(screen.getByText(/không còn phụ trách học viên này/)).toBeInTheDocument()
+    expect(screen.queryByLabelText('Đã dạy: Thì hiện tại')).not.toBeInTheDocument()
+    await user.click(
+      screen.getByRole('group', { name: 'Nghe' }).querySelectorAll('button')[2] as HTMLElement,
+    )
+    await user.type(screen.getByLabelText('Nhận xét'), 'Buổi cuối')
+    await user.click(screen.getByRole('button', { name: 'Nộp phiếu' }))
+    await user.click(screen.getAllByRole('button', { name: 'Nộp phiếu', hidden: true })[1])
+
+    await waitFor(() => expect(submittedBody(fetchMock)).toBeDefined())
+    expect(submittedBody(fetchMock)).toMatchObject({ taughtTopicIds: [], completedTopicIds: [] })
+    expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith('/learning-path'))).toBe(false)
   })
 })

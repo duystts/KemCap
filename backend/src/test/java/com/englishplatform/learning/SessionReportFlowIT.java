@@ -221,6 +221,54 @@ class SessionReportFlowIT extends LearningFlowSupport {
         .andExpect(jsonPath("$.comment").value("Nhận xét"));
   }
 
+  /**
+   * T148 (U6 R5): phiếu cho biết giáo viên của buổi còn phụ trách không; khi không còn (đổi giáo
+   * viên, giáo viên nghỉ việc) giáo vụ đóng được phiếu treo kèm lý do, hết nhắc quá hạn.
+   */
+  @Test
+  void adminClosesPendingReportOfFormerTeacher() throws Exception {
+    Setup s = setup();
+    UUID sessionId = completedWithPendingReport(s, 2);
+    String report = "/api/v1/sessions/" + sessionId + "/report";
+    String close = report + "/close";
+    String row = "$[?(@.sessionId == '" + sessionId + "')]";
+
+    call(get(report), s.teacher()).andExpect(jsonPath("$.teacherAssigned").value(true));
+    call(post(close), s.admin(), "{\"reason\":\"Thử\"}")
+        .andExpect(status().isConflict())
+        .andExpect(jsonPath("$.code").value("INVALID_STATE_TRANSITION"));
+
+    TestUser newTeacher = user(Role.TEACHER);
+    call(
+            put("/api/v1/enrollments/" + s.enrollmentId() + "/teacher"),
+            s.admin(),
+            "{\"teacherId\":\"" + newTeacher.id() + "\",\"reason\":\"GV nghỉ\"}")
+        .andExpect(status().isOk());
+    call(get(report), s.teacher()).andExpect(jsonPath("$.teacherAssigned").value(false));
+    call(get(report), s.admin()).andExpect(jsonPath("$.teacherAssigned").value(false));
+
+    call(post(close), s.teacher(), "{\"reason\":\"Thử\"}").andExpect(status().isForbidden());
+    call(post(close), newTeacher, "{\"reason\":\"Thử\"}").andExpect(status().isForbidden());
+    call(post(close), s.admin(), "{\"reason\":\" \"}").andExpect(status().isBadRequest());
+    call(post(close), s.admin(), "{\"reason\":\"Giáo viên nghỉ việc, không nộp được\"}")
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("CLOSED"))
+        .andExpect(jsonPath("$.closeReason").value("Giáo viên nghỉ việc, không nộp được"))
+        .andExpect(jsonPath("$.closedAt").isNotEmpty());
+
+    call(post(close), s.admin(), "{\"reason\":\"Lần hai\"}").andExpect(status().isConflict());
+    submitReport(s.teacher(), sessionId, SCORES + ",\"comment\":\"Muộn\"")
+        .andExpect(status().isConflict());
+    call(get("/api/v1/session-reports?status=PENDING"), s.admin())
+        .andExpect(jsonPath(row).isEmpty());
+    call(get("/api/v1/session-reports"), s.teacher()).andExpect(jsonPath(row).isEmpty());
+    call(get(report), newTeacher).andExpect(jsonPath("$.status").value("CLOSED"));
+
+    clock.advance(Duration.ofHours(25));
+    overdueJob.run();
+    assertThat(overdue(sessionId)).isEmpty();
+  }
+
   /** R2: event tới sai thứ tự không quyết định phiếu; trạng thái thật của buổi mới là căn cứ. */
   @Test
   void staleEventsFollowActualSessionStatus() throws Exception {

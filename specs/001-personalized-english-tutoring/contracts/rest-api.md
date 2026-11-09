@@ -101,7 +101,8 @@ Mật khẩu: tối thiểu 8 ký tự, có chữ và số.
 | GET | `/learning-paths/{id}/revisions` | A; T | lịch sử điều chỉnh | FR-018 |
 | GET | `/session-reports?status=` | T; A | danh sách phiếu kèm tên, `dueAt`, `overdue`, `onTime`; không gồm học viên đã ẩn danh; giáo viên đã bị đổi chỉ thấy phiếu chưa nộp | FR-019 |
 | GET | `/sessions/{id}/report` | A; T; S | phiếu đánh giá buổi; giáo viên đã bị đổi chỉ đọc được phiếu chưa nộp của buổi mình dạy | FR-019 |
-| PUT | `/sessions/{id}/report` | T | `{taughtTopicIds?, completedTopicIds?, scores{listening?, speaking?, reading?, writing?, grammarVocab?}, comment, assignments?[{title, instructions?, dueAt?}]}` → SUBMITTED; chỉ giáo viên của buổi, nộp một lần; 409 `ANONYMIZED` | FR-019 |
+| POST | `/sessions/{id}/report/close` | A | `{reason}` bắt buộc → `CLOSED`; chỉ phiếu `PENDING` mà giáo viên của buổi không còn phụ trách học viên (ví dụ đã nghỉ việc), ngược lại 409 `INVALID_STATE_TRANSITION`; phiếu đóng không còn nhắc quá hạn (T148) | FR-019 |
+| PUT | `/sessions/{id}/report` | T | `{taughtTopicIds?, completedTopicIds?, scores{listening?, speaking?, reading?, writing?, grammarVocab?}, comment, assignments?[{title, instructions?, dueAt?}]}` → SUBMITTED; chỉ giáo viên của buổi, nộp một lần; 409 `ANONYMIZED`. Giáo viên không còn phụ trách học viên vẫn nộp được nhưng không kèm chủ đề (400 nếu gửi chủ đề); `ReportDto.teacherAssigned` cho biết điều này, kèm `closeReason`, `closedAt` | FR-019 |
 | GET | `/assignments?studentId=&status=` | A; T; S | bài tập kèm `sessionId` và `submission{textAnswer, submittedAt, late, score, feedback}`; `status`: PENDING, SUBMITTED, GRADED | FR-020 |
 | POST | [GĐ2 — K2] `/assignments/{id}/upload-url` | S | `{fileName, contentType, size}` → pre-signed PUT URL + `fileKey` | FR-020 |
 | PUT | `/assignments/{id}/submission` | S | MVP: `{textAnswer}` (bắt buộc); [GĐ2 — K2]: `fileKey?, fileName?` | FR-020 |

@@ -137,6 +137,38 @@ public class SessionReportService {
     return report;
   }
 
+  /** Giáo viên của buổi còn phụ trách học viên: còn chọn được chủ đề, giáo vụ chưa đóng được. */
+  @Transactional(readOnly = true)
+  public boolean isTeacherAssigned(SessionReport report) {
+    return enrollmentApi.isAssigned(report.getTeacherId(), report.getStudentId());
+  }
+
+  /**
+   * Giáo vụ đóng phiếu chưa nộp khi giáo viên của buổi không còn phụ trách học viên, ví dụ đã nghỉ
+   * việc (T148). Giáo viên còn phụ trách thì phải nộp, không đóng thay được.
+   */
+  @Transactional
+  public SessionReport close(CurrentUser actor, UUID sessionId, String reason) {
+    SessionReport report = find(sessionId);
+    if (reason == null || reason.isBlank()) {
+      throw BusinessException.validation("reason", "Cần lý do đóng phiếu");
+    }
+    if (reason.length() > MAX_TEXT_LENGTH) {
+      throw BusinessException.validation("reason", "Lý do tối đa " + MAX_TEXT_LENGTH + " ký tự");
+    }
+    if (report.getStatus() != SessionReport.Status.PENDING) {
+      throw new BusinessException(
+          ErrorCode.INVALID_STATE_TRANSITION, "Chỉ đóng được phiếu chưa nộp");
+    }
+    if (isTeacherAssigned(report)) {
+      throw new BusinessException(
+          ErrorCode.INVALID_STATE_TRANSITION,
+          "Giáo viên của buổi vẫn phụ trách học viên, hãy nhắc giáo viên nộp phiếu");
+    }
+    report.close(reason.trim(), actor.id(), clock.instant());
+    return report;
+  }
+
   private static void validate(Submission input) {
     if (input.comment() == null || input.comment().isBlank()) {
       throw BusinessException.validation("comment", "Cần nhận xét buổi học");

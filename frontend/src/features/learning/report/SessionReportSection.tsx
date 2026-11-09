@@ -4,6 +4,7 @@ import { fetchSessionReport } from '@/lib/api/learning'
 import { ApiError } from '@/lib/api/client'
 import { DateTimeText } from '@/components/DateTimeText'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import CloseReportPanel from './CloseReportPanel'
 import SessionReportForm from './SessionReportForm'
 import { SKILLS } from './skills'
 
@@ -33,8 +34,22 @@ export default function SessionReportSection({ sessionId }: { sessionId: string 
   if (report.status === 'PENDING') {
     if (report.teacherId === me?.id) return <SessionReportForm report={report} />
     return (
+      <div className="space-y-3">
+        <p className="text-sm text-slate-500">
+          Phiếu đánh giá chưa được nộp. Hạn nộp: <DateTimeText value={report.dueAt} />
+        </p>
+        {me?.role === 'ADMIN' && !report.teacherAssigned && (
+          <CloseReportPanel sessionId={sessionId} />
+        )}
+      </div>
+    )
+  }
+
+  if (report.status === 'CLOSED') {
+    return (
       <p className="text-sm text-slate-500">
-        Phiếu đánh giá chưa được nộp. Hạn nộp: <DateTimeText value={report.dueAt} />
+        Phiếu đánh giá đã được giáo vụ đóng lúc <DateTimeText value={report.closedAt} />
+        {report.closeReason && <>. Lý do: {report.closeReason}</>}
       </p>
     )
   }

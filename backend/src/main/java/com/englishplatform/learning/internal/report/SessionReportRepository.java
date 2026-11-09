@@ -63,7 +63,7 @@ public interface SessionReportRepository extends JpaRepository<SessionReport, UU
       update SessionReport r set
         r.scoreListening = null, r.scoreSpeaking = null, r.scoreReading = null,
         r.scoreWriting = null, r.scoreGrammarVocab = null, r.comment = null,
-        r.taughtTopicIds = null, r.overdueNotifiedAt = coalesce(r.overdueNotifiedAt, :now)
+        r.taughtTopicIds = null, r.closeReason = null, r.overdueNotifiedAt = coalesce(r.overdueNotifiedAt, :now)
       where r.studentId = :studentId
       """)
   int anonymizeForStudent(@Param("studentId") UUID studentId, @Param("now") Instant now);

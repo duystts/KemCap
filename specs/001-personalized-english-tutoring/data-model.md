@@ -354,7 +354,7 @@ Hồ sơ năng lực hiện tại = bản ghi mới nhất; lịch sử = toàn 
 | id | UUID | PK |
 | session_id | UUID | unique — tạo tự động (PENDING) khi nhận event `SessionFinished` (outcome COMPLETED) |
 | teacher_id, student_id | UUID | |
-| status | enum `PENDING`, `SUBMITTED` | |
+| status | enum `PENDING`, `SUBMITTED`, `CLOSED` | `CLOSED`: giáo vụ đóng phiếu chưa nộp khi giáo viên của buổi không còn phụ trách học viên (T148) |
 | session_ends_at | timestamptz | giờ kết thúc buổi, dùng cho biểu đồ tiến bộ |
 | due_at | timestamptz | = ends_at + 24h |
 | taught_topic_ids | UUID[] | topic thuộc path ACTIVE của học viên |
@@ -362,6 +362,7 @@ Hồ sơ năng lực hiện tại = bản ghi mới nhất; lịch sử = toàn 
 | comment | text | bắt buộc khi SUBMITTED |
 | submitted_at | timestamptz | đúng hạn nếu ≤ due_at |
 | overdue_notified_at | timestamptz | đã phát `SessionReportOverdue` |
+| close_reason, closed_by, closed_at | text, uuid, timestamptz | khi `CLOSED`; `close_reason` bị xóa khi ẩn danh hóa |
 | session_voided_at | timestamptz | buổi đã nộp phiếu được giáo vụ sửa thành không hoàn thành: giữ phiếu, không tính vào tiến bộ |
 
 ### assignment & submission
