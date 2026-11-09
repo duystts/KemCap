@@ -9,6 +9,7 @@ const LoginPage = lazy(() => import('@/features/auth/LoginPage'))
 const AcceptInvitePage = lazy(() => import('@/features/auth/AcceptInvitePage'))
 const ForgotPasswordPage = lazy(() => import('@/features/auth/ForgotPasswordPage'))
 const ResetPasswordPage = lazy(() => import('@/features/auth/ResetPasswordPage'))
+const PolicyPage = lazy(() => import('@/features/auth/PolicyPage'))
 // export để nhánh khác bỏ trang giữ chỗ cuối cùng không làm lỗi noUnusedLocals; xóa khi hết dùng
 export const PlaceholderPage = lazy(() => import('./PlaceholderPage'))
 
@@ -58,6 +59,7 @@ export const router = createBrowserRouter([
   { path: '/accept-invite', element: page(<AcceptInvitePage />) },
   { path: '/forgot-password', element: page(<ForgotPasswordPage />) },
   { path: '/reset-password', element: page(<ResetPasswordPage />) },
+  { path: '/policy', element: page(<PolicyPage />) },
   {
     element: <RequireRole roles={['ADMIN']} />,
     children: [

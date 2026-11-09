@@ -4,6 +4,7 @@ import { errorMessage } from '@/components/useApiErrorToast'
 import { Button } from '@/components/ui/button'
 import { authApi } from '@/lib/api/auth'
 import { AuthCard } from './AuthCard'
+import { PolicyLink } from './PolicyLink'
 
 /**
  * Khi chính sách đổi phiên bản, người dùng chỉ thấy màn này cho tới khi đồng ý (FR-030). Backend
@@ -35,8 +36,9 @@ export function ConsentGatePage() {
       subtitle={`Phiên bản ${me.currentPolicyVersion}`}
     >
       <p className="text-sm">
-        Trung tâm đã cập nhật Điều khoản sử dụng và Chính sách xử lý dữ liệu cá nhân. Bạn cần đồng ý
-        phiên bản mới để tiếp tục sử dụng hệ thống.
+        Trung tâm đã cập nhật{' '}
+        <PolicyLink>Điều khoản sử dụng và Chính sách xử lý dữ liệu cá nhân</PolicyLink>. Bạn cần
+        đồng ý phiên bản mới để tiếp tục sử dụng hệ thống.
       </p>
       <label className="flex items-start gap-2 text-sm">
         <input

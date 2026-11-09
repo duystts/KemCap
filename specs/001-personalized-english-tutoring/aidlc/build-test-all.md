@@ -299,3 +299,20 @@ QE chỉ rà ở mức bằng chứng build/test, không phải code review. Lư
 ## 5. Verdict
 
 **PASS_WITH_NOTES** (backend) — `clean verify` BUILD SUCCESS (98/0/0 unit, 159/0/0 IT), `spotless:check` không cache PASS, 4 IT đồng thời xanh 2/2 lần lặp, smoke API 24 bước cùng R20, F2, chạy bù, `/api/v%31`, ẩn danh hóa và `pg_dump` đều đúng trên jar và Postgres thật, không có lỗi mất dữ liệu; nhưng F1 cần sửa hoặc được chấp nhận, ngoại lệ `plan.md:177` còn chờ xác nhận, và **toàn feature chưa sẵn sàng demo** vì FE U2–U5 chưa vào `main`, FE U6, U8, trang tóm tắt U7 chưa có ở nhánh nào; giao diện, video thật, CI, Playwright, k6, gitleaks là NOT RUN.
+
+## 6. Chạy lại 2026-11-08 (sau khi có FE)
+
+Các mục trên là lượt 2026-11-03, chỉ backend. Lượt này chạy trên `main` `751e143` cộng R17 (nhánh `fe/r17-policy-page`, chưa commit), sau khi FE U2–U8 đã vào `main` qua PR #13–#34.
+
+| Hạng mục | Lệnh | Kết quả |
+|---|---|---|
+| Backend | `./mvnw clean verify` | **PASS** (exit 0): 100/0/0 unit, 185/0/0 IT |
+| Frontend | `tsc -b`, `npm run lint`, `vitest run`, `npm run build` | **PASS**: 106/106 test; lint chỉ có cảnh báo `only-export-components` có sẵn |
+| Smoke Playwright (T142) | `npm run e2e`, database sạch, backend jar profile `local,demo-seed` | **PASS** 10/10 |
+| k6 (T141) | — | Không chạy lại; đạt 2026-11-05 |
+| Mobile, Lighthouse (T143) | script trong PR #34 | Đạt phần đo; usability với người: **NOT RUN**, làm 11/11 |
+| Quickstart 24 bước qua giao diện (T146) | — | **NOT RUN**, tổng duyệt 11/11 |
+
+Các mục trước đây NOT RUN vì thiếu FE (mục 2.3, 2.6): đã có màn hình, Playwright phủ bước 1–5, 8, 11, 15–17; phòng học (bước 7) kiểm thủ công với LiveKit thật ở T079 và T143; các bước còn lại kiểm thủ công khi làm từng task FE, chưa có lượt chạy trọn 24 bước qua giao diện. F4 (link trong email tới `/sessions/:id`): route đã có trên `main`; bấm thử từ thư thật để T146.
+
+**Verdict lượt này: PASS_WITH_NOTES**: build và test xanh cả backend lẫn FE; còn T143 (usability) và T146 cần người, làm ngày 11/11.

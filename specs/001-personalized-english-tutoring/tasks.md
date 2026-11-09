@@ -449,3 +449,16 @@ Task: "LearningPathServiceTest in backend/src/test/java/com/englishplatform/lear
 - [Story] map task về user story để truy vết; (Người·Unit) map về unit trong `aidlc/unit-of-work.md`
 - Dừng ở mỗi Checkpoint (cổng bolt) để kiểm tra
 - Các mục plan/contracts về `FileStorage`, upload tệp, `auth_rate_limit`, `/reports/teacher-quality` không có task vì đã cắt (K1–K3)
+
+## Phase 11: Convergence
+
+Converge 2026-11-08 trên `main` `751e143` cộng R17. Không có phát hiện CRITICAL. Theo quyết định của leader, T147–T150, T152 làm sau demo 2026-11-12.
+
+- [ ] T147 Lưu quyết định "Xếp bù" của buổi Gián đoạn ở backend (hiện `Session.decideInterruption(false)` không đổi gì, buổi vẫn `INTERRUPTED`), khóa lựa chọn sau khi quyết định, cập nhật `InterruptionDecisionPanel`; thêm IT: xếp bù rồi không trừ buổi được nữa per FR-014, FR-024 (contradicts)
+- [ ] T148 Chốt và làm đường xử lý phiếu treo khi đổi giáo viên hoặc giáo viên nghỉ việc (GV cũ không đọc được lộ trình nên form thiếu chủ đề; U6 R5) per FR-019 (partial)
+- [ ] T149 Gửi email sau khi dòng `notification_dispatch` commit, tránh gửi trùng khi app chết sau gửi (U5 R5) per FR-013, plan: NFR-REL (partial)
+- [ ] T150 Ghi múi giờ trong giờ hiển thị của email và thông báo trong hệ thống (U5 R7) per FR-013 (partial)
+- [ ] T151 Thay bản tóm tắt tạm ở trang `/policy` bằng nội dung pháp lý đã duyệt, tăng phiên bản chính sách trong cấu hình triển khai; xác nhận mốc 16 tuổi per FR-030 (partial)
+- [ ] T152 Bỏ N+1 khi đọc lộ trình (mỗi chặng một query chủ đề) và giới hạn kích thước cây (U4 R6) per FR-017, plan: NFR-PERF (partial)
+- [ ] T153 Đặt tên cho nút phóng to trong ô video và tăng tương phản nút ngắt kết nối của LiveKit ở phòng học (còn lại từ Lighthouse T143) per FR-012, T143 (partial)
+- [ ] T154 Sau demo, review lại các PR #8 trở đi và các commit đi thẳng `main` (U6–U8, T140) theo ngoại lệ có thời hạn trong Complexity Tracking per plan: Complexity Tracking, Constitution (quy trình review) (partial)
