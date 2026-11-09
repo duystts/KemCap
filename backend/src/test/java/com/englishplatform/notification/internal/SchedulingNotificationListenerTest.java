@@ -83,8 +83,8 @@ class SchedulingNotificationListenerTest {
         .containsExactly(
             "session:" + sessionId + ":booked:" + studentId,
             "session:" + sessionId + ":booked:" + teacherId);
-    assertThat(sent.models().get(0)).containsEntry("formattedTime", "18:00, 01/11/2026");
-    assertThat(sent.models().get(1)).containsEntry("formattedTime", "11:00, 01/11/2026");
+    assertThat(sent.models().get(0)).containsEntry("formattedTime", "18:00, 01/11/2026 (GMT+7)");
+    assertThat(sent.models().get(1)).containsEntry("formattedTime", "11:00, 01/11/2026 (GMT+0)");
     assertThat(sent.models().get(0))
         .containsEntry("link", "https://app.test/sessions/" + sessionId);
   }
@@ -155,7 +155,7 @@ class SchedulingNotificationListenerTest {
     Sent sent = captured("session-outcome-overdue", 2);
     assertThat(sent.users()).containsExactly(teacherId, adminId);
     // admin không có timezone → mặc định giờ Việt Nam
-    assertThat(sent.models().get(1)).containsEntry("formattedTime", "19:00, 01/11/2026");
+    assertThat(sent.models().get(1)).containsEntry("formattedTime", "19:00, 01/11/2026 (GMT+7)");
   }
 
   private SessionCancelled cancelled(SessionStatus status, UUID by, CancelCause cause) {
