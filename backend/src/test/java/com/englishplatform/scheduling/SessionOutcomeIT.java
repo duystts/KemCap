@@ -122,12 +122,35 @@ class SessionOutcomeIT extends SchedulingTestSupport {
             post("/api/v1/sessions/" + makeUp + "/interruption-decision"),
             s.admin(),
             "{\"decision\":\"MAKE_UP\"}")
-        .andExpect(jsonPath("$.status").value("INTERRUPTED"));
+        .andExpect(jsonPath("$.status").value("INTERRUPTED"))
+        .andExpect(jsonPath("$.interruptionDecision").value("MAKE_UP"));
     call(
             post("/api/v1/sessions/" + makeUp + "/interruption-decision"),
             s.teacher(),
             "{\"decision\":\"COUNT\"}")
         .andExpect(status().isForbidden());
+
+    // T147: đã xếp bù thì không tính buổi được nữa, cả qua quyết định lại lẫn sửa kết quả
+    call(get("/api/v1/sessions/" + makeUp), s.admin())
+        .andExpect(jsonPath("$.interruptionDecision").value("MAKE_UP"));
+    call(get("/api/v1/sessions/" + interrupted), s.admin())
+        .andExpect(jsonPath("$.interruptionDecision").value("COUNT"));
+    call(
+            post("/api/v1/sessions/" + makeUp + "/interruption-decision"),
+            s.admin(),
+            "{\"decision\":\"COUNT\"}")
+        .andExpect(status().isConflict())
+        .andExpect(jsonPath("$.code").value("INVALID_STATE_TRANSITION"));
+    call(
+            post("/api/v1/sessions/" + makeUp + "/outcome"),
+            s.admin(),
+            "{\"outcome\":\"COMPLETED\",\"note\":\"Sửa\"}")
+        .andExpect(status().isConflict())
+        .andExpect(jsonPath("$.code").value("INVALID_STATE_TRANSITION"));
+    call(get("/api/v1/sessions/" + makeUp + "/outcome-history"), s.admin())
+        .andExpect(jsonPath("$[-1].fromStatus").value("INTERRUPTED"))
+        .andExpect(jsonPath("$[-1].toStatus").value("INTERRUPTED"))
+        .andExpect(jsonPath("$[-1].note").value("Gián đoạn: xếp bù"));
 
     EnrollmentView e = enrollment(s.enrollmentId());
     assertThat(e.sessionsReserved()).isZero();

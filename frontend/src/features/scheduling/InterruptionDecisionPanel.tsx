@@ -20,12 +20,26 @@ const CONFIRM: Record<InterruptionDecision, { title: string; description: string
     },
   }
 
-export default function InterruptionDecisionPanel({ sessionId }: { sessionId: string }) {
+export function MadeUpNote() {
+  return (
+    <p className="p-4 rounded-xl border bg-slate-50 text-sm text-slate-700">
+      Đã xếp bù: buổi này không bị trừ, học viên đặt buổi mới để học bù.
+    </p>
+  )
+}
+
+export default function InterruptionDecisionPanel({
+  sessionId,
+  decision,
+}: {
+  sessionId: string
+  decision?: InterruptionDecision | null
+}) {
   const queryClient = useQueryClient()
   const showError = useApiErrorToast()
 
   const [pending, setPending] = useState<InterruptionDecision | null>(null)
-  // Backend giữ nguyên trạng thái Gián đoạn khi xếp bù, nên chỉ ẩn được trong phiên này
+  // Hiện ngay sau khi bấm, trước khi tải lại buổi học; backend lưu quyết định (T147)
   const [madeUp, setMadeUp] = useState(false)
 
   const decisionMutation = useMutation({
@@ -43,13 +57,8 @@ export default function InterruptionDecisionPanel({ sessionId }: { sessionId: st
     },
   })
 
-  if (madeUp) {
-    return (
-      <p className="p-4 rounded-xl border bg-slate-50 text-sm text-slate-700">
-        Đã xếp bù: buổi này không bị trừ, học viên đặt buổi mới để học bù.
-      </p>
-    )
-  }
+  if (madeUp || decision === 'MAKE_UP') return <MadeUpNote />
+  if (decision) return null
 
   return (
     <div className="p-4 rounded-xl border bg-slate-50 flex flex-wrap items-center justify-between gap-3">

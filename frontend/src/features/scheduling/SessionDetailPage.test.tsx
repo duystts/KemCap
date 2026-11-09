@@ -166,6 +166,26 @@ describe('SessionDetailPage', () => {
     expect(requestBody(fetchMock, '/interruption-decision')).toEqual({ decision: 'MAKE_UP' })
   })
 
+  it('đã xếp bù (tải lại trang): không còn nút, chỉ hiện ghi chú', async () => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async () =>
+      json(200, { ...session, status: 'INTERRUPTED', interruptionDecision: 'MAKE_UP' }),
+    )
+    renderPage('ADMIN')
+
+    expect(await screen.findByText(/Đã xếp bù: buổi này không bị trừ/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Tính là đã học' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Xếp bù' })).not.toBeInTheDocument()
+  })
+
+  it('học viên thấy buổi đã xếp bù', async () => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async () =>
+      json(200, { ...session, status: 'INTERRUPTED', interruptionDecision: 'MAKE_UP' }),
+    )
+    renderPage('STUDENT')
+
+    expect(await screen.findByText(/Đã xếp bù: buổi này không bị trừ/)).toBeInTheDocument()
+  })
+
   it('giáo viên không thấy quyết định gián đoạn', async () => {
     mockApi({ status: 'INTERRUPTED' })
     renderPage('TEACHER')

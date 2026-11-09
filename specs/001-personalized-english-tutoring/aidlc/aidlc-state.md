@@ -48,4 +48,4 @@ Còn lại trước demo 2026-11-12:
 4. `verify --all` gồm FE: chạy lại 2026-11-08, PASS_WITH_NOTES (100 unit + 185 IT, FE 106/106, e2e 10/10; build-test-all.md mục 6). Converge xong: Phase 11 T147–T154, phần lớn để sau demo; T151 (nội dung chính sách) cần pháp lý.
 5. Ngoài code: hỏi pháp lý về mốc 16 tuổi và việc giữ tên người yêu cầu sau ẩn danh hóa; leader xác nhận đã đọc xong các commit đi thẳng `main` (U6–U8, T140).
 
-Sau demo: lỗi "Xếp bù" không lưu quyết định; U5 R5, R7, U4 R6, U6 R5; review lại các PR #8–#34 nếu có thêm người.
+T147 (quyết định "Xếp bù" không được lưu) sửa 2026-11-09, trước demo theo yêu cầu của leader. Sau demo: T148–T150, T152–T154 (U6 R5, U5 R5, R7, U4 R6, cảnh báo trợ năng LiveKit, review lại các PR).

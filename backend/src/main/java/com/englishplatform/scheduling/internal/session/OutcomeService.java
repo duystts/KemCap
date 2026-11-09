@@ -79,15 +79,15 @@ public class OutcomeService {
   public Session decideInterruption(CurrentUser actor, UUID sessionId, boolean count) {
     Session session = lookup.visible(actor, sessionId);
     Optional<CounterAction> action = session.decideInterruption(count, actor.id(), clock.instant());
+    applyAndFlush(session, action);
+    changes.save(
+        new SessionOutcomeChange(
+            session.getId(),
+            SessionStatus.INTERRUPTED,
+            session.getStatus(),
+            actor.id(),
+            count ? "Gián đoạn: tính là đã học" : "Gián đoạn: xếp bù"));
     if (action.isPresent()) {
-      applyAndFlush(session, action);
-      changes.save(
-          new SessionOutcomeChange(
-              session.getId(),
-              SessionStatus.INTERRUPTED,
-              SessionStatus.COMPLETED,
-              actor.id(),
-              "Gián đoạn: tính là đã học"));
       publishFinished(session);
     }
     return session;

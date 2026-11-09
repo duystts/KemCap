@@ -454,7 +454,7 @@ Task: "LearningPathServiceTest in backend/src/test/java/com/englishplatform/lear
 
 Converge 2026-11-08 trên `main` `751e143` cộng R17. Không có phát hiện CRITICAL. Theo quyết định của leader, T147–T150, T152 làm sau demo 2026-11-12.
 
-- [ ] T147 Lưu quyết định "Xếp bù" của buổi Gián đoạn ở backend (hiện `Session.decideInterruption(false)` không đổi gì, buổi vẫn `INTERRUPTED`), khóa lựa chọn sau khi quyết định, cập nhật `InterruptionDecisionPanel`; thêm IT: xếp bù rồi không trừ buổi được nữa per FR-014, FR-024 (contradicts)
+- [X] T147 Lưu quyết định "Xếp bù" của buổi Gián đoạn ở backend (hiện `Session.decideInterruption(false)` không đổi gì, buổi vẫn `INTERRUPTED`), khóa lựa chọn sau khi quyết định, cập nhật `InterruptionDecisionPanel`; thêm IT: xếp bù rồi không trừ buổi được nữa per FR-014, FR-024 (contradicts)
 - [ ] T148 Chốt và làm đường xử lý phiếu treo khi đổi giáo viên hoặc giáo viên nghỉ việc (GV cũ không đọc được lộ trình nên form thiếu chủ đề; U6 R5) per FR-019 (partial)
 - [ ] T149 Gửi email sau khi dòng `notification_dispatch` commit, tránh gửi trùng khi app chết sau gửi (U5 R5) per FR-013, plan: NFR-REL (partial)
 - [ ] T150 Ghi múi giờ trong giờ hiển thị của email và thông báo trong hệ thống (U5 R7) per FR-013 (partial)
