@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,9 +52,12 @@ class SessionReportController {
       List<UUID> taughtTopicIds,
       SessionReport.Scores scores,
       String comment,
-      Instant submittedAt) {
+      Instant submittedAt,
+      boolean teacherAssigned,
+      String closeReason,
+      Instant closedAt) {
 
-    static ReportDto of(SessionReport r, Instant now) {
+    static ReportDto of(SessionReport r, Instant now, boolean teacherAssigned) {
       return new ReportDto(
           r.getId(),
           r.getSessionId(),
@@ -67,7 +71,10 @@ class SessionReportController {
           r.getTaughtTopicIds(),
           r.getScores(),
           r.getComment(),
-          r.getSubmittedAt());
+          r.getSubmittedAt(),
+          teacherAssigned,
+          r.getCloseReason(),
+          r.getClosedAt());
     }
   }
 
@@ -82,6 +89,8 @@ class SessionReportController {
       Instant dueAt,
       boolean overdue,
       Boolean onTime) {}
+
+  record CloseRequest(@Size(max = 2000) String reason) {}
 
   record AssignmentRequest(String title, String instructions, Instant dueAt) {}
 
@@ -134,7 +143,18 @@ class SessionReportController {
   @GetMapping("/sessions/{sessionId}/report")
   @PreAuthorize("isAuthenticated()")
   ReportDto get(@PathVariable UUID sessionId) {
-    return ReportDto.of(service.get(CurrentUser.require(), sessionId), clock.instant());
+    return dto(service.get(CurrentUser.require(), sessionId));
+  }
+
+  /** T148: giáo vụ đóng phiếu treo của giáo viên không còn phụ trách học viên. */
+  @PostMapping("/sessions/{sessionId}/report/close")
+  @PreAuthorize("hasRole('ADMIN')")
+  ReportDto close(@PathVariable UUID sessionId, @Valid @RequestBody CloseRequest r) {
+    return dto(service.close(CurrentUser.require(), sessionId, r.reason()));
+  }
+
+  private ReportDto dto(SessionReport report) {
+    return ReportDto.of(report, clock.instant(), service.isTeacherAssigned(report));
   }
 
   @PutMapping("/sessions/{sessionId}/report")
@@ -156,6 +176,6 @@ class SessionReportController {
                                 : new SessionReportService.NewAssignment(
                                     a.title(), a.instructions(), a.dueAt()))
                     .toList());
-    return ReportDto.of(service.submit(CurrentUser.require(), sessionId, input), clock.instant());
+    return dto(service.submit(CurrentUser.require(), sessionId, input));
   }
 }

@@ -77,11 +77,13 @@ export default function SessionReportForm({ report }: { report: SessionReportDto
     }
   }, [draft, sessionId])
 
-  // Giáo viên đã bị đổi hoặc học viên chưa có lộ trình: không có chủ đề để chọn, vẫn nộp được
+  // Giáo viên đã bị đổi không đọc được lộ trình nữa (T148); học viên chưa có lộ trình cũng không có
+  // chủ đề để chọn. Cả hai vẫn nộp được phiếu.
   const { data: path, isLoading: loadingPath } = useQuery({
     queryKey: ['learning-path', studentId],
     queryFn: () => fetchLearningPath(studentId),
     retry: false,
+    enabled: report.teacherAssigned,
   })
   const milestones = path?.milestones ?? []
   const topicIds = new Set(milestones.flatMap((m) => m.topics.map((t) => t.id)))
@@ -147,7 +149,12 @@ export default function SessionReportForm({ report }: { report: SessionReportDto
         {/* Chủ đề */}
         <section className="space-y-2">
           <h3 className="text-sm font-semibold text-slate-800">Chủ đề trong lộ trình</h3>
-          {loadingPath ? (
+          {!report.teacherAssigned ? (
+            <p className="text-xs text-slate-500">
+              Bạn không còn phụ trách học viên này nên phiếu không chọn chủ đề lộ trình. Bạn vẫn nộp
+              được điểm, nhận xét và bài tập của buổi mình đã dạy.
+            </p>
+          ) : loadingPath ? (
             <p className="text-xs text-slate-400">Đang tải lộ trình…</p>
           ) : milestones.length === 0 ? (
             <p className="text-xs text-slate-500">

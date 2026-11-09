@@ -23,7 +23,9 @@ public class SessionReport extends BaseEntity {
 
   public enum Status {
     PENDING,
-    SUBMITTED
+    SUBMITTED,
+    /** Giáo vụ đóng phiếu giáo viên cũ không nộp được (T148). */
+    CLOSED
   }
 
   /** Điểm kỹ năng trong buổi, thang 1–5; kỹ năng không đánh giá là null. */
@@ -92,6 +94,15 @@ public class SessionReport extends BaseEntity {
   @Column(name = "session_voided_at")
   private Instant sessionVoidedAt;
 
+  @Column(name = "close_reason")
+  private String closeReason;
+
+  @Column(name = "closed_by")
+  private UUID closedBy;
+
+  @Column(name = "closed_at")
+  private Instant closedAt;
+
   @Version private long version;
 
   protected SessionReport() {}
@@ -115,6 +126,13 @@ public class SessionReport extends BaseEntity {
     this.taughtTopicIds = taughtTopics.toArray(UUID[]::new);
     this.comment = comment;
     this.submittedAt = now;
+  }
+
+  void close(String reason, UUID by, Instant now) {
+    this.status = Status.CLOSED;
+    this.closeReason = reason;
+    this.closedBy = by;
+    this.closedAt = now;
   }
 
   /** Giáo vụ sửa buổi thành không hoàn thành: giữ phiếu đã nộp, không tính vào tiến bộ. */
@@ -186,5 +204,17 @@ public class SessionReport extends BaseEntity {
 
   public Instant getSubmittedAt() {
     return submittedAt;
+  }
+
+  public String getCloseReason() {
+    return closeReason;
+  }
+
+  public UUID getClosedBy() {
+    return closedBy;
+  }
+
+  public Instant getClosedAt() {
+    return closedAt;
   }
 }
