@@ -80,7 +80,7 @@ export default function SessionOutcomeDialog({
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-150">
         <div>
           <h3 className="text-lg font-bold text-slate-900">Chốt kết quả buổi học</h3>

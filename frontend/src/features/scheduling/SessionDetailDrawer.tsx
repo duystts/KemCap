@@ -82,7 +82,7 @@ export default function SessionDetailDrawer({
 
   return (
     <>
-      <div className="fixed inset-0 z-40 bg-slate-900/30 backdrop-blur-xs flex justify-end">
+      <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-xs flex justify-end">
         <div className="bg-white w-full max-w-md h-full shadow-2xl flex flex-col justify-between overflow-y-auto animate-in slide-in-from-right duration-200">
           {/* Header */}
           <div>

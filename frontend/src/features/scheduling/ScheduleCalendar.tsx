@@ -13,16 +13,48 @@ import { statusLabel } from '@/components/StatusBadge'
 import { Card, CardContent } from '@/components/ui/card'
 import { useMediaQuery } from '@/lib/useMediaQuery'
 
-// Màu sắc cho 8 trạng thái buổi học
+// Màu cho 8 trạng thái buổi học, lấy từ biến CSS để đổi theo theme
 const STATUS_COLORS: Record<SessionStatus, { bg: string; border: string; text: string }> = {
-  BOOKED: { bg: '#dae7f2', border: '#5183b5', text: '#2e4963' },
-  COMPLETED: { bg: '#e2e9d5', border: '#788c5d', text: '#3e4931' },
-  STUDENT_NO_SHOW: { bg: '#f6dcd8', border: '#bf4a40', text: '#7a2424' },
-  TEACHER_ABSENT: { bg: '#f6e1d7', border: '#c8623f', text: '#78371f' },
-  CANCELLED_ON_TIME: { bg: '#f0eee6', border: '#a3a198', text: '#5e5d57' },
-  CANCELLED_LATE: { bg: '#f6dcd8', border: '#b53333', text: '#7a2424' },
-  CANCELLED_SYSTEM: { bg: '#f0eee6', border: '#6f6d64', text: '#45443f' },
-  INTERRUPTED: { bg: '#f9eeda', border: '#c79a3a', text: '#6f5416' },
+  BOOKED: {
+    bg: 'var(--color-blue-100)',
+    border: 'var(--color-blue-500)',
+    text: 'var(--color-blue-800)',
+  },
+  COMPLETED: {
+    bg: 'var(--color-emerald-100)',
+    border: 'var(--color-emerald-500)',
+    text: 'var(--color-emerald-800)',
+  },
+  STUDENT_NO_SHOW: {
+    bg: 'var(--color-rose-100)',
+    border: 'var(--color-rose-500)',
+    text: 'var(--color-rose-800)',
+  },
+  TEACHER_ABSENT: {
+    bg: 'var(--color-indigo-100)',
+    border: 'var(--color-indigo-500)',
+    text: 'var(--color-indigo-800)',
+  },
+  CANCELLED_ON_TIME: {
+    bg: 'var(--color-slate-100)',
+    border: 'var(--color-slate-400)',
+    text: 'var(--color-slate-600)',
+  },
+  CANCELLED_LATE: {
+    bg: 'var(--color-rose-100)',
+    border: 'var(--color-rose-600)',
+    text: 'var(--color-rose-800)',
+  },
+  CANCELLED_SYSTEM: {
+    bg: 'var(--color-slate-100)',
+    border: 'var(--color-slate-500)',
+    text: 'var(--color-slate-700)',
+  },
+  INTERRUPTED: {
+    bg: 'var(--color-ochre-100)',
+    border: 'var(--color-ochre-500)',
+    text: 'var(--color-ochre-800)',
+  },
 }
 
 export default function ScheduleCalendar() {

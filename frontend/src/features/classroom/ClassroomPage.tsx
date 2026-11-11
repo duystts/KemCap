@@ -68,7 +68,7 @@ export default function ClassroomPage() {
 
   if (isLoading) {
     return (
-      <div className="h-dvh w-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4">
+      <div className="fixed-palette h-dvh w-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4">
         <h2 className="text-lg">Đang chuẩn bị phòng học…</h2>
       </div>
     )
@@ -76,7 +76,7 @@ export default function ClassroomPage() {
 
   if (error || !joinInfo) {
     return (
-      <div className="h-dvh w-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4 text-center">
+      <div className="fixed-palette h-dvh w-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4 text-center">
         <h2 className="text-xl">Không vào được phòng học</h2>
         <p className="text-sm text-slate-300 max-w-md mt-2 mb-6">{errorMessage(error)}</p>
         <Button onClick={() => navigate(schedulePath)}>Quay lại lịch học</Button>
@@ -86,7 +86,7 @@ export default function ClassroomPage() {
 
   if (connectionLost) {
     return (
-      <div className="h-dvh w-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4 text-center">
+      <div className="fixed-palette h-dvh w-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4 text-center">
         <h2 className="text-xl">Mất kết nối phòng học</h2>
         <p className="text-sm text-slate-300 max-w-md mt-2 mb-6">
           Kiểm tra mạng rồi vào lại. Buổi học chưa được ghi nhận kết quả.
@@ -106,7 +106,7 @@ export default function ClassroomPage() {
   }
 
   return (
-    <div className="h-dvh w-screen bg-slate-950 text-white flex flex-col overflow-hidden relative">
+    <div className="fixed-palette h-dvh w-screen bg-slate-950 text-white flex flex-col overflow-hidden relative">
       <div className="h-12 border-b border-slate-800 bg-slate-900 px-4 flex items-center justify-between shrink-0 text-xs">
         <span className="font-semibold text-slate-200">Lớp học trực tuyến 1-1</span>
         <span className="text-slate-300 truncate ml-3">

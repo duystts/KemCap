@@ -350,7 +350,7 @@ export default function StudentProfilePage() {
 
       {/* Dialog Cập nhật thông tin học viên */}
       {editProfileOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between pb-2 border-b">
               <h3 className="text-base font-bold text-slate-800">Cập nhật hồ sơ học viên</h3>
