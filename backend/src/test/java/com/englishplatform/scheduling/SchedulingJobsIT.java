@@ -104,6 +104,11 @@ class SchedulingJobsIT extends SchedulingTestSupport {
             s.teacher(),
             "{\"date\":\"" + day + "\",\"startTime\":\"14:00\",\"endTime\":\"16:00\"}")
         .andExpect(status().isCreated());
+
+    LocalDate yesterday = clock.instant().atZone(VN).toLocalDate().minusDays(1);
+    call(post(url + "/exceptions"), s.teacher(), "{\"date\":\"" + yesterday + "\"}")
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.errors[0].field").value("date"));
   }
 
   private void runJob(String bean) throws Exception {

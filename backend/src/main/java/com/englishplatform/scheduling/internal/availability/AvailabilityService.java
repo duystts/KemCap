@@ -107,6 +107,9 @@ public class AvailabilityService {
     if (spec.date() == null) {
       throw BusinessException.validation("date", "Chọn ngày nghỉ");
     }
+    if (spec.date().isBefore(clock.instant().atZone(zone).toLocalDate())) {
+      throw BusinessException.validation("date", "Ngày nghỉ phải từ hôm nay trở đi");
+    }
     if ((spec.startTime() == null) != (spec.endTime() == null)) {
       throw BusinessException.validation(
           "startTime", "Nhập cả giờ bắt đầu và kết thúc, hoặc bỏ trống cả hai");
