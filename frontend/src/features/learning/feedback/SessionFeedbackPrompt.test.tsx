@@ -35,7 +35,7 @@ function json(status: number, body: unknown) {
 }
 
 function mockApi(options: {
-  mine?: { sessionId: string; stars: number }[]
+  mine?: { sessionId: string; stars: number; comment?: string; createdAt?: string }[]
   sessions?: SessionItem[]
   booked?: SessionItem[]
   enrollments?: unknown[]
@@ -86,12 +86,24 @@ describe('SessionFeedbackPrompt', () => {
     })
   })
 
-  it('ẩn khi đã gửi', async () => {
-    const fetchMock = mockApi({ mine: [{ sessionId: 'ses-1', stars: 5 }] })
-    const { container } = wrap(<SessionFeedbackPrompt session={session()} />)
+  it('đã gửi: hiện lại đánh giá của mình, không còn form', async () => {
+    mockApi({
+      mine: [{ sessionId: 'ses-1', stars: 4, comment: 'Cô dạy dễ hiểu', createdAt: hoursAgo(1) }],
+    })
+    wrap(<SessionFeedbackPrompt session={session()} />)
 
-    await waitFor(() => expect(fetchMock).toHaveBeenCalled())
-    await waitFor(() => expect(container).toBeEmptyDOMElement())
+    expect(await screen.findByText('Đánh giá của bạn')).toBeInTheDocument()
+    expect(screen.getByLabelText('4 sao')).toBeInTheDocument()
+    expect(screen.getByText('Cô dạy dễ hiểu')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Gửi đánh giá' })).not.toBeInTheDocument()
+  })
+
+  it('đã gửi và đã quá 7 ngày: vẫn xem lại được', async () => {
+    mockApi({ mine: [{ sessionId: 'ses-1', stars: 5, createdAt: hoursAgo(24 * 8) }] })
+    wrap(<SessionFeedbackPrompt session={session({ endsAt: hoursAgo(24 * 9) })} />)
+
+    expect(await screen.findByText('Đánh giá của bạn')).toBeInTheDocument()
+    expect(screen.getByLabelText('5 sao')).toBeInTheDocument()
   })
 
   it('ẩn khi quá 7 ngày hoặc buổi chưa hoàn thành', async () => {
