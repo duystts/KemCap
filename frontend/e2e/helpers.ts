@@ -111,7 +111,9 @@ export async function createUser(
   await form.getByPlaceholder('an.nguyen@example.com').fill(user.email)
   if (user.birthDate) await form.locator('input[type=date]').fill(user.birthDate)
   await form.getByRole('button', { name: 'Tạo người dùng' }).click()
-  await expect(form.getByRole('button', { name: 'Tạo người dùng' })).toBeHidden()
+  // Nút đổi chữ thành "Đang tạo…" ngay khi bấm, nên chờ nút ẩn là chưa đủ: chờ form đóng, tức API
+  // đã tạo xong, rồi mới cho bước sau gọi API đọc người dùng
+  await expect(page.getByPlaceholder('an.nguyen@example.com')).toBeHidden()
 }
 
 /** Chọn ngày đầu tiên có khung giờ trống; trả về giờ bắt đầu của các khung giờ ngày đó. */

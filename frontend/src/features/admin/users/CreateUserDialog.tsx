@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
 
+// Khớp với @Pattern của CreateUserRequest ở backend
+const PHONE_PATTERN = /^(0|\+84)\d{9,10}$/
+
 interface CreateUserDialogProps {
   open: boolean
   onClose: () => void
@@ -65,11 +68,18 @@ export default function CreateUserDialog({ open, onClose }: CreateUserDialogProp
       return
     }
 
+    // Cho phép gõ kèm dấu cách, chấm, gạch để dễ đọc; lưu dạng liền
+    const normalizedPhone = phone.replace(/[\s.-]/g, '')
+    if (normalizedPhone && !PHONE_PATTERN.test(normalizedPhone)) {
+      toast.error('Số điện thoại không hợp lệ. Nhập 10–11 chữ số, bắt đầu bằng 0 hoặc +84.')
+      return
+    }
+
     createMutation.mutate({
       email: email.trim(),
       fullName: fullName.trim(),
       role,
-      phone: phone.trim() || undefined,
+      phone: normalizedPhone || undefined,
       dateOfBirth: dateOfBirth || undefined,
     })
   }

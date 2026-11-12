@@ -107,7 +107,8 @@ class CatalogNotificationListenerTest {
             any());
     assertThat(users.getAllValues()).containsExactly(studentId, teacherId1, teacherId2);
     assertThat(models.getAllValues().get(0))
-        .containsEntry("cancelledTimes", List.of("18:00, 02/11/2026", "18:00, 04/11/2026"))
+        .containsEntry(
+            "cancelledTimes", List.of("18:00, 02/11/2026 (GMT+7)", "18:00, 04/11/2026 (GMT+7)"))
         .containsEntry("rebookHint", true);
   }
 

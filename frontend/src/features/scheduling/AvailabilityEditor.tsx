@@ -50,6 +50,7 @@ export default function AvailabilityEditor({ teacherIdOverride }: { teacherIdOve
 
   // New exception form
   const [exDate, setExDate] = useState('')
+  const [today] = useState(() => new Date().toLocaleDateString('sv-SE'))
   const [exStart, setExStart] = useState('')
   const [exEnd, setExEnd] = useState('')
   const [exReason, setExReason] = useState('')
@@ -316,6 +317,7 @@ export default function AvailabilityEditor({ teacherIdOverride }: { teacherIdOve
               <label className="block text-xs font-medium text-slate-600 mb-1">Ngày nghỉ *</label>
               <Input
                 type="date"
+                min={today}
                 value={exDate}
                 onChange={(e) => setExDate(e.target.value)}
                 className="bg-white"

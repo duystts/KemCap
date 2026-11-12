@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { PAYMENT_NOTE_HINT, recordPayment, type PaymentMethod } from '@/lib/api/billing'
 import { Button } from '@/components/ui/button'
+import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { Input } from '@/components/ui/input'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
 
@@ -29,6 +30,7 @@ export default function ManualPaymentDialog({
   const [paidAt, setPaidAt] = useState(todayStr)
   const [method, setMethod] = useState<PaymentMethod>('BANK_TRANSFER')
   const [note, setNote] = useState('')
+  const [confirmOverpay, setConfirmOverpay] = useState(false)
 
   const paymentMutation = useMutation({
     mutationFn: () =>
@@ -47,6 +49,7 @@ export default function ManualPaymentDialog({
       onClose()
     },
     onError: (err) => showError(err),
+    onSettled: () => setConfirmOverpay(false),
   })
 
   if (!open) return null
@@ -55,6 +58,11 @@ export default function ManualPaymentDialog({
     e.preventDefault()
     if (amountVnd <= 0) {
       toast.error('Số tiền thanh toán phải lớn hơn 0!')
+      return
+    }
+    // Thu vượt được phép (spec) nhưng thường là gõ nhầm số: hỏi lại trước khi ghi
+    if (amountVnd > Math.max(debtVnd, 0)) {
+      setConfirmOverpay(true)
       return
     }
     paymentMutation.mutate()
@@ -160,6 +168,23 @@ export default function ManualPaymentDialog({
           </div>
         </form>
       </div>
+
+      <ConfirmDialog
+        open={confirmOverpay}
+        title="Số tiền vượt công nợ còn lại"
+        description={
+          <>
+            Bạn đang ghi nhận <strong>{amountVnd.toLocaleString('vi-VN')} đ</strong>, trong khi công
+            nợ còn lại là <strong>{Math.max(debtVnd, 0).toLocaleString('vi-VN')} đ</strong>. Phần
+            chênh sẽ được ghi là thu vượt.
+          </>
+        }
+        confirmLabel="Vẫn ghi nhận"
+        cancelLabel="Sửa số tiền"
+        busy={paymentMutation.isPending}
+        onConfirm={() => paymentMutation.mutate()}
+        onCancel={() => setConfirmOverpay(false)}
+      />
     </div>
   )
 }
