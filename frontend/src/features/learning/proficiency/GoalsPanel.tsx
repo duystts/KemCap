@@ -37,6 +37,7 @@ export default function GoalsPanel({ studentId, canEdit = true }: GoalsPanelProp
   const [goalType, setGoalType] = useState<GoalType>('IELTS')
   const [target, setTarget] = useState('')
   const [deadline, setDeadline] = useState('')
+  const [today] = useState(() => new Date().toLocaleDateString('sv-SE'))
 
   const { data: goals = [], isLoading } = useQuery({
     queryKey: ['goals', studentId],
@@ -250,7 +251,12 @@ export default function GoalsPanel({ studentId, canEdit = true }: GoalsPanelProp
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Thời hạn dự kiến hoàn thành
                 </label>
-                <Input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
+                <Input
+                  type="date"
+                  min={today}
+                  value={deadline}
+                  onChange={(e) => setDeadline(e.target.value)}
+                />
               </div>
 
               <div className="pt-4 border-t flex justify-end gap-2">

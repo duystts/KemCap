@@ -155,6 +155,21 @@ class CatalogFlowIT extends ApiTestSupport {
             "{\"email\":\"" + uniqueEmail() + "\",\"fullName\":\"HV\",\"role\":\"STUDENT\"}")
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.errors[0].field").value("dateOfBirth"));
+    call(
+            post("/api/v1/users"),
+            admin,
+            "{\"email\":\""
+                + uniqueEmail()
+                + "\",\"fullName\":\"GV\",\"role\":\"TEACHER\",\"phone\":\"abc-invalid-phone\"}")
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.errors[0].field").value("phone"));
+    call(
+            post("/api/v1/users"),
+            admin,
+            "{\"email\":\""
+                + uniqueEmail()
+                + "\",\"fullName\":\"GV\",\"role\":\"TEACHER\",\"phone\":\"+84912345678\"}")
+        .andExpect(status().isCreated());
     TestUser teacher = user(Role.TEACHER);
     call(get("/api/v1/users"), teacher).andExpect(status().isForbidden());
   }

@@ -16,6 +16,7 @@ import GuardianConsentDialog from './GuardianConsentDialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
+import { useDebouncedValue } from '@/lib/useDebouncedValue'
 
 const ROLE_LABELS: Record<Role, { label: string; color: string }> = {
   ADMIN: { label: 'Giáo vụ / Admin', color: 'bg-purple-100 text-purple-800' },
@@ -28,6 +29,7 @@ export default function UsersPage() {
   const showError = useApiErrorToast()
 
   const [search, setSearch] = useState('')
+  const debouncedSearch = useDebouncedValue(search.trim())
   const [selectedRole, setSelectedRole] = useState<Role | ''>('')
   const [selectedStatus, setSelectedStatus] = useState<UserStatus | ''>('')
 
@@ -35,12 +37,12 @@ export default function UsersPage() {
   const [consentStudent, setConsentStudent] = useState<{ id: string; name: string } | null>(null)
 
   const { data: users = [], isLoading } = useQuery({
-    queryKey: ['users', selectedRole, selectedStatus, search],
+    queryKey: ['users', selectedRole, selectedStatus, debouncedSearch],
     queryFn: () =>
       fetchUsers({
         role: selectedRole || undefined,
         status: selectedStatus || undefined,
-        q: search || undefined,
+        q: debouncedSearch || undefined,
       }),
   })
 
