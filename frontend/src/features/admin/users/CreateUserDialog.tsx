@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { createUser, type CreateUserData } from '@/lib/api/users'
 import type { Role } from '@/lib/api/types'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { FieldError, Input } from '@/components/ui/input'
 import { useApiErrorToast } from '@/components/useApiErrorToast'
+import { ApiError } from '@/lib/api/client'
 
 // Khớp với @Pattern của CreateUserRequest ở backend
 const PHONE_PATTERN = /^(0|\+84)\d{9,10}$/
@@ -24,6 +25,8 @@ export default function CreateUserDialog({ open, onClose }: CreateUserDialogProp
   const [role, setRole] = useState<Role>('STUDENT')
   const [phone, setPhone] = useState('')
   const [dateOfBirth, setDateOfBirth] = useState('')
+  const [emailError, setEmailError] = useState('')
+  const emailWrapRef = useRef<HTMLDivElement>(null)
 
   // Tính tuổi
   let isUnder16 = false
@@ -46,7 +49,15 @@ export default function CreateUserDialog({ open, onClose }: CreateUserDialogProp
       onClose()
       resetForm()
     },
-    onError: (err) => showError(err),
+    onError: (err) => {
+      // Email trùng: báo ngay tại ô email và đưa con trỏ về đó thay vì chỉ hiện toast
+      if (err instanceof ApiError && err.code === 'EMAIL_TAKEN') {
+        setEmailError('Email này đã được sử dụng trong hệ thống.')
+        emailWrapRef.current?.querySelector('input')?.focus()
+        return
+      }
+      showError(err)
+    },
   })
 
   const resetForm = () => {
@@ -55,6 +66,7 @@ export default function CreateUserDialog({ open, onClose }: CreateUserDialogProp
     setRole('STUDENT')
     setPhone('')
     setDateOfBirth('')
+    setEmailError('')
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -131,7 +143,7 @@ export default function CreateUserDialog({ open, onClose }: CreateUserDialogProp
             />
           </div>
 
-          <div>
+          <div ref={emailWrapRef}>
             <label className="block text-xs font-semibold text-slate-700 mb-1">
               Email đăng nhập <span className="text-red-500">*</span>
             </label>
@@ -139,9 +151,14 @@ export default function CreateUserDialog({ open, onClose }: CreateUserDialogProp
               type="email"
               placeholder="an.nguyen@example.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value)
+                setEmailError('')
+              }}
+              aria-invalid={!!emailError}
               required
             />
+            <FieldError message={emailError} />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

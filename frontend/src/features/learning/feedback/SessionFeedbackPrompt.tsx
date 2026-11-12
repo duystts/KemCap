@@ -11,7 +11,10 @@ import { canRate } from './canRate'
 
 const MAX_COMMENT = 2000
 
-/** Form chấm sao một buổi, không bắt buộc. Tự ẩn khi đã gửi hoặc quá hạn. */
+/**
+ * Form chấm sao một buổi, không bắt buộc. Đã gửi thì hiện lại đánh giá của chính học viên (chỉ đọc);
+ * quá hạn mà chưa gửi thì ẩn.
+ */
 export default function SessionFeedbackPrompt({ session }: { session: SessionItem }) {
   const queryClient = useQueryClient()
   const showError = useApiErrorToast()
@@ -24,7 +27,7 @@ export default function SessionFeedbackPrompt({ session }: { session: SessionIte
   const { data: mine, isLoading } = useQuery({
     queryKey: ['session-feedback', 'mine'],
     queryFn: fetchMyFeedback,
-    enabled: canRate(session, now),
+    enabled: session.status === 'COMPLETED',
   })
 
   const submitMutation = useMutation({
@@ -42,8 +45,28 @@ export default function SessionFeedbackPrompt({ session }: { session: SessionIte
     },
   })
 
-  if (isLoading || closed || !canRate(session, now)) return null
-  if (mine?.some((f) => f.sessionId === session.id)) return null
+  if (isLoading) return null
+
+  const given = mine?.find((f) => f.sessionId === session.id)
+  if (given) {
+    return (
+      <div className="bg-white rounded-xl border p-5 space-y-1">
+        <h2 className="text-base text-slate-900">Đánh giá của bạn</h2>
+        <span aria-label={`${given.stars} sao`} className="text-indigo-600">
+          {'★'.repeat(given.stars)}
+          <span className="text-slate-300">{'★'.repeat(5 - given.stars)}</span>
+        </span>
+        {given.comment && (
+          <p className="text-sm text-slate-700 whitespace-pre-wrap">{given.comment}</p>
+        )}
+        <p className="text-xs text-slate-500">
+          Gửi <DateTimeText value={given.createdAt} />. Chỉ bạn và giáo vụ xem được.
+        </p>
+      </div>
+    )
+  }
+
+  if (closed || !canRate(session, now)) return null
 
   return (
     <div className="bg-white rounded-xl border p-5 space-y-3">
