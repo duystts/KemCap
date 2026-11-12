@@ -6,7 +6,14 @@ import { Toaster } from 'sonner'
 import { AuthProvider } from '@/app/AuthProvider'
 import { queryClient } from '@/app/queryClient'
 import { router } from '@/app/router'
+import { initTheme, useResolvedTheme } from '@/app/theme'
 import './index.css'
+
+initTheme()
+
+function ThemedToaster() {
+  return <Toaster richColors position="top-right" theme={useResolvedTheme()} />
+}
 
 async function enableMocks() {
   if (import.meta.env.VITE_USE_MOCKS !== 'true') return
@@ -20,7 +27,7 @@ void enableMocks().then(() => {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <RouterProvider router={router} />
-          <Toaster richColors position="top-right" />
+          <ThemedToaster />
         </AuthProvider>
       </QueryClientProvider>
     </StrictMode>,

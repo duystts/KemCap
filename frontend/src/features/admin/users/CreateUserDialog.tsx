@@ -99,7 +99,7 @@ export default function CreateUserDialog({ open, onClose }: CreateUserDialogProp
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="p-5 border-b flex items-center justify-between">
           <div className="flex items-center gap-2">

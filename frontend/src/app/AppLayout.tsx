@@ -4,6 +4,7 @@ import { NotificationBell } from '@/features/notifications/NotificationBell'
 import type { Role } from '@/lib/api/types'
 import { cn } from '@/lib/utils'
 import { useAuth } from './AuthProvider'
+import { ThemeSelect } from './ThemeSelect'
 
 interface NavItem {
   to: string
@@ -75,9 +76,16 @@ export function AppLayout() {
       </aside>
       <div className="flex flex-1 flex-col">
         <header className="flex items-center justify-end gap-3 border-b border-border px-4 py-3 print:hidden">
+          <ThemeSelect />
           <NotificationBell />
-          <span className="text-sm font-medium">{me.fullName}</span>
-          <Button variant="ghost" size="sm" onClick={() => void logout()} aria-label="Đăng xuất">
+          <span className="min-w-0 truncate text-sm font-medium">{me.fullName}</span>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="shrink-0"
+            onClick={() => void logout()}
+            aria-label="Đăng xuất"
+          >
             Đăng xuất
           </Button>
         </header>

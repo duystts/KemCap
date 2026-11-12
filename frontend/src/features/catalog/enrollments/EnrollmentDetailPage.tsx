@@ -428,7 +428,7 @@ export default function EnrollmentDetailPage() {
 
       {/* 2. Đổi giáo viên */}
       {changeTeacherDialogOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between pb-2 border-b">
               <h3 className="text-base font-bold text-slate-800">Đổi giáo viên phụ trách</h3>
@@ -515,7 +515,7 @@ export default function EnrollmentDetailPage() {
 
       {/* 3. Gia hạn gói */}
       {extendDialogOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between pb-2 border-b">
               <h3 className="text-base font-bold text-slate-800">Gia hạn thời hạn gói</h3>
@@ -564,7 +564,7 @@ export default function EnrollmentDetailPage() {
 
       {/* 4. Hủy gói */}
       {cancelDialogOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between pb-2 border-b">
               <h3 className="text-base font-bold text-slate-800 text-red-600">Hủy gói học</h3>

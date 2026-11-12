@@ -184,7 +184,7 @@ export default function CoursesPage() {
 
       {/* Dialog tạo / sửa khóa học */}
       {dialogOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="p-5 border-b flex items-center justify-between">
               <h2 className="text-lg font-bold text-slate-800">

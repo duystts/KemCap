@@ -47,7 +47,7 @@ export default function AdjustmentDialog({
   const canSubmit = amount !== '' && !amountError && note.trim() !== '' && !mutation.isPending
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
       <div
         role="dialog"
         aria-modal="true"

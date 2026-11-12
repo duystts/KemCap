@@ -69,33 +69,46 @@ function SkillPanel({
       <div className="h-40 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={points} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
-            <CartesianGrid vertical={false} stroke="#e3e0d5" />
+            <CartesianGrid vertical={false} stroke="var(--color-slate-200)" />
             {/* Nhiều buổi có thể cùng ngày nên trục theo buổi, nhãn là ngày */}
             <XAxis
               dataKey="sessionId"
               tickFormatter={(id: string) => shortDate(dateOf.get(id) ?? '')}
-              tick={{ fill: '#6f6d64', fontSize: 11 }}
+              tick={{ fill: 'var(--color-slate-500)', fontSize: 11 }}
               tickLine={false}
-              axisLine={{ stroke: '#d1cec2' }}
+              axisLine={{ stroke: 'var(--color-slate-300)' }}
               minTickGap={16}
             />
             <YAxis
               domain={[1, 5]}
               ticks={[1, 2, 3, 4, 5]}
               width={20}
-              tick={{ fill: '#6f6d64', fontSize: 11 }}
+              tick={{ fill: 'var(--color-slate-500)', fontSize: 11 }}
               tickLine={false}
               axisLine={false}
             />
-            <Tooltip content={<ChartTooltip skillLabel={label} />} cursor={{ stroke: '#a3a198' }} />
+            <Tooltip
+              content={<ChartTooltip skillLabel={label} />}
+              cursor={{ stroke: 'var(--color-slate-400)' }}
+            />
             <Line
               type="linear"
               dataKey={skill}
               name={label}
-              stroke="#b4532f"
+              stroke="var(--color-primary)"
               strokeWidth={2}
-              dot={{ r: 4, strokeWidth: 2, stroke: '#ffffff', fill: '#b4532f' }}
-              activeDot={{ r: 5, strokeWidth: 2, stroke: '#ffffff', fill: '#b4532f' }}
+              dot={{
+                r: 4,
+                strokeWidth: 2,
+                stroke: 'var(--color-white)',
+                fill: 'var(--color-primary)',
+              }}
+              activeDot={{
+                r: 5,
+                strokeWidth: 2,
+                stroke: 'var(--color-white)',
+                fill: 'var(--color-primary)',
+              }}
               connectNulls
               isAnimationActive={false}
             />
